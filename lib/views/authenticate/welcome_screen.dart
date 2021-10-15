@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:luanvanflutter/style/constants.dart';
-import 'package:luanvanflutter/views/authenticate/register.dart';
+import 'package:luanvanflutter/style/floating_image.dart';
+import 'package:luanvanflutter/views/authenticate/register_screen.dart';
 import 'package:luanvanflutter/views/authenticate/signup_screen.dart';
 import 'package:luanvanflutter/views/components/rounded_button.dart';
 
@@ -34,9 +35,11 @@ class Body extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: size.height * 0.05),
-            SvgPicture.asset(
-              "assets/icons/chat.svg",
-              height: size.height * 0.45,
+            FloatingImage(
+              image: SvgPicture.asset(
+                "assets/icons/chat.svg",
+                height: size.height * 0.45,
+              ),
             ),
             SizedBox(height: size.height * 0.05),
             RoundedButton(
@@ -76,6 +79,7 @@ class Body extends StatelessWidget {
 
 class Background extends StatelessWidget {
   final Widget child;
+
   const Background({
     required Key key,
     required this.child,

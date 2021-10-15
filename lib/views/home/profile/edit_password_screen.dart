@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:luanvanflutter/controller/auth_controller.dart';
 import 'package:luanvanflutter/controller/controller.dart';
-import 'package:luanvanflutter/style/decoration.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/loading.dart';
-import 'package:luanvanflutter/views/components/rounded_input_field.dart';
 import 'package:luanvanflutter/views/components/rounded_password_field.dart';
 import 'package:provider/provider.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:luanvanflutter/views/home/home.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';
 
-class EditAccount extends StatefulWidget {
+class EditPassword extends StatefulWidget {
+  const EditPassword({Key? key}) : super(key: key);
+
   @override
-  _EditAccountState createState() => _EditAccountState();
+  _EditPasswordState createState() => _EditPasswordState();
 }
 
-class _EditAccountState extends State<EditAccount> {
+class _EditPasswordState extends State<EditPassword> {
   final _formKey = GlobalKey<FormState>();
   String email = '';
   String oldPassword = '';
@@ -25,11 +25,12 @@ class _EditAccountState extends State<EditAccount> {
   String confirmPassword = '';
   bool loading = false;
 
-  bool checkCurrentPasswordValid = true;
+  bool checkCurrentPasswordValid = false;
+
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<CurrentUser>(context);
+    final user = context.watch<CurrentUser?>();
     return loading
         ? Loading()
         : GestureDetector(
@@ -50,9 +51,8 @@ class _EditAccountState extends State<EditAccount> {
                         TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
               ),
               body: StreamBuilder<UserData>(
-                  stream: DatabaseServices(uid: user.uid).userData,
+                  stream: DatabaseServices(uid: user!.uid).userData,
                   builder: (context, snapshot) {
-                    UserData userData = snapshot.data!;
                     return GestureDetector(
                       onTap: () => FocusScope.of(context).unfocus(),
                       child: Scaffold(
@@ -72,17 +72,13 @@ class _EditAccountState extends State<EditAccount> {
                                       children: <Widget>[
                                         Row(
                                           children: <Widget>[
-                                            const Icon(
-                                              Icons.lock,
-                                              color: Colors.deepPurpleAccent,
-                                            ),
                                             const SizedBox(width: 3),
                                             Expanded(
                                               child: RoundedPasswordField(
                                                 validator: (val) {
                                                   return checkCurrentPasswordValid
                                                       ? null
-                                                      : 'Sai mật khẩu!';
+                                                      : 'Mật khẩu hiện tại không đúng!';
                                                 },
                                                 onChanged: (val) {
                                                   setState(
@@ -95,7 +91,7 @@ class _EditAccountState extends State<EditAccount> {
                                         ),
                                         Row(
                                           children: <Widget>[
-                                            SizedBox(width: 3),
+                                            const SizedBox(width: 3),
                                             Expanded(
                                               child: RoundedPasswordField(
                                                 validator: (val) {
@@ -115,10 +111,6 @@ class _EditAccountState extends State<EditAccount> {
                                         ),
                                         Row(
                                           children: <Widget>[
-                                            const Icon(
-                                              Icons.lock,
-                                              color: Colors.deepPurpleAccent,
-                                            ),
                                             Expanded(
                                               child: RoundedPasswordField(
                                                 validator: (val) {
@@ -143,23 +135,45 @@ class _EditAccountState extends State<EditAccount> {
                                                 await context
                                                     .read<AuthService>()
                                                     .validatePassword(
-                                                        oldPassword);
+                                                        oldPassword) == 'OK' ? true : false;
 
                                             if (_formKey.currentState!
                                                 .validate()) {
                                               setState(() {
                                                 loading = false;
                                               });
-                                              context
-                                                  .read<AuthService>()
-                                                  .updatePassword(newPassword);
 
-                                              Navigator.of(context)
-                                                  .pushAndRemoveUntil(
-                                                      FadeRoute(
-                                                          page: Wrapper()),
-                                                      ModalRoute.withName(
-                                                          'Wrapper'));
+                                              if(checkCurrentPasswordValid){
+                                                context
+                                                    .read<AuthService>()
+                                                    .updatePassword(newPassword)
+                                                    .then((value) {
+                                                      if(value == 'OK'){
+                                                        Fluttertoast.showToast(
+                                                            msg: "Đổi mật khẩu thành công",
+                                                            toastLength: Toast.LENGTH_SHORT,
+                                                            gravity: ToastGravity.CENTER,
+                                                            timeInSecForIosWeb: 1
+                                                        );
+                                                        Navigator.of(context)
+                                                            .pushAndRemoveUntil(
+                                                            FadeRoute(
+                                                                page: Wrapper()),
+                                                            ModalRoute.withName(
+                                                                'Wrapper'));
+                                                      }
+                                                      else {
+                                                        final SnackBar snackBar = SnackBar(content: Text(value));
+                                                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                                      }
+                                                })
+                                                ;
+
+
+                                              }
+
+
+
                                             }
                                           },
                                           child: Container(
@@ -172,9 +186,12 @@ class _EditAccountState extends State<EditAccount> {
                                             decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(25),
-                                                color: Color(0xFF373737)),
-                                            child: Text('Xác nhận mật khẩu mới',
-                                                style: simpleTextStyle()),
+                                                color: kPrimaryColor),
+                                            child: const Text('Xác nhận mật khẩu mới',
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w400
+                                                )),
                                           ),
                                         ),
                                       ],

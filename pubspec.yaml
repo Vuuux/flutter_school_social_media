@@ -78,6 +78,9 @@ dependencies:
   fluttertoast: ^8.0.8
   google_fonts: ^2.1.0
   day_night_switch: ^0.0.2+1
+  geolocator: ^7.7.0
+  geocoding: ^2.0.1
+  google_sign_in: ^5.1.1
 
 dev_dependencies:
   flutter_test:

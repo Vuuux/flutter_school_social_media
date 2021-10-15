@@ -92,25 +92,31 @@ class AuthService {
   }
 
   //xác thực mật khẩu
-  Future validatePassword(String password) async {
-    var baseUser = await _auth.currentUser;
-    try {
-      var authCredential = EmailAuthProvider.credential(
-          email: baseUser!.uid, password: password);
-      // var authCredential = await _auth.signInWithEmailAndPassword(email: baseUser.email, password: password);
-      print(authCredential.toString() + "logged in");
-      return authCredential != null;
-    } catch (e) {
-      print(e);
-      return false;
+  Future<String> validatePassword(String password) async {
+
+    var baseUser = _auth.currentUser;
+    try{
+      await baseUser!.reauthenticateWithCredential(EmailAuthProvider.credential(
+          email: baseUser.email!, password: password));
+      return 'OK';
     }
+    on FirebaseAuthException catch (er){
+      print("ERROR CODE:" + er.code);
+      return er.code;
+    }
+      // var authCredential = await _auth.signInWithEmailAndPassword(email: baseUser.email, password: password);
   }
 
-  Future updatePassword(String newPassword) async {
-    var firebaseUser = await _auth.currentUser;
-    if (validatePassword(newPassword) != null) {
-      firebaseUser!.updatePassword(newPassword);
-    }
+  Future<String> updatePassword(String newPassword) async {
+    var firebaseUser = _auth.currentUser;
+      try{
+        firebaseUser!.updatePassword(newPassword);
+        return 'OK';
+      }
+      catch (e){
+        return e.toString();
+      }
+
   }
 
   Future updateProfilePicture(String avatar) async {

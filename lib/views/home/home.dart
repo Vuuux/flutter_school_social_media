@@ -3,10 +3,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
-import 'package:luanvanflutter/views/home/profile.dart';
+import 'package:luanvanflutter/style/constants.dart';
+import 'package:luanvanflutter/views/home/profile/profile.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
+import 'feed/feed.dart';
 import 'notifications_page.dart';
 
 //Trang chủ sau đăng nhập
@@ -24,7 +26,7 @@ class _HomeState extends State<Home> {
 
   //Các tab ở chế độ thường
   final tabs = [
-    //Feed(),
+    const Feed(),
     //ChatScreen(),
     //NotificationPage(),
     const MyProfile(),
@@ -264,7 +266,7 @@ class _HomeState extends State<Home> {
           backgroundColor: Colors.transparent,
           child: ClipOval(
             child: Image.asset('assets/images/ghosty2.png',
-                fit: BoxFit.fill, color: Colors.deepPurpleAccent),
+                fit: BoxFit.fill, color: kPrimaryColor),
           ),
           onPressed: () {
             DatabaseServices(uid: user.uid).updateAnon(true);
@@ -299,7 +301,7 @@ class _HomeState extends State<Home> {
                       child: Icon(
                         Icons.menu,
                         color: _currentIndex == 0
-                            ? Colors.deepPurpleAccent
+                            ? kPrimaryColor
                             : Colors.white,
                       ),
                     ),
@@ -315,7 +317,7 @@ class _HomeState extends State<Home> {
                       child: Icon(
                         Icons.chat,
                         color: _currentIndex == 0
-                            ? Colors.deepPurpleAccent
+                            ? kPrimaryColor
                             : Colors.white,
                       ),
                     )
@@ -337,7 +339,7 @@ class _HomeState extends State<Home> {
                       child: Icon(
                         Icons.new_releases,
                         color: _currentIndex == 0
-                            ? Colors.deepPurpleAccent
+                            ? kPrimaryColor
                             : Colors.white,
                       ),
                     ),
@@ -347,13 +349,13 @@ class _HomeState extends State<Home> {
                       // minWidth: 40,
                       onPressed: () {
                         setState(() {
-                          _currentIndex = 0;
+                          _currentIndex = 1;
                         });
                       },
                       child: Icon(
                         Icons.portrait,
-                        color: _currentIndex == 0
-                            ? Colors.deepPurpleAccent
+                        color: _currentIndex == 1
+                            ? kPrimaryColor
                             : Colors.white,
                       ),
                     )

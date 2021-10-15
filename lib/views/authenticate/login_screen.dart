@@ -4,14 +4,18 @@ import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:luanvanflutter/controller/auth_controller.dart';
 import 'package:luanvanflutter/controller/controller.dart';
+import 'package:luanvanflutter/style/floating_image.dart';
 import 'package:luanvanflutter/style/loading.dart';
-import 'package:luanvanflutter/views/authenticate/register.dart';
+import 'package:luanvanflutter/views/authenticate/forgot_password_screen.dart';
+import 'package:luanvanflutter/views/authenticate/register_screen.dart';
 import 'package:luanvanflutter/views/authenticate/signup_screen.dart';
 import 'package:luanvanflutter/views/components/already_have_an_account_acheck.dart';
+import 'package:luanvanflutter/views/components/forgot_password_check.dart';
 import 'package:luanvanflutter/views/components/rounded_button.dart';
 import 'package:luanvanflutter/views/components/rounded_input_field.dart';
 import 'package:luanvanflutter/views/components/rounded_password_field.dart';
 import 'package:luanvanflutter/views/home/home.dart';
+import 'package:luanvanflutter/views/wrapper/wrapper.dart';
 import 'package:provider/src/provider.dart';
 
 import 'helper.dart';
@@ -25,7 +29,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   bool loading = false;
   late QuerySnapshot snapshotUserinfo;
 
@@ -60,32 +63,36 @@ class _LoginScreenState extends State<LoginScreen> {
 
       context.read<AuthService>().signIn(email, password).then((value) {
         String err = "";
-        if(value == "OK"){
+        if (value == "OK") {
           Helper.saveUserLoggedInSharedPreference(true);
           Fluttertoast.showToast(
               msg: "Đăng nhập thành công",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1
-          );
+              timeInSecForIosWeb: 1);
           setState(() {
+            error = err;
             loading = false;
           });
-        }
-        else {
-          switch(value){
-            case "invalid-email":{
-              err = "Sai tài khoản hoặc mật khẩu!";
-              break;
-            }
-            case "wrong-password":{
-              err = "Sai tài khoản hoặc mật khẩu!";
-              break;
-            }
-            case "user-not-found": {
-              err = "Người dùng này không tồn tại";
-              break;
-            }
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => Wrapper()));
+        } else {
+          switch (value) {
+            case "invalid-email":
+              {
+                err = "Sai tài khoản hoặc mật khẩu!";
+                break;
+              }
+            case "wrong-password":
+              {
+                err = "Sai tài khoản hoặc mật khẩu!";
+                break;
+              }
+            case "user-not-found":
+              {
+                err = "Người dùng này không tồn tại";
+                break;
+              }
           }
           setState(() {
             error = err;
@@ -97,116 +104,130 @@ class _LoginScreenState extends State<LoginScreen> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
-
     Size size = MediaQuery.of(context).size;
     double h = MediaQuery.of(context).size.height;
     double w = MediaQuery.of(context).size.width;
 
-
-
     return Container(
-      child: loading
-          ? Loading()
-          : GestureDetector(
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: Scaffold(
-                body: SizedBox(
-                  width: double.infinity,
-                  height: size.height,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: <Widget>[
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        child: Image.asset(
-                          "assets/images/main_top.png",
-                          width: size.width * 0.35,
-                        ),
+      child: Stack(
+        children: [
+          GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: Scaffold(
+              body: SizedBox(
+                width: double.infinity,
+                height: size.height,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      child: Image.asset(
+                        "assets/images/main_top.png",
+                        width: size.width * 0.35,
                       ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Image.asset(
-                          "assets/images/login_bottom.png",
-                          width: size.width * 0.4,
-                        ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Image.asset(
+                        "assets/images/login_bottom.png",
+                        width: size.width * 0.4,
                       ),
-                      SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            const Text(
-                              "ĐĂNG NHẬP",
-                              style: TextStyle(fontWeight: FontWeight.bold,
-                              fontSize: 30
-                              ),
-                            ),
-                            SizedBox(height: size.height * 0.03),
-                            Form(
-                                key: _formKey,
-                                child: Column(
-                                  children: <Widget>[
-                                    SvgPicture.asset(
-                                      "assets/icons/login.svg",
-                                      height: size.height * 0.35,
-                                    ),
-                                    SizedBox(height: size.height * 0.03),
-                                    RoundedInputField(
-                                      initialValue: email,
-                                      hintText: "Email của bạn",
-                                      icon: Icons.person,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          email = value;
-                                        });
-                                      },
-                                      validator: (val) =>
-                                          val.isEmpty ? 'Nhập email' : null,
-                                    ),
-                                    RoundedPasswordField(
-                                      validator: (val) => val.length < 6
-                                          ? 'Điền mật khẩu dưới 6 ký tự'
-                                          : null,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          password = value;
-                                        });
-                                      }, hintText: 'Mật khẩu',
-                                    ),
-                                  ],
-                                )),
-                            RoundedButton(
-                              text: "ĐĂNG NHẬP",
-                              press: () async {
-                                signIn(context);
-                              },
-
-                            ),
-                            SizedBox(height: size.height * 0.03),
-                            AlreadyHaveAnAccountCheck(
-                              press: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return const Register();
+                    ),
+                    SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          const Text(
+                            "ĐĂNG NHẬP",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 30),
+                          ),
+                          SizedBox(height: size.height * 0.03),
+                          Form(
+                              key: _formKey,
+                              child: Column(
+                                children: <Widget>[
+                                  FloatingImage(
+                                      image: SvgPicture.asset(
+                                    "assets/icons/login.svg",
+                                    height: size.height * 0.35,
+                                  )),
+                                  SizedBox(height: size.height * 0.03),
+                                  RoundedInputField(
+                                    initialValue: email,
+                                    hintText: "Email của bạn",
+                                    icon: Icons.person,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        email = value;
+                                      });
                                     },
+                                    validator: (val) =>
+                                        val.isEmpty ? 'Nhập email' : null,
                                   ),
-                                );
-                              },
-                              key: UniqueKey(),
-                            ),
-                          ],
-                        ),
+                                  RoundedPasswordField(
+                                    validator: (val) => val.length < 6
+                                        ? 'Điền mật khẩu dưới 6 ký tự'
+                                        : null,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        password = value;
+                                      });
+                                    },
+                                    hintText: 'Mật khẩu',
+                                  ),
+                                  ForgotPasswordCheck(
+                                    key: UniqueKey(),
+                                    press: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) {
+                                            return const ForgotPassword();
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  )
+                                ],
+                              )),
+                          RoundedButton(
+                            text: "ĐĂNG NHẬP",
+                            press: () async {
+                              signIn(context);
+                            },
+                          ),
+                          SizedBox(height: size.height * 0.03),
+                          AlreadyHaveAnAccountCheck(
+                            press: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return const Register();
+                                  },
+                                ),
+                              );
+                            },
+                            key: UniqueKey(),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
+          ),
+          loading ? Loading() : const Center()
+        ],
+      ),
     );
   }
 }

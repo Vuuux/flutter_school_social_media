@@ -6,14 +6,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:luanvanflutter/views/components/circle_avatar.dart';
 import 'package:provider/provider.dart';
-import '../../style/constants.dart';
-import '../../models/user.dart';
+import '../../../style/constants.dart';
+import '../../../models/user.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 
-import 'edit_account_screen.dart';
+import 'edit_password_screen.dart';
 import 'edit_profile_screen.dart';
 
 //Class quản lý thông tin user
@@ -112,14 +112,11 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   editUserPassword() {
-    Navigator.of(context).pushAndRemoveUntil(
-        FadeRoute(page: EditAccount()), ModalRoute.withName('EditAccount'));
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const EditPassword()));
   }
 
   editUserProfile() {
-    Navigator.of(context).pushAndRemoveUntil(
-        FadeRoute(page: EditProfileScreen()),
-        ModalRoute.withName('EditProfileScreen'));
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const EditProfileScreen()));
   }
 
 
