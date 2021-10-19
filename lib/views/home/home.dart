@@ -5,9 +5,11 @@ import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/views/home/profile/profile.dart';
+import 'package:luanvanflutter/views/home/search/example_search_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
+import 'chat/chat_screen.dart';
 import 'feed/feed.dart';
 import 'notifications_page.dart';
 
@@ -23,22 +25,9 @@ class _HomeState extends State<Home> {
   static bool anonymous = false;
   int _currentIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
+  late CurrentUser? user;
   //Các tab ở chế độ thường
-  final tabs = [
-    const Feed(),
-    //ChatScreen(),
-    //NotificationPage(),
-    const MyProfile(),
-  ];
 
-  //Các tab ở chế độ ẩn danh
-  final anonymousTabs = [
-    //Forum(),
-    //AnonymousChatScreen(),
-    //NotificationPage(),
-    //Myanonprofile(),
-  ];
 
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
@@ -139,8 +128,23 @@ class _HomeState extends State<Home> {
   //_currentIndex đại diện cho tab ở chế độ thường, _anonymousCurrentIndex cho tab ở chế độ ẩn danh
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<CurrentUser?>(context);
+    user = Provider.of<CurrentUser?>(context);
     _saveDeviceToken(user!.uid);
+    final tabs = [
+      const Feed(),
+      const ChatScreen(),
+      const NotificationPage(),
+      MyProfile(user: user!,),
+      const SimpleSearch(),
+    ];
+
+    //Các tab ở chế độ ẩn danh
+    final anonymousTabs = [
+      //Forum(),
+      //AnonymousChatScreen(),
+      //NotificationPage(),
+      //Myanonprofile(),
+    ];
     //ScreenUtil.setScreenOrientation('portrait');
     //this StreamProvider provides the list of user for WiggleList();
     return
@@ -153,7 +157,7 @@ class _HomeState extends State<Home> {
           splashColor: Colors.transparent,
           child: const Icon(Icons.portrait),
           onPressed: () {
-            DatabaseServices(uid: user.uid).updateAnon(false);
+            DatabaseServices(uid: user!.uid).updateAnon(false);
             setState(() {
               anonymous = false;
             });
@@ -217,7 +221,7 @@ class _HomeState extends State<Home> {
                       minWidth: 40,
                       onPressed: () {
                         setState(() {
-                          _currentIndex = 0;
+                          _currentIndex = 1;
                         });
                       },
                       child: Icon(
@@ -233,7 +237,7 @@ class _HomeState extends State<Home> {
                       // minWidth: 40,
                       onPressed: () {
                         setState(() {
-                          _currentIndex = 0;
+                          _currentIndex = 2;
                         });
                       },
                       child: CircleAvatar(
@@ -269,7 +273,7 @@ class _HomeState extends State<Home> {
                 fit: BoxFit.fill, color: kPrimaryColor),
           ),
           onPressed: () {
-            DatabaseServices(uid: user.uid).updateAnon(true);
+            DatabaseServices(uid: user!.uid).updateAnon(true);
             setState(() {
               anonymous = true;
             });
@@ -292,7 +296,7 @@ class _HomeState extends State<Home> {
                     MaterialButton(
                       highlightColor: Colors.transparent,
                       splashColor: Colors.transparent,
-                      // minWidth: 40,
+                      minWidth: 20,
                       onPressed: () {
                         setState(() {
                           _currentIndex = 0;
@@ -308,15 +312,15 @@ class _HomeState extends State<Home> {
                     MaterialButton(
                       highlightColor: Colors.transparent,
                       splashColor: Colors.transparent,
-                      minWidth: 40,
+                      minWidth: 20,
                       onPressed: () {
                         setState(() {
-                          _currentIndex = 0;
+                          _currentIndex = 1;
                         });
                       },
                       child: Icon(
                         Icons.chat,
-                        color: _currentIndex == 0
+                        color: _currentIndex == 1
                             ? kPrimaryColor
                             : Colors.white,
                       ),
@@ -330,15 +334,15 @@ class _HomeState extends State<Home> {
                     MaterialButton(
                       highlightColor: Colors.transparent,
                       splashColor: Colors.transparent,
-                      minWidth: 40,
+                      minWidth: 20,
                       onPressed: () {
                         setState(() {
-                          _currentIndex = 0;
+                          _currentIndex = 2;
                         });
                       },
                       child: Icon(
                         Icons.new_releases,
-                        color: _currentIndex == 0
+                        color: _currentIndex == 2
                             ? kPrimaryColor
                             : Colors.white,
                       ),
@@ -346,19 +350,35 @@ class _HomeState extends State<Home> {
                     MaterialButton(
                       highlightColor: Colors.transparent,
                       splashColor: Colors.transparent,
-                      // minWidth: 40,
+                      minWidth: 20,
                       onPressed: () {
                         setState(() {
-                          _currentIndex = 1;
+                          _currentIndex = 3;
                         });
                       },
                       child: Icon(
                         Icons.portrait,
-                        color: _currentIndex == 1
+                        color: _currentIndex == 3
                             ? kPrimaryColor
                             : Colors.white,
                       ),
-                    )
+                    ),
+                    MaterialButton(
+                      highlightColor: Colors.transparent,
+                      splashColor: Colors.transparent,
+                      minWidth: 20,
+                      onPressed: () {
+                        setState(() {
+                          _currentIndex = 4;
+                        });
+                      },
+                      child: Icon(
+                        Icons.search,
+                        color: _currentIndex == 4
+                            ? kPrimaryColor
+                            : Colors.white,
+                      ),
+                    ),
                   ],
                 )
               ],

@@ -44,7 +44,7 @@ class _AddPicturesUtilsState extends State<AddPicturesUtils> {
               elevation: 0,
               titleSpacing: 50,
               leading: IconButton(
-                  icon: Icon(LineAwesomeIcons.home),
+                  icon: const Icon(LineAwesomeIcons.home),
                   onPressed: () {
                     Navigator.of(context).pushAndRemoveUntil(
                         FadeRoute(page: Wrapper()),
@@ -89,9 +89,12 @@ class _AddPicturesUtilsState extends State<AddPicturesUtils> {
                         firebaseStorageReference.putFile(_image!);
                     TaskSnapshot taskSnapshot = await uploadTask;
                     x = (await taskSnapshot.ref.getDownloadURL()).toString();
+                    Map<String, dynamic> map = {
+                      '0' : x
+                    };
 
                     dynamic result =
-                        DatabaseServices(uid: user.uid).uploadPhotos(x);
+                        DatabaseServices(uid: user.uid).uploadPhotos(map);
 
                     if (result != null) {
                       Navigator.of(context).pushAndRemoveUntil(

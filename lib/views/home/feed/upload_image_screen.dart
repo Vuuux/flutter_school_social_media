@@ -11,6 +11,7 @@ import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/decoration.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/src/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:image/image.dart' as ImD;
 
@@ -96,7 +97,7 @@ class _UploadImageState extends State<UploadImage>
     locationController.text = formattedAddress;
   }
 
-  controlUploadAndSave() async {
+  controlUploadAndSave(String uid) async {
     setState(() {
       uploading = true;
     });
@@ -104,11 +105,11 @@ class _UploadImageState extends State<UploadImage>
     await compressPhoto();
 
     String downloadUrl = await uploadPhoto(file);
-    DatabaseServices(uid: '').createPost(
+    DatabaseServices(uid: uid).createPost(
         postId,
         widget.userData.name,
         Timestamp.now(),
-        widget.userData.email,
+        uid,
         descriptionTextEditingController.text,
         locationController.text,
         {},
@@ -120,10 +121,11 @@ class _UploadImageState extends State<UploadImage>
       uploading = false;
       postId = Uuid().v4();
     });
+
     Navigator.pop(context);
   }
 
-  displayUploadFormScreen() {
+  displayUploadFormScreen(CurrentUser user) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -136,7 +138,7 @@ class _UploadImageState extends State<UploadImage>
           FlatButton(
             highlightColor: Colors.transparent,
             splashColor: Colors.transparent,
-            onPressed: () => controlUploadAndSave(),
+            onPressed: () => controlUploadAndSave(user.uid),
             child: const Text(
               "Chia sẻ",
               style: TextStyle(
@@ -245,10 +247,11 @@ class _UploadImageState extends State<UploadImage>
 
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<CurrentUser?>();
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        body: displayUploadFormScreen(),
+        body: displayUploadFormScreen(user!),
       ),
     );
   }
