@@ -1,6 +1,6 @@
 //Hmmie đại diện cho người bạn khác trừ bạn
 class Ctuer {
-  late String name;
+  late String username;
   late String email;
   late String community;
   late String bio;
@@ -21,7 +21,7 @@ class Ctuer {
 
   Ctuer(
       {this.id = "",
-      this.name = "",
+      this.username = "",
       this.nickname = "",
       this.email = "",
       this.community = "",
@@ -42,7 +42,7 @@ class Ctuer {
   factory Ctuer.fromJson(Map<String, dynamic> data) {
     return Ctuer(
       id: data['id'],
-      name: data['name'],
+      username: data['name'],
       nickname: data['nickname'],
       email: data['email'],
       community: data['community'],

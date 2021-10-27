@@ -71,14 +71,14 @@ class _AnswerScreenState extends State<AnswerScreen> {
 
       Map<String, dynamic> questionMap = {
         "message": widget.question,
-        "sendBy": widget.userData.name,
+        "sendBy": widget.userData.username,
         "time": Timestamp.now(),
         "email": widget.userData.email,
         "type": 'question'
       };
       Map<String, dynamic> messageMap = {
         "message": message,
-        "sendBy": widget.userData.name,
+        "sendBy": widget.userData.username,
         "time": Timestamp.now(),
         "email": widget.userData.email,
         "type": 'message'
@@ -100,7 +100,7 @@ class _AnswerScreenState extends State<AnswerScreen> {
         'type': 'question',
         'msgInfo': widget.question,
         'ownerID': widget.ctuer.email,
-        'ownerName': widget.ctuer.name,
+        'ownerName': widget.ctuer.username,
         'timestamp': DateTime.now(),
         'userDp': widget.userData.anonAvatar,
         'userID': widget.userData.nickname,
@@ -121,7 +121,7 @@ class _AnswerScreenState extends State<AnswerScreen> {
     DatabaseServices(uid: '').cloudRef.doc().set({
       'type': 'question',
       'ownerID': hmmie.email,
-      'ownerName': hmmie.name,
+      'ownerName': hmmie.username,
       'timestamp': DateTime.now(),
       'userDp': widget.userData.anonAvatar,
       'userID': widget.userData.nickname,

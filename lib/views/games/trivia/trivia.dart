@@ -219,9 +219,9 @@ class _TriviaState extends State<Trivia> {
   answerQuestion() {
     //TODO: ADD UID
     DatabaseServices(uid: '').createTriviaRoom(
-        getTriviaRoomID(widget.userData.name, widget.ctuer.name),
-        widget.userData.name,
-        widget.ctuer.name);
+        getTriviaRoomID(widget.userData.username, widget.ctuer.username),
+        widget.userData.username,
+        widget.ctuer.username);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(

@@ -64,9 +64,9 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  createChatRoomAndStartConversation(UserData userData, Ctuer hmmie) {
-    String chatRoomID = getChatRoomID(userData.email, hmmie.nickname);
-    List<String> users = [userData.email, hmmie.email];
+  createChatRoomAndStartConversation(UserData userData, Ctuer ctuer) {
+    String chatRoomID = getChatRoomID(userData.email, ctuer.nickname);
+    List<String> users = [userData.email, ctuer.email];
 
     Map<String, dynamic> chatRoomMap = {
       "users": users,
@@ -75,7 +75,7 @@ class _SearchScreenState extends State<SearchScreen> {
     DatabaseServices(uid: '').uploadBondData(
         userData: userData,
         myAnon: true,
-        hmmie: hmmie,
+        ctuer: ctuer,
         friendAnon: false,
         chatRoomID: chatRoomID);
     DatabaseServices(uid: '').createAnonChatRoom(chatRoomID, chatRoomMap);
@@ -85,7 +85,7 @@ class _SearchScreenState extends State<SearchScreen> {
     //     page: AnonymousConversation(
     //       friendAnon: false,
     //       ctuerList: widget.ctuerList,
-    //       ctuer: hmmie,
+    //       ctuer: ctuer,
     //       chatRoomId: chatRoomID,
     //       userData: userData,
     //     ),
@@ -94,15 +94,15 @@ class _SearchScreenState extends State<SearchScreen> {
     // );
   }
 
-  Widget searchTile({required String myEmail, required Ctuer hmmie, required UserData userData}) {
-    if (hmmie.email != userData.email) {
+  Widget searchTile({required String myEmail, required Ctuer ctuer, required UserData userData}) {
+    if (ctuer.email != userData.email) {
       return RaisedButton(
         onPressed: () {
           // Navigator.of(context).pushAndRemoveUntil(
           //   FadeRoute(
           //     page: OthersProfile(
           //       ctuerList: widget.ctuerList,
-          //       ctuer: hmmie,
+          //       ctuer: ctuer,
           //       userData: userData,
           //     ),
           //   ),
@@ -128,7 +128,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       width: 180,
                       height: 180,
                       child: Image.network(
-                        hmmie.avatar,
+                        ctuer.avatar,
                         fit: BoxFit.fill,
                       ) ??
                           Image.asset('assets/images/profile1.png',
@@ -138,7 +138,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  hmmie.name,
+                  ctuer.username,
                   style: TextStyle(color: Colors.black),
                 ),
               ],
@@ -146,7 +146,7 @@ class _SearchScreenState extends State<SearchScreen> {
             const Spacer(),
             GestureDetector(
               onTap: () {
-                createChatRoomAndStartConversation(userData, hmmie);
+                createChatRoomAndStartConversation(userData, ctuer);
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -184,13 +184,13 @@ class _SearchScreenState extends State<SearchScreen> {
                 itemBuilder: (context, index) {
                   name = searchSnapshot.docs[index].get('name');
                   for (int i = 0; i < ctuerList.length; i++) {
-                    if (ctuerList[i].name == name) {
+                    if (ctuerList[i].username == name) {
                       currentCtuer = ctuerList[i];
                     }
                   }
                   return searchTile(
                       myEmail: userData.email,
-                      hmmie: currentCtuer!,
+                      ctuer: currentCtuer!,
                       userData: userData);
                 })
                 : Container();

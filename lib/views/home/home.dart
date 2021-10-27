@@ -131,11 +131,11 @@ class _HomeState extends State<Home> {
     user = Provider.of<CurrentUser?>(context);
     _saveDeviceToken(user!.uid);
     final tabs = [
-      const Feed(),
-      const ChatScreen(),
-      const NotificationPage(),
-      MyProfile(user: user!,),
-      const SimpleSearch(),
+      Feed(),
+      ChatScreen(),
+      NotificationPage(),
+      MyProfile(),
+      SimpleSearch(),
     ];
 
     //Các tab ở chế độ ẩn danh
@@ -148,120 +148,120 @@ class _HomeState extends State<Home> {
     //ScreenUtil.setScreenOrientation('portrait');
     //this StreamProvider provides the list of user for WiggleList();
     return
-      anonymous
-          ? Scaffold(
-        key: _scaffoldKey,
-        body: anonymousTabs[_currentIndex],
-        //floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-        floatingActionButton: FloatingActionButton(
-          splashColor: Colors.transparent,
-          child: const Icon(Icons.portrait),
-          onPressed: () {
-            DatabaseServices(uid: user!.uid).updateAnon(false);
-            setState(() {
-              anonymous = false;
-            });
-          },
-        ),
-        floatingActionButtonLocation:
-        FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: BottomAppBar(
-          color: const Color(0xFF373737),
-          shape: const CircularNotchedRectangle(),
-          notchMargin: 10,
-          child: SizedBox(
-            height: 45,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    MaterialButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      // minWidth: 40,
-                      onPressed: () {
-                        setState(() {
-                          _currentIndex = 0;
-                        });
-                      },
-                      child: Icon(
-                        Icons.menu,
-                        color: _currentIndex == 0
-                            ? Colors.deepPurpleAccent
-                            : Colors.white,
-                      ),
-                    ),
-                    MaterialButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      minWidth: 40,
-                      onPressed: () {
-                        setState(() {
-                          _currentIndex = 0;
-                        });
-                      },
-                      child: Icon(
-                        Icons.chat,
-                        color: _currentIndex == 0
-                            ? Colors.deepPurpleAccent
-                            : Colors.white,
-                      ),
-                    )
-                  ],
-                ),
-                // Right Tab bar icons
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    MaterialButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      minWidth: 40,
-                      onPressed: () {
-                        setState(() {
-                          _currentIndex = 1;
-                        });
-                      },
-                      child: Icon(
-                        Icons.new_releases,
-                        color: _currentIndex == 0
-                            ? Colors.deepPurpleAccent
-                            : Colors.white,
-                      ),
-                    ),
-                    MaterialButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      // minWidth: 40,
-                      onPressed: () {
-                        setState(() {
-                          _currentIndex = 2;
-                        });
-                      },
-                      child: CircleAvatar(
-                        radius: 19,
-                        backgroundColor: Colors.transparent,
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/images/ghosty2.png',
-                            fit: BoxFit.fill,
-                            color: _currentIndex == 0
-                                ? Colors.deepPurpleAccent
-                                : Colors.white,
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                )
-              ],
-            ),
-          ),
-        ),
-      )
-          :
+      // anonymous
+      //     ? Scaffold(
+      //   key: _scaffoldKey,
+      //   body: anonymousTabs[_currentIndex],
+      //   //floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
+      //   floatingActionButton: FloatingActionButton(
+      //     splashColor: Colors.transparent,
+      //     child: const Icon(Icons.portrait),
+      //     onPressed: () {
+      //       DatabaseServices(uid: user!.uid).updateAnon(false);
+      //       setState(() {
+      //         anonymous = false;
+      //       });
+      //     },
+      //   ),
+      //   floatingActionButtonLocation:
+      //   FloatingActionButtonLocation.centerDocked,
+      //   bottomNavigationBar: BottomAppBar(
+      //     color: const Color(0xFF373737),
+      //     shape: const CircularNotchedRectangle(),
+      //     notchMargin: 10,
+      //     child: SizedBox(
+      //       height: 45,
+      //       child: Row(
+      //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //         children: <Widget>[
+      //           Row(
+      //             crossAxisAlignment: CrossAxisAlignment.start,
+      //             children: <Widget>[
+      //               MaterialButton(
+      //                 highlightColor: Colors.transparent,
+      //                 splashColor: Colors.transparent,
+      //                 // minWidth: 40,
+      //                 onPressed: () {
+      //                   setState(() {
+      //                     _currentIndex = 0;
+      //                   });
+      //                 },
+      //                 child: Icon(
+      //                   Icons.menu,
+      //                   color: _currentIndex == 0
+      //                       ? Colors.deepPurpleAccent
+      //                       : Colors.white,
+      //                 ),
+      //               ),
+      //               MaterialButton(
+      //                 highlightColor: Colors.transparent,
+      //                 splashColor: Colors.transparent,
+      //                 minWidth: 40,
+      //                 onPressed: () {
+      //                   setState(() {
+      //                     _currentIndex = 0;
+      //                   });
+      //                 },
+      //                 child: Icon(
+      //                   Icons.chat,
+      //                   color: _currentIndex == 0
+      //                       ? Colors.deepPurpleAccent
+      //                       : Colors.white,
+      //                 ),
+      //               )
+      //             ],
+      //           ),
+      //           // Right Tab bar icons
+      //           Row(
+      //             crossAxisAlignment: CrossAxisAlignment.start,
+      //             children: <Widget>[
+      //               MaterialButton(
+      //                 highlightColor: Colors.transparent,
+      //                 splashColor: Colors.transparent,
+      //                 minWidth: 40,
+      //                 onPressed: () {
+      //                   setState(() {
+      //                     _currentIndex = 1;
+      //                   });
+      //                 },
+      //                 child: Icon(
+      //                   Icons.new_releases,
+      //                   color: _currentIndex == 0
+      //                       ? Colors.deepPurpleAccent
+      //                       : Colors.white,
+      //                 ),
+      //               ),
+      //               MaterialButton(
+      //                 highlightColor: Colors.transparent,
+      //                 splashColor: Colors.transparent,
+      //                 // minWidth: 40,
+      //                 onPressed: () {
+      //                   setState(() {
+      //                     _currentIndex = 2;
+      //                   });
+      //                 },
+      //                 child: CircleAvatar(
+      //                   radius: 19,
+      //                   backgroundColor: Colors.transparent,
+      //                   child: ClipOval(
+      //                     child: Image.asset(
+      //                       'assets/images/ghosty2.png',
+      //                       fit: BoxFit.fill,
+      //                       color: _currentIndex == 0
+      //                           ? Colors.deepPurpleAccent
+      //                           : Colors.white,
+      //                     ),
+      //                   ),
+      //                 ),
+      //               )
+      //             ],
+      //           )
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // )
+      //     :
       Scaffold(
         key: _scaffoldKey,
         body: tabs[_currentIndex],
@@ -297,11 +297,7 @@ class _HomeState extends State<Home> {
                       highlightColor: Colors.transparent,
                       splashColor: Colors.transparent,
                       minWidth: 20,
-                      onPressed: () {
-                        setState(() {
-                          _currentIndex = 0;
-                        });
-                      },
+                      onPressed: () => changePage(0),
                       child: Icon(
                         Icons.menu,
                         color: _currentIndex == 0
@@ -313,11 +309,7 @@ class _HomeState extends State<Home> {
                       highlightColor: Colors.transparent,
                       splashColor: Colors.transparent,
                       minWidth: 20,
-                      onPressed: () {
-                        setState(() {
-                          _currentIndex = 1;
-                        });
-                      },
+                      onPressed: () => changePage(1),
                       child: Icon(
                         Icons.chat,
                         color: _currentIndex == 1
@@ -335,11 +327,7 @@ class _HomeState extends State<Home> {
                       highlightColor: Colors.transparent,
                       splashColor: Colors.transparent,
                       minWidth: 20,
-                      onPressed: () {
-                        setState(() {
-                          _currentIndex = 2;
-                        });
-                      },
+                      onPressed: () => changePage(2),
                       child: Icon(
                         Icons.new_releases,
                         color: _currentIndex == 2
@@ -351,11 +339,7 @@ class _HomeState extends State<Home> {
                       highlightColor: Colors.transparent,
                       splashColor: Colors.transparent,
                       minWidth: 20,
-                      onPressed: () {
-                        setState(() {
-                          _currentIndex = 3;
-                        });
-                      },
+                      onPressed: () => changePage(3),
                       child: Icon(
                         Icons.portrait,
                         color: _currentIndex == 3
@@ -367,11 +351,7 @@ class _HomeState extends State<Home> {
                       highlightColor: Colors.transparent,
                       splashColor: Colors.transparent,
                       minWidth: 20,
-                      onPressed: () {
-                        setState(() {
-                          _currentIndex = 4;
-                        });
-                      },
+                      onPressed: () => changePage(4),
                       child: Icon(
                         Icons.search,
                         color: _currentIndex == 4

@@ -77,7 +77,7 @@ class AuthService {
 
       await DatabaseServices(uid: user.uid).uploadWhoData(
           email: email,
-          name: name,
+          username: name,
           nickname: nickname,
           isAnon: isAnon,
           avatar: avatar,

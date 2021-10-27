@@ -129,12 +129,12 @@ class UserResult extends StatelessWidget {
                 backgroundImage: CachedNetworkImageProvider(user.avatar),
                 backgroundColor: kPrimaryColor,
               ),
-              title: Text(user.name,
+              title: Text(user.username,
               style: const TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold
               ),),
-              subtitle: Text(user.name, style: const TextStyle(
+              subtitle: Text(user.username, style: const TextStyle(
                 color: kPrimaryColor,
               ),),
             ),

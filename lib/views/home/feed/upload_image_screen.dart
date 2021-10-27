@@ -107,7 +107,7 @@ class _UploadImageState extends State<UploadImage>
     String downloadUrl = await uploadPhoto(file);
     DatabaseServices(uid: uid).createPost(
         postId,
-        widget.userData.name,
+        widget.userData.username,
         Timestamp.now(),
         uid,
         descriptionTextEditingController.text,

@@ -51,7 +51,7 @@ class _FilterpageState extends State<Filterpage> {
     }
   });
   filtered.forEach((element) {
-    print(element.name);
+    print(element.username);
   });
 
   super.initState();
@@ -295,7 +295,7 @@ class _FilterpageState extends State<Filterpage> {
                         print('Không có kết quả!');
                       } else {
                         filtered.forEach((element) {
-                          print(element.name);
+                          print(element.username);
                         });
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(

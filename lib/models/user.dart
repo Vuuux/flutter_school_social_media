@@ -4,7 +4,6 @@ import 'package:luanvanflutter/models/profile_notifier.dart';
 //class User đăng nhập
 class CurrentUser {
   final String uid;
-
   CurrentUser({required this.uid});
 }
 
@@ -12,7 +11,7 @@ class CurrentUser {
 class UserData {
   late final String id;
   late final String email;
-  late final String name;
+  late final String username;
   late final String nickname;
   late final String gender;
   late final String major;
@@ -31,7 +30,7 @@ class UserData {
   UserData(
       {required this.id,
       required this.email,
-      required this.name,
+      required this.username,
       required this.nickname,
       required this.gender,
       required this.major,
@@ -50,7 +49,7 @@ class UserData {
   UserData.fromMap(Map<String, dynamic> data) {
     id = data['id'];
     email = data['email'];
-    name = data['name'];
+    username = data['name'];
     nickname = data['nickname'];
     gender = data['gender'];
     major = data['major'];
@@ -67,10 +66,11 @@ class UserData {
     address = data['address'];
   }
 
+
   factory UserData.fromDocumentSnapshot(DocumentSnapshot? data) {
     return UserData(
         email: data!['email'],
-        name: data['name'],
+        username: data['username'],
         nickname: data['nickname'],
         gender: data['gender'],
         major: data['major'],

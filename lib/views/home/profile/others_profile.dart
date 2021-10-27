@@ -239,10 +239,10 @@ class _OthersProfileState extends State<OthersProfile> {
     dbServer.cloudRef.doc().set({
       'type': 'follow',
       'ownerID': widget.ctuer.email,
-      'ownerName': widget.ctuer.name,
+      'ownerName': widget.ctuer.username,
       'timestamp': DateTime.now(),
       'userDp': userData.avatar,
-      'userID': userData.name,
+      'userID': userData.username,
       'token': val,
     });
   }
@@ -254,10 +254,10 @@ class _OthersProfileState extends State<OthersProfile> {
     dbServer.cloudRef.doc().set({
       'type': 'request',
       'ownerID': widget.ctuer.email,
-      'ownerName': widget.ctuer.name,
+      'ownerName': widget.ctuer.username,
       'timestamp': DateTime.now(),
       'userDp': userData.avatar,
-      'userID': userData.name,
+      'userID': userData.username,
       'token': val,
     });
   }
@@ -489,7 +489,7 @@ class _OthersProfileState extends State<OthersProfile> {
                                             fit: BoxFit.fill,
                                           )),
                                           const SizedBox(height: 15),
-                                          Text(widget.ctuer.name,
+                                          Text(widget.ctuer.username,
                                               style: const TextStyle(
                                                   fontSize: 20,
                                                   fontWeight: FontWeight.w500,
@@ -701,7 +701,7 @@ class _OthersProfileState extends State<OthersProfile> {
                                     padding: const EdgeInsets.all(20),
                                     child: Text(
                                         'THEO DÕI ' +
-                                            widget.ctuer.name +
+                                            widget.ctuer.username +
                                             ' ĐỂ HIỂN THỊ PROFILE',
                                         style: const TextStyle(
                                             fontSize: 13,

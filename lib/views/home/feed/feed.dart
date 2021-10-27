@@ -6,12 +6,12 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/ctuer.dart';
+import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/views/home/feed/post_screen.dart';
 import 'package:luanvanflutter/views/home/feed/upload_image_screen.dart';
 import 'package:provider/provider.dart';
 
-import 'comment_page_screen.dart';
 
 //Class feed chứa các bài post
 class Feed extends StatefulWidget {
@@ -34,59 +34,59 @@ class _FeedState extends State<Feed> {
   Widget postList(List<Ctuer> owner, CurrentUser currentUser) {
     return StreamBuilder<QuerySnapshot>(
       //TODO: FIX STREAM HERE
-      stream: Stream.fromFuture(DatabaseServices(uid: currentUser.uid).getPosts(owner[0].id)),
+      stream: Stream.fromFuture(
+          DatabaseServices(uid: currentUser.uid).getPosts(owner[0].id)),
       builder: (context, snapshot) {
         return snapshot.hasData
             ? ListView.builder(
-                controller: scrollController,
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (context, index) {
-                  String postId = snapshot.data!.docs[index].get('postId');
-                  String ownerId = snapshot.data!.docs[index].get('ownerId');
-                  String name = snapshot.data!.docs[index].get('name');
-                  String location = snapshot.data!.docs[index].get('location');
-                  String description =
-                      snapshot.data!.docs[index].get('description');
-                  Timestamp timestamp =
-                      snapshot.data!.docs[index].get('timestamp');
-                  String url = snapshot.data!.docs[index].get('url');
-                  Map<dynamic, dynamic> likes =
-                      snapshot.data!.docs[index].get('likes');
-                  //TODO: GET POST FROM FOLLOWER HERE
-                  //print(ownerId);
-                  for (int i = 0; i < ctuers.length; i++) {
-                    if (ctuers[i].id == ownerId || currentUser.uid == ownerId) {
-                      return Column(
-                        children: <Widget>[
-                          Post(
-                            postId: postId,
-                            ownerId: ownerId,
-                            username: name,
-                            location: location,
-                            description: description,
-                            url: url,
-                            likes: likes,
-                            timestamp: timestamp),
-                          const Divider(height: 20, thickness: 5),
-                        ]
-                      );
-                    }
-                  }
+            controller: scrollController,
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              String postId = snapshot.data!.docs[index].get('postId');
+              String ownerId = snapshot.data!.docs[index].get('ownerId');
+              String name = snapshot.data!.docs[index].get('name');
+              String location = snapshot.data!.docs[index].get('location');
+              String description =
+              snapshot.data!.docs[index].get('description');
+              Timestamp timestamp =
+              snapshot.data!.docs[index].get('timestamp');
+              String url = snapshot.data!.docs[index].get('url');
+              Map<String, dynamic> likes =
+              snapshot.data!.docs[index].get('likes');
 
-                  return const SizedBox.shrink();
-                })
+              final post = PostModel(postId: postId,
+                  ownerId: ownerId,
+                  username: name,
+                  location: location,
+                  description: description,
+                  url: url,
+                  likes: likes,
+                  timestamp: timestamp);
+
+              for (int i = 0; i < ctuers.length; i++) {
+                if (ctuers[i].id == ownerId || currentUser.uid == ownerId) {
+                  return Column(
+                      children: <Widget>[
+                        PostItem(post: post),
+                        //const Divider(height: 20, thickness: 5),
+                      ]
+                  );
+                }
+              }
+
+              return const SizedBox.shrink();
+            })
             : Container(
-                child: const Center(
-                  child: Text("Chưa có bài viết nào."),
-                ),
-              );
+          child: const Center(
+            child: Text("Chưa có bài viết nào."),
+          ),
+        );
       },
     );
   }
 
   @override
   void initState() {
-
     super.initState();
   }
 
@@ -124,7 +124,7 @@ class _FeedState extends State<Feed> {
     }
   }
 
-  captureImageWithCamera( UserData userData) async {
+  captureImageWithCamera(UserData userData) async {
     Navigator.pop(context);
     PickedFile? pickedFile = await ImagePicker()
         .getImage(source: ImageSource.camera, maxHeight: 680, maxWidth: 970);
@@ -188,7 +188,7 @@ class _FeedState extends State<Feed> {
         designSize: const Size(360, 690),
         orientation: Orientation.portrait);
     final user = context.watch<CurrentUser?>();
-    if(mounted){
+    if (mounted) {
       DatabaseServices(uid: user!.uid).getFollowings().then((value) {
         setState(() {
           ctuers = value;
@@ -217,7 +217,6 @@ class _FeedState extends State<Feed> {
                     }),
               ],
             ),
-            //TODO: ADD USER LIST HERE
             body: postList(ctuers, user),
           );
           // RefreshIndicator(

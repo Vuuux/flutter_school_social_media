@@ -107,7 +107,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         if (value == 'OK') {
           await DatabaseServices(uid: user.uid).uploadWhoData(
               email: email,
-              name: name,
+              username: name,
               avatar: y,
               gender: selectedGenderType,
               score: 0,
@@ -261,7 +261,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         const SizedBox(width: 3),
                                         Expanded(
                                           child: RoundedInputField(
-                                            initialValue: userData!.name,
+                                            initialValue: userData!.username,
                                             validator: (val) {
                                               return val!.isEmpty
                                                   ? 'Vui lòng cung cấp tên của bạn'
@@ -479,7 +479,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       email = userData.email;
                                     }
                                     if (name == '') {
-                                      name = userData.name;
+                                      name = userData.username;
                                     }
                                     if (bio == '') {
                                       bio = userData.bio;

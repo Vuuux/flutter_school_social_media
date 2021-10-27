@@ -22,11 +22,11 @@ class _IntroPage1State extends State<IntroPage1> {
     index = Random().nextInt(widget.ctuerList.length);
 
     chosenCtuer = widget.ctuerList[index];
-    while (chosenCtuer.name == widget.userData.name) {
+    while (chosenCtuer.username == widget.userData.username) {
       index = Random().nextInt(widget.ctuerList.length);
       chosenCtuer = widget.ctuerList[index];
     }
-    print(chosenCtuer.name);
+    print(chosenCtuer.username);
     super.initState();
   }
 
@@ -103,7 +103,7 @@ class _IntroPage1State extends State<IntroPage1> {
                     DatabaseServices(uid: '').uploadBondData(
                       userData: widget.userData,
                       myAnon: true,
-                      hmmie: chosenCtuer,
+                      ctuer: chosenCtuer,
                       friendAnon: true,
                       chatRoomID: getChatRoomID(
                           widget.userData.nickname, chosenCtuer.nickname),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:luanvanflutter/views/home/feed/post_screen.dart';
 
 class PostDetail extends StatefulWidget {
-  final Post post;
+  final PostItem post;
   const PostDetail({Key? key, required this.post}) : super(key: key);
 
   @override
