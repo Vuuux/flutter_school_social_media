@@ -11,6 +11,7 @@ import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
 import 'package:luanvanflutter/views/home/feed/comment_item.dart';
+import 'package:luanvanflutter/views/home/feed/components/comment_tree.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:luanvanflutter/views/home/profile/profile.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';
@@ -26,12 +27,14 @@ class ShowComments extends StatefulWidget {
   TextEditingController commentController = TextEditingController();
   String replyTo = '';
   String tag = '';
+  UserData? currentUser;
 
-  ShowComments({Key? key,
-    required this.context,
-    required this.postId,
-    required this.ownerId,
-    required this.mediaUrl})
+  ShowComments(
+      {Key? key,
+      required this.context,
+      required this.postId,
+      required this.ownerId,
+      required this.mediaUrl})
       : super(key: key);
 
   @override
@@ -42,9 +45,10 @@ class _ShowCommentsState extends State<ShowComments> {
   @override
   void initState() {
     super.initState();
-    if(mounted){
+    if (mounted) {
       widget.commentController.addListener(() {
-        if(widget.commentController.text.isEmpty || !widget.commentController.text.startsWith('@')){
+        if (widget.commentController.text.isEmpty ||
+            !widget.commentController.text.startsWith('@')) {
           widget.replyTo = '';
           widget.tag = '';
         }
@@ -52,9 +56,14 @@ class _ShowCommentsState extends State<ShowComments> {
     }
   }
 
+  Future getCurrentUserData(String uid) async {
+    return await DatabaseServices(uid: uid).getUserByUserId();
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = context.watch<CurrentUser?>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("B Ì N H  L U Ậ N",
@@ -80,7 +89,7 @@ class _ShowCommentsState extends State<ShowComments> {
               decoration: const InputDecoration(labelText: "Nhập bình luận..."),
             ),
             trailing: OutlineButton(
-              onPressed: () => handlePostComment(user),
+              onPressed: () => handlePostComment(user.uid),
               borderSide: BorderSide.none,
               child: const Text("GỬI"),
             ),
@@ -115,227 +124,29 @@ class _ShowCommentsState extends State<ShowComments> {
                             }
                           }
                           return Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 16),
-                              child:
-                              CommentTreeWidget<CommentModel, CommentModel>(
-                                comment,
-                                cmtList,
-                                treeThemeData: TreeThemeData(
-                                    lineColor: cmtList.isEmpty
-                                        ? Colors.transparent
-                                        : kPrimaryColor,
-                                    lineWidth: 2),
-                                avatarRoot: (context, data) =>
-                                    PreferredSize(
-                                      child: CircleAvatar(
-                                        radius: 24,
-                                        backgroundColor: Colors.grey,
-                                        backgroundImage:
-                                        CachedNetworkImageProvider(data.avatar),
-                                      ),
-                                      preferredSize: const Size.fromRadius(28),
-                                    ),
-                                avatarChild: (context, data) =>
-                                    PreferredSize(
-                                      child: CircleAvatar(
-                                        radius: 24,
-                                        backgroundColor: Colors.grey,
-                                        backgroundImage:
-                                        CachedNetworkImageProvider(data.avatar),
-                                      ),
-                                      preferredSize: const Size.fromRadius(18),
-                                    ),
-                                contentChild: (context, data) {
-                                  return FutureBuilder<DocumentSnapshot>(
-                                      future: DatabaseServices(uid: data.tagId)
-                                          .getUserByUserId(),
-                                      builder: (context, nameSnapshot) {
-                                        UserData? userDetail;
-                                        bool isLiked = false;
-                                        isLiked =
-                                            data.likes[uid] == true;
-                                        if (nameSnapshot.hasData) {
-                                          userDetail =
-                                              UserData.fromDocumentSnapshot(
-                                                  nameSnapshot.data);
-                                        }
-                                        return Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              padding:
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 8,
-                                                  horizontal: 8),
-                                              decoration: BoxDecoration(
-                                                  color: Colors.grey[100],
-                                                  borderRadius:
-                                                  BorderRadius.circular(
-                                                      12)),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    data.username,
-                                                    style: Theme
-                                                        .of(context)
-                                                        .textTheme
-                                                        .caption
-                                                        ?.copyWith(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                        FontWeight.w600,
-                                                        color:
-                                                        Colors.black),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 4,
-                                                  ),
-                                                  _buildCommentLine(context,
-                                                      data, userDetail, uid)
-                                                ],
-                                              ),
-                                            ),
-                                            Padding(
-                                                padding:
-                                                const EdgeInsets.only(top: 4),
-                                                child: _buildLikeReply(comment.commentId, postId, uid, data, isLiked)
-                                            )
-                                          ],
-                                        );
-                                      });
-                                },
-                                contentRoot: (context, data) {
-                                  return FutureBuilder<DocumentSnapshot>(
-                                      future: DatabaseServices(uid: data.tagId)
-                                          .getUserByUserId(),
-                                      builder: (context, rootSnapshot) {
-                                        UserData? userDetail;
-                                        bool isRootLiked = false;
-                                        isRootLiked =
-                                            data.likes[uid] == true;
-                                        if (rootSnapshot.hasData) {
-                                          userDetail =
-                                              UserData.fromDocumentSnapshot(
-                                                  rootSnapshot.data);
-                                        }
-                                        return Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              padding:
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 8,
-                                                  horizontal: 8),
-                                              decoration: BoxDecoration(
-                                                  color: Colors.grey[100],
-                                                  borderRadius:
-                                                  BorderRadius.circular(
-                                                      12)),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    data.username,
-                                                    style: Theme
-                                                        .of(context)
-                                                        .textTheme
-                                                        .caption
-                                                        ?.copyWith(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                        FontWeight.w600,
-                                                        color:
-                                                        Colors.black),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 4,
-                                                  ),
-                                                  _buildCommentLine(context,
-                                                      data, userDetail, uid)
-                                                ],
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                              const EdgeInsets.only(top: 4),
-                                              child: _buildLikeReply(comment.commentId, postId, uid, data, isRootLiked)
-                                            )
-                                          ],
-                                        );
-                                      });
-                                },
-                              ));
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 16),
+                            child: CommentTree(
+                              postId: postId,
+                              comment: comment,
+                              cmtList: cmtList,
+                              onClickReply: (data, replyTo, tag) {
+                                widget.commentController.text =
+                                    '@' + data.username + ' ';
+                                widget.replyTo = replyTo;
+                                widget.tag = tag;
+                              },
+                            ),
+                          );
                         });
                   });
             } else {
-              return const Text('Chưa có bình luận nào :<');
+              return Loading() ;
             }
           } else {
-            return Container();
+            return Loading();
           }
         });
-  }
-
-  _buildCommentLine(BuildContext context, CommentModel data,
-      UserData? userDetail, String uid) {
-    return RichText(
-      text: TextSpan(children: <TextSpan>[
-        TextSpan(
-            text: userDetail != null ? userDetail.username + ' ' : '',
-            style: Theme
-                .of(context)
-                .textTheme
-                .caption
-                ?.copyWith(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue[800]),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) =>
-                    userDetail!.id == uid
-                        ? const MyProfile()
-                        : OthersProfile(ctuer: userDetail)));
-              }),
-        TextSpan(
-          text: data.comment,
-          style: Theme
-              .of(context)
-              .textTheme
-              .caption
-              ?.copyWith(
-              fontSize: 16, fontWeight: FontWeight.w300, color: Colors.black),
-        ),
-      ]),
-    );
-  }
-
-  buildLikeCount(CommentModel data) {
-    return data.getLikeCount() > 0
-        ? Card(
-        elevation: 2.0,
-        child: Padding(
-          padding: const EdgeInsets.only(right: 2.0),
-          child: Row(
-            children: <Widget>[
-              Icon(
-                Icons.favorite,
-                size: 14,
-                color: Colors.red[900],
-              ),
-              Text('${data.getLikeCount()}',
-                  style: const TextStyle(fontSize: 14)),
-            ],
-          ),
-        ))
-        : SizedBox.shrink();
   }
 
   Future<String> getReplyName(String tagId) async {
@@ -345,18 +156,27 @@ class _ShowCommentsState extends State<ShowComments> {
     }) as String;
   }
 
-  handlePostComment(CurrentUser user) async {
-    DocumentSnapshot snapshot = await DatabaseServices(uid: user.uid)
+  handlePostComment(String uid) async {
+    await getCurrentUserData(uid).then((value) {
+      setState(() {
+        widget.currentUser = UserData.fromDocumentSnapshot(value);
+      });
+    });
+
+    DocumentSnapshot snapshot = await DatabaseServices(uid: uid)
         .getUserByUserId()
         .then((value) => value);
     UserData currentUser = UserData.fromDocumentSnapshot(snapshot);
     var uuid = Uuid();
     String comment = '';
-    if(widget.commentController.text.startsWith('@')){
-      comment = widget.commentController.text.substring(widget.commentController.text.indexOf(' ') + 1);
+    if (widget.commentController.text.startsWith('@')) {
+      comment = widget.commentController.text
+          .substring(widget.commentController.text.indexOf(' ') + 1);
+    } else {
+      comment = widget.commentController.text;
     }
-    List<String> commentData = widget.commentController.text.split(' ');
-    DatabaseServices(uid: user.uid).postComment(
+
+    DatabaseServices(uid: uid).postComment(
       widget.postId,
       currentUser.id,
       uuid.v4(),
@@ -367,78 +187,22 @@ class _ShowCommentsState extends State<ShowComments> {
       widget.replyTo,
       widget.tag,
     );
+    bool isNotPostOwner = widget.ownerId != uid;
+    if (isNotPostOwner) {
+      DatabaseServices(uid: uid).addCommentNotifications(
+          postOwnerId: widget.ownerId,
+          comment: comment,
+          postId: widget.postId,
+          uid: uid,
+          username: currentUser.username,
+          avatar: currentUser.avatar,
+          url: widget.mediaUrl,
+          timestamp: Timestamp.now());
+    }
     widget.tag = '';
     widget.replyTo = '';
     widget.commentController.clear();
     widget.commentController.clearComposing();
     FocusScope.of(context).unfocus();
   }
-
-  Future<bool> handleLikeComment(String postId, String uid,
-      CommentModel data) async {
-    if (data.likes[uid] == false) {
-      await DatabaseServices(uid: uid).likeComment(postId, data.commentId);
-      data.likes[uid] = true;
-      return true;
-    } else {
-      await DatabaseServices(uid: uid).unlikeComment(postId, data.commentId);
-      data.likes[uid] = false;
-      return false;
-    }
-  }
-
-  Widget _buildLikeReply(String rootCommentId,String postId, String uid, CommentModel data, bool isLiked) =>
-      Row(
-        children: [
-          const SizedBox(
-            width: 8,
-          ),
-          GestureDetector(
-              onTap: () async {
-                await handleLikeComment(
-                    postId,
-                    uid,
-                    data)
-                    .then((value) =>
-                    setState(() {
-                      isLiked = value;
-                    }));
-              },
-              child: Text(
-                'Like',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .caption!
-                    .copyWith(
-                    color: isLiked
-                        ? Colors.blue[
-                    800]
-                        : Colors.grey[
-                    700],
-                    fontWeight:
-                    FontWeight
-                        .bold),
-              )),
-          const SizedBox(
-            width: 24,
-          ),
-          GestureDetector(
-              onTap: () {
-                widget.commentController.text = '@' + data.username + ' ';
-                widget.replyTo = rootCommentId;
-                widget.tag = data.userId;
-              },
-              child: Text('Reply')),
-          const SizedBox(
-            width: 12,
-          ),
-          Text(timeago.format(data.timestamp.toDate())),
-          const Spacer(),
-          buildLikeCount(data)
-        ],
-      );
-
 }
-
-

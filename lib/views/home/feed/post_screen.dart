@@ -16,6 +16,7 @@ import 'comment_screen.dart';
 class PostItem extends StatefulWidget {
   final PostModel post;
   bool isLiked = false;
+  UserData? currentUser;
 
   PostItem({Key? key, required this.post}) : super(key: key);
 
@@ -24,7 +25,6 @@ class PostItem extends StatefulWidget {
 }
 
 class _PostItemState extends State<PostItem> {
-
   buildPostHeader(String uid) {
     return FutureBuilder<DocumentSnapshot>(
       future:
@@ -139,16 +139,14 @@ class _PostItemState extends State<PostItem> {
             ),
             const Padding(padding: EdgeInsets.only(right: 20.0)),
             GestureDetector(
-              onTap: ()
-              => Navigator.push(
+              onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => ShowComments(
                           context: context,
                           postId: widget.post.postId,
                           ownerId: widget.post.ownerId,
-                          mediaUrl: widget.post.url)
-                  )),
+                          mediaUrl: widget.post.url))),
               child: Icon(
                 Icons.chat,
                 size: 28.0,
@@ -189,10 +187,19 @@ class _PostItemState extends State<PostItem> {
     }
   }
 
+  Future getCurrentUserData(String uid) async {
+    return await DatabaseServices(uid: uid).getUserByUserId();
+  }
+
   @override
   Widget build(BuildContext context) {
     user = context.watch<CurrentUser?>();
     widget.isLiked = (widget.post.likes[user!.uid] == true);
+    getCurrentUserData(user!.uid).then((value) {
+      setState(() {
+        widget.currentUser = UserData.fromDocumentSnapshot(value);
+      });
+    });
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -215,6 +222,8 @@ class _PostItemState extends State<PostItem> {
           widget.post.likes[user!.uid] = false;
         });
       });
+
+      DatabaseServices(uid: user!.uid).removeLikeNotifications(ownerId, postId);
     } else if (!_isLiked) {
       DatabaseServices(uid: user!.uid)
           .likePost(user!.uid, ownerId, postId)
@@ -226,12 +235,20 @@ class _PostItemState extends State<PostItem> {
           showHeart = true;
         });
       });
-      Timer(const Duration(milliseconds: 1000), () {
-        setState(() {
-          showHeart = false;
-        });
-      });
+      DatabaseServices(uid: user!.uid).addLikeNotifications(
+          ownerId,
+          widget.currentUser!.username,
+          user!.uid,
+          widget.currentUser!.avatar,
+          postId,
+          widget.post.url,
+          Timestamp.now());
     }
+    Timer(const Duration(milliseconds: 1000), () {
+      setState(() {
+        showHeart = false;
+      });
+    });
   }
 
   buildCommentPage() {
@@ -241,5 +258,4 @@ class _PostItemState extends State<PostItem> {
         ownerId: widget.post.ownerId,
         mediaUrl: widget.post.url);
   }
-
 }

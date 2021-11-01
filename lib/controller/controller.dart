@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:luanvanflutter/models/ctuer.dart';
+import 'package:luanvanflutter/models/notification.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/views/home/notifications_page.dart';
 
@@ -38,7 +39,7 @@ class DatabaseServices {
 
   //Lấy dữ liệu từ server truyền vào Collection Reference
   final CollectionReference ctuerRef =
-  FirebaseFirestore.instance.collection('users');
+      FirebaseFirestore.instance.collection('users');
   final chatRef = FirebaseFirestore.instance.collection('chatRooms');
   final anonChatRef = FirebaseFirestore.instance.collection('anonChatRooms');
   final cloudRef = FirebaseFirestore.instance.collection('cloud');
@@ -55,31 +56,32 @@ class DatabaseServices {
   final blogRef = FirebaseFirestore.instance.collection('blogs');
   final commentRef = FirebaseFirestore.instance.collection('comments');
 
-  Future<String> uploadWhoData({required String email,
-    required String username,
-    required String nickname,
-    required bool isAnon,
-    required String avatar,
-    required String gender,
-    required int score}) async {
+  Future<String> uploadWhoData(
+      {required String email,
+      required String username,
+      required String nickname,
+      required bool isAnon,
+      required String avatar,
+      required String gender,
+      required int score}) async {
     try {
       gender == 'Male'
           ? maleRef.doc(email).set({
-        "username": username,
-        "email": email,
-        "nickname": nickname,
-        "isAnon": isAnon,
-        "avatar": avatar,
-        "score": score,
-      })
+              "username": username,
+              "email": email,
+              "nickname": nickname,
+              "isAnon": isAnon,
+              "avatar": avatar,
+              "score": score,
+            })
           : femaleRef.doc(email).set({
-        "username": username,
-        "email": email,
-        "nickname": nickname,
-        "isAnon": isAnon,
-        "avatar": avatar,
-        "score": score,
-      });
+              "username": username,
+              "email": email,
+              "nickname": nickname,
+              "isAnon": isAnon,
+              "avatar": avatar,
+              "score": score,
+            });
 
       return 'OK';
     } catch (err) {
@@ -88,18 +90,20 @@ class DatabaseServices {
     }
   }
 
-  Future uploadUserData(String email,
-      String username,
-      String nickname,
-      String gender,
-      String major,
-      String bio,
-      String avatar,
-      bool isAnon,
-      String media,
-      String playlist,
-      String course,
-      String address,) async {
+  Future uploadUserData(
+    String email,
+    String username,
+    String nickname,
+    String gender,
+    String major,
+    String bio,
+    String avatar,
+    bool isAnon,
+    String media,
+    String playlist,
+    String course,
+    String address,
+  ) async {
     return await ctuerRef.doc(uid).set({
       'id': uid,
       "email": email,
@@ -128,7 +132,7 @@ class DatabaseServices {
     List<Ctuer> ctuers = [];
     var snapshot = await followerRef.doc(uid).get();
     Map<String, DocumentReference> data =
-    Map<String, DocumentReference>.from(snapshot['followers']);
+        Map<String, DocumentReference>.from(snapshot['followers']);
 
     for (var value in data.values) {
       await value.get().then((val) {
@@ -147,7 +151,7 @@ class DatabaseServices {
     List<Ctuer> ctuers = [];
     var snapshot = await followingRef.doc(uid).get();
     Map<String, DocumentReference> data =
-    Map<String, DocumentReference>.from(snapshot['users']);
+        Map<String, DocumentReference>.from(snapshot['users']);
 
     for (var value in data.values) {
       await value.get().then((val) {
@@ -285,9 +289,11 @@ class DatabaseServices {
     });
   }
 
-  Future createTriviaRoom(String triviaRoomID,
-      String player1,
-      String player2,) async {
+  Future createTriviaRoom(
+    String triviaRoomID,
+    String player1,
+    String player2,
+  ) async {
     return triviaRef.doc(triviaRoomID).set({
       'player1': player1,
       'player2': player2,
@@ -308,6 +314,39 @@ class DatabaseServices {
     });
   }
 
+  Future addLikeNotifications(
+      String ownerId,
+      String username,
+      String userId,
+      String avatar,
+      String postId,
+      String mediaUrl,
+      Timestamp timestamp) async {
+    return await feedRef.doc(ownerId).collection('feedItems').doc(postId).set({
+      "type": "like",
+      "username": username,
+      "userId": userId,
+      "avatar": avatar,
+      "postId": postId,
+      "mediaUrl": mediaUrl,
+      "timestamp": timestamp,
+      "status": "unseen"
+    });
+  }
+
+  Future removeLikeNotifications(String ownerId, String postId) async {
+    return await feedRef
+        .doc(ownerId)
+        .collection('feedItems')
+        .doc(postId)
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+  }
+
   //lấy về request
   //check this
   getRequestStatus(String OwnerID, String ownerName, String useravatar,
@@ -321,11 +360,12 @@ class DatabaseServices {
         .snapshots();
   }
 
-  Future uploadBondData({required UserData userData,
-    required bool myAnon,
-    required Ctuer ctuer,
-    required bool friendAnon,
-    required String chatRoomID}) async {
+  Future uploadBondData(
+      {required UserData userData,
+      required bool myAnon,
+      required Ctuer ctuer,
+      required bool friendAnon,
+      required String chatRoomID}) async {
     return bondRef.doc(chatRoomID).set({
       '${userData.username} Email': userData.email,
       '${userData.username} Anon': myAnon,
@@ -364,18 +404,20 @@ class DatabaseServices {
     });
   }
 
-  Future<String> updateUserData(String email,
-      String username,
-      String nickname,
-      String gender,
-      String major,
-      String bio,
-      String avatar,
-      bool isAnon,
-      String media,
-      String playlist,
-      String course,
-      String address,) async {
+  Future<String> updateUserData(
+    String email,
+    String username,
+    String nickname,
+    String gender,
+    String major,
+    String bio,
+    String avatar,
+    bool isAnon,
+    String media,
+    String playlist,
+    String course,
+    String address,
+  ) async {
     try {
       await ctuerRef.doc(uid).update({
         "email": email,
@@ -402,8 +444,8 @@ class DatabaseServices {
 
   //tăng điểm danh tiếng
   //check this
-  Future increaseFame(int initialValue, String raterEmail,
-      bool isAdditional) async {
+  Future increaseFame(
+      int initialValue, String raterEmail, bool isAdditional) async {
     if (isAdditional) {
       await ctuerRef
           .doc(uid)
@@ -416,8 +458,8 @@ class DatabaseServices {
     });
   }
 
-  Future decreaseFame(int initialValue, String raterEmail,
-      bool isAdditional) async {
+  Future decreaseFame(
+      int initialValue, String raterEmail, bool isAdditional) async {
     if (isAdditional) {
       await ctuerRef
           .doc(uid)
@@ -452,18 +494,20 @@ class DatabaseServices {
       return Ctuer(
           id: doc.data().toString().contains('id') ? doc.get('id') : '',
           email:
-          doc.data().toString().contains('email') ? doc.get('email') : '',
+              doc.data().toString().contains('email') ? doc.get('email') : '',
           avatar:
-          doc.data().toString().contains('avatar') ? doc.get('avatar') : '',
-          username: doc.data().toString().contains('username') ? doc.get('username') : '',
+              doc.data().toString().contains('avatar') ? doc.get('avatar') : '',
+          username: doc.data().toString().contains('username')
+              ? doc.get('username')
+              : '',
           bio: doc.data().toString().contains('bio') ? doc.get('bio') : '',
           community: doc.data().toString().contains('community')
               ? doc.get('community')
               : '',
           gender:
-          doc.data().toString().contains('gender') ? doc.get('gender') : '',
+              doc.data().toString().contains('gender') ? doc.get('gender') : '',
           major:
-          doc.data().toString().contains('major') ? doc.get('major') : '',
+              doc.data().toString().contains('major') ? doc.get('major') : '',
           nickname: doc.data().toString().contains('nickname')
               ? doc.get('nickname')
               : '',
@@ -481,9 +525,9 @@ class DatabaseServices {
               : '',
           fame: doc.data().toString().contains('fame') ? doc.get('fame') : 0,
           media:
-          doc.data().toString().contains('media') ? doc.get('media') : '',
+              doc.data().toString().contains('media') ? doc.get('media') : '',
           course:
-          doc.data().toString().contains('course') ? doc.get('course') : '',
+              doc.data().toString().contains('course') ? doc.get('course') : '',
           playlist: doc.data().toString().contains('playlist')
               ? doc.get('playlist')
               : '',
@@ -516,11 +560,13 @@ class DatabaseServices {
     return UserData(
         email: doc.data().toString().contains('email') ? doc.get('email') : '',
         avatar:
-        doc.data().toString().contains('avatar') ? doc.get('avatar') : '',
-        username: doc.data().toString().contains('username') ? doc.get('username') : '',
+            doc.data().toString().contains('avatar') ? doc.get('avatar') : '',
+        username: doc.data().toString().contains('username')
+            ? doc.get('username')
+            : '',
         bio: doc.data().toString().contains('bio') ? doc.get('bio') : '',
         gender:
-        doc.data().toString().contains('gender') ? doc.get('gender') : '',
+            doc.data().toString().contains('gender') ? doc.get('gender') : '',
         major: doc.data().toString().contains('major') ? doc.get('major') : '',
         nickname: doc.data().toString().contains('nickname')
             ? doc.get('nickname')
@@ -529,7 +575,7 @@ class DatabaseServices {
             ? doc.get('isAnon')
             : false,
         anonBio:
-        doc.data().toString().contains('anonBio') ? doc.get('anonBio') : '',
+            doc.data().toString().contains('anonBio') ? doc.get('anonBio') : '',
         anonInterest: doc.data().toString().contains('anonInterest')
             ? doc.get('anonInterest')
             : '',
@@ -539,12 +585,12 @@ class DatabaseServices {
         fame: doc.data().toString().contains('fame') ? doc.get('fame') : 0,
         media: doc.data().toString().contains('media') ? doc.get('media') : '',
         course:
-        doc.data().toString().contains('course') ? doc.get('course') : '',
+            doc.data().toString().contains('course') ? doc.get('course') : '',
         playlist: doc.data().toString().contains('playlist')
             ? doc.get('playlist')
             : '',
         address:
-        doc.data().toString().contains('address') ? doc.get('address') : '',
+            doc.data().toString().contains('address') ? doc.get('address') : '',
         id: doc.data().toString().contains('id') ? doc.get('address') : '');
     //   email: snapshot.get('email'),
     //   username: snapshot.get('username'),
@@ -628,7 +674,7 @@ class DatabaseServices {
   }
 
   Future<Stream<QuerySnapshot<Map<String, dynamic>>>>
-  getSusConversationMessages(String chatRoomId) async {
+      getSusConversationMessages(String chatRoomId) async {
     return FirebaseFirestore.instance
         .collection('susChatRoom')
         .doc(chatRoomId)
@@ -638,7 +684,7 @@ class DatabaseServices {
   }
 
   Future<Stream<QuerySnapshot<Map<String, dynamic>>>>
-  getAnonConversationMessages(String chatRoomId) async {
+      getAnonConversationMessages(String chatRoomId) async {
     return anonChatRef
         .doc(chatRoomId)
         .collection('chatDetail')
@@ -671,10 +717,11 @@ class DatabaseServices {
   }
 
   //cập nhật câu trả lời của trò chơi
-  Future updateCompAnswers({required UserData userData,
-    required Ctuer ctuer,
-    required String compRoomId,
-    required List<String> answers}) async {
+  Future updateCompAnswers(
+      {required UserData userData,
+      required Ctuer ctuer,
+      required String compRoomId,
+      required List<String> answers}) async {
     return compRef
         .doc(compRoomId)
         .collection('${userData.username} answers')
@@ -683,10 +730,11 @@ class DatabaseServices {
   }
 
   //cập nhật câu trả lời của Hmmie
-  Future updateFriendCompAnswers({required UserData userData,
-    required Ctuer ctuer,
-    required String compRoomId,
-    required List<String> answer}) async {
+  Future updateFriendCompAnswers(
+      {required UserData userData,
+      required Ctuer ctuer,
+      required String compRoomId,
+      required List<String> answer}) async {
     return compRef
         .doc(compRoomId)
         .collection('$ctuer.username answers')
@@ -737,9 +785,10 @@ class DatabaseServices {
     });
   }
 
-  Future createCompRoom({required String compRoomId,
-    required String player1,
-    required String player2}) async {
+  Future createCompRoom(
+      {required String compRoomId,
+      required String player1,
+      required String player2}) async {
     return compRef.doc(compRoomId).set({
       'player1': player1,
       'player2': player2,
@@ -767,8 +816,8 @@ class DatabaseServices {
     return await compRef.doc(compRoomId).collection('questions').snapshots();
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> getDocCompQuestions(Ctuer ctuer,
-      UserData userData, String compRoomId) async {
+  Future<QuerySnapshot<Map<String, dynamic>>> getDocCompQuestions(
+      Ctuer ctuer, UserData userData, String compRoomId) async {
     return await compRef.doc(compRoomId).collection('questions').get();
   }
 
@@ -821,30 +870,30 @@ class DatabaseServices {
     return anonChatRef.where("users", arrayContains: userName).snapshots();
   }
 
-  Future<List<NotificationsItem>> getNotifications(String email) async {
-    QuerySnapshot querySnapshot = await feedRef
-        .doc(email)
-        .collection('feed')
+  Future<QuerySnapshot<Map<String, dynamic>>> getNotifications() async {
+    return await feedRef
+        .doc(uid)
+        .collection('feedItems')
         .orderBy('timestamp', descending: true)
         .limit(60)
         .get();
 
-    List<NotificationsItem> notificationsItems = [];
+   // List<NotificationModel> notificationsItems = [];
 
-    for (var document in querySnapshot.docs) {
-      notificationsItems.add(NotificationsItem.fromDocument(document));
-    }
-    return notificationsItems;
+
+    //return notificationsItems;
   }
 
-  Future createPost(String postId,
-      String username,
-      Timestamp timestamp,
-      String ownerId,
-      String description,
-      String location,
-      Map<String, dynamic> likes,
-      String url,) async {
+  Future createPost(
+    String postId,
+    String username,
+    Timestamp timestamp,
+    String ownerId,
+    String description,
+    String location,
+    Map<String, dynamic> likes,
+    String url,
+  ) async {
     await postRef.doc(ownerId).collection('userPosts').doc(postId).set({
       "postId": postId,
       "username": username,
@@ -857,7 +906,8 @@ class DatabaseServices {
     });
   }
 
-  Future postComment(String postId,
+  Future postComment(
+      String postId,
       String userId,
       String commentId,
       String username,
@@ -865,8 +915,7 @@ class DatabaseServices {
       Timestamp timestamp,
       String avatar,
       String replyTo,
-      String tagId
-      ) async {
+      String tagId) async {
     return await commentRef
         .doc(postId)
         .collection('userComments')
@@ -885,7 +934,12 @@ class DatabaseServices {
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getComments(String postId) async {
-    return await commentRef.doc(postId).collection('userComments').where('replyTo', isEqualTo: "").get();
+    return await commentRef
+        .doc(postId)
+        .collection('userComments')
+        .where('replyTo', isEqualTo: "")
+        .orderBy('timestamp', descending: true)
+        .get();
   }
 
   likeComment(String postId, String commentId) async {
@@ -904,8 +958,35 @@ class DatabaseServices {
         .update({'likes.$uid': false});
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> getReplyComments(String postId, String commentId) async {
-    return await commentRef.doc(postId).collection('userComments').where(
-        'replyTo', isEqualTo: commentId).get();
+  Future<QuerySnapshot<Map<String, dynamic>>> getReplyComments(
+      String postId, String commentId) async {
+    return await commentRef
+        .doc(postId)
+        .collection('userComments')
+        .where('replyTo', isEqualTo: commentId)
+        .orderBy('timestamp', descending: true)
+        .get();
+  }
+
+  Future addCommentNotifications(
+      {required String postOwnerId,
+      required String comment,
+      required String postId,
+      required String uid,
+      required String username,
+      required String avatar,
+      required String url,
+      required Timestamp timestamp}) async {
+    return await feedRef.doc(postOwnerId).collection('feedItems').add({
+      "type": "comment",
+      "commentData": comment,
+      "postId": postId,
+      "userId": uid,
+      "username": username,
+      "avatar": avatar,
+      "mediaUrl": url,
+      "timestamp": timestamp,
+      "status": "unseen"
+    });
   }
 }

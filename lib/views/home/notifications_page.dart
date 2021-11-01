@@ -1,6 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import "package:flutter/material.dart";
+import 'package:luanvanflutter/models/notification.dart';
 import 'package:luanvanflutter/models/user.dart';
+import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as tAgo;
@@ -23,7 +26,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
     return StreamBuilder<UserData>(
         stream: databaseService.userData,
-        builder: (context, snapshot ) {
+        builder: (context, snapshot) {
           UserData? userData = snapshot.data;
           if (userData != null) {
             return Scaffold(
@@ -34,22 +37,32 @@ class _NotificationPageState extends State<NotificationPage> {
                     style:
                         TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
               ),
-              body: FutureBuilder(
-                  future: databaseService.getNotifications(userData.email),
+              body: FutureBuilder<QuerySnapshot>(
+                  future: databaseService.getNotifications(),
                   builder: (context, dataSnapshot) {
-                    if(dataSnapshot.connectionState != ConnectionState.done){
+                    List<NotificationModel> notificationsItems = [];
+                    if (dataSnapshot.connectionState != ConnectionState.done) {
                       return Loading();
                     }
-                    if(dataSnapshot.hasError) {
-                      //TODO: Show Error
+                    if (dataSnapshot.hasData) {
+
+                      for (var document in dataSnapshot.data!.docs) {
+                        notificationsItems.add(NotificationModel.fromDocument(document));
+                      }
+                      return ListView.separated(
+                        itemBuilder: (context, index) {
+                          return NotificationsItem(
+                              noti: notificationsItems[index]);
+                        },
+                        itemCount: notificationsItems.length,
+                        separatorBuilder: (BuildContext context, int index) {
+                          return const Divider(height: 1, thickness: 1,);
+                        },
+                      );
                     }
 
-                    List<NotificationsItem> items = dataSnapshot.data as List<NotificationsItem>;
-                    return ListView.builder(
-                      itemBuilder: (context, index) {
-                        return items[index];
-                      },
-                      itemCount: items.length,
+                    return const Center(
+                      child: Text("Bạn chưa có thông báo nào"),
                     );
                   }),
             );
@@ -60,65 +73,37 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 }
 
-late String notificationItemText;
-late Widget mediaPreview;
-
 class NotificationsItem extends StatefulWidget {
-  final String type;
-  final String ownerID;
-  final String ownerName;
-  final Timestamp timestamp;
-  final String userDp;
-  final String userID;
-  final String msgInfo;
-  final String status;
-  final String senderEmail;
-  final String notifID;
+  final NotificationModel noti;
+  late String notificationItemText;
+  late Widget mediaPreview;
 
-  NotificationsItem(
-      {
-        Key? key, required this.type,
-      required this.ownerID,
-      required this.ownerName,
-      required this.timestamp,
-      required this.userDp,
-      required this.userID,
-      required this.msgInfo,
-      required this.status,
-      required this.senderEmail,
-      required this.notifID}) : super(key: key);
+  NotificationsItem({Key? key, required this.noti}) : super(key: key);
 
   DatabaseServices databaseService = DatabaseServices(uid: '');
 
-  factory NotificationsItem.fromDocument(DocumentSnapshot documentSnapshot) {
-    return NotificationsItem(
-        type: documentSnapshot.get('type'),
-        ownerID: documentSnapshot.get('ownerID'),
-        ownerName: documentSnapshot.get('ownerName'),
-        timestamp: documentSnapshot.get('timestamp'),
-        userDp: documentSnapshot.get('userDp'),
-        userID: documentSnapshot.get('userID'),
-        msgInfo: documentSnapshot.get('msgInfo'),
-        status: documentSnapshot.get('status'),
-        senderEmail: documentSnapshot.get('senderEmail'),
-        notifID: documentSnapshot.get('notifID'));
-  }
   configureMediaPreview(context) {
-    mediaPreview = const Text('');
-    if (type == 'follow') {
+    mediaPreview = SizedBox(
+      child: CachedNetworkImage(imageUrl: noti.mediaUrl),
+    );
+    if (noti.type == 'follow') {
       notificationItemText = 'đang theo dõi bạn';
-    } else if (type == 'message') {
+    } else if (noti.type == 'like') {
+      notificationItemText = 'đã thích bài viết của bạn';
+    } else if (noti.type == 'comment') {
+      notificationItemText = 'đã bình luận: ' + noti.comment!;
+    } else if (noti.type == 'message') {
       notificationItemText = 'gởi bạn 1 tin nhắn';
-    } else if (type == 'request') {
+    } else if (noti.type == 'request') {
       notificationItemText = 'yêu cầu theo dõi bạn';
-    } else if (type == 'compatibility') {
+    } else if (noti.type == 'compatibility') {
       notificationItemText = 'muốn chơi trò QnA với bạn';
-    } else if (type == 'anonmessage') {
+    } else if (noti.type == 'anonmessage') {
       notificationItemText = 'đã gởi 1 tin nhắn (Vô danh)';
-    } else if (type == 'question') {
+    } else if (noti.type == 'question') {
       notificationItemText = 'muốn chơi đố vui cùng bạn';
     } else {
-      notificationItemText = 'Lỗi, Unknown type = $type';
+      notificationItemText = 'Lỗi, Unknown type = ' + noti.type;
     }
   }
 
@@ -138,49 +123,51 @@ class _NotificationsItemState extends State<NotificationsItem> {
   }
 
   checkAcceptedOrDeclinedforfollow() {
-    if (widget.type == 'request') {
-      widget.databaseService.feedRef
-          .doc(widget.ownerID)
-          .collection('feed')
-          .doc(widget.senderEmail)
-          .get()
-          .then((doc) {
-        if (doc.exists) {
-          if (doc.data()!['status'] == 'followed') {
-            if (mounted) {
-              setState(() {
-                accepted = true;
-              });
-            }
-          }
-        }
-      });
+    if (widget.noti.type == 'request') {
+      //TODO: ACCEP REQUEST
     }
+    //   widget.databaseService.feedRef
+    //       .doc(widget.ownerID)
+    //       .collection('feed')
+    //       .doc(widget.senderEmail)
+    //       .get()
+    //       .then((doc) {
+    //     if (doc.exists) {
+    //       if (doc.data()!['status'] == 'followed') {
+    //         if (mounted) {
+    //           setState(() {
+    //             accepted = true;
+    //           });
+    //         }
+    //       }
+    //     }
+    //   });
+    // }
   }
 
   checkAcceptedOrDeclinedfortictactoe() {
-    if (widget.type == 'tictactoe') {
-      widget.databaseService.feedRef
-          .doc(widget.ownerID)
-          .collection('feed')
-          .where('notifID', isEqualTo: widget.notifID)
-          .where('type', isEqualTo: 'tictactoe')
-          .get()
-          .then((value) {
-        if (value.docs[0].data()['status'] == 'accepted') {
-          if (mounted) {
-            setState(() {
-              accepted = true;
-            });
-          }
-        } else if (value.docs[0].data()['status'] == 'declined') {
-          if (mounted) {
-            setState(() {
-              declined = true;
-            });
-          }
-        }
-      });
+    if (widget.noti.type == 'tictactoe') {
+      // widget.databaseService.feedRef
+      //     .doc(widget.ownerID)
+      //     .collection('feed')
+      //     .where('notifID', isEqualTo: widget.notifID)
+      //     .where('type', isEqualTo: 'tictactoe')
+      //     .get()
+      //     .then((value) {
+      //   if (value.docs[0].data()['status'] == 'accepted') {
+      //     if (mounted) {
+      //       setState(() {
+      //         accepted = true;
+      //       });
+      //     }
+      //   } else if (value.docs[0].data()['status'] == 'declined') {
+      //     if (mounted) {
+      //       setState(() {
+      //         declined = true;
+      //       });
+      //     }
+      //   }
+      // });
     }
   }
 
@@ -209,7 +196,7 @@ class _NotificationsItemState extends State<NotificationsItem> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 1.0),
       child: Container(
-        color: const Color(0xFF212121),
+        color: kPrimaryLightColor,
         child: ListTile(
           title: GestureDetector(
             child: Row(
@@ -221,18 +208,21 @@ class _NotificationsItemState extends State<NotificationsItem> {
                     style: const TextStyle(fontSize: 10.0, color: Colors.black),
                     children: [
                       TextSpan(
-                          text: widget.userID,
+                          text: widget.noti.username,
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 11,
-                              color: Colors.white)),
+                              fontSize: 16,
+                              color: Colors.black)),
                       TextSpan(
-                          text: ' $notificationItemText',
-                          style: (const TextStyle(color: Colors.white))),
+                          text: " " + widget.notificationItemText,
+                          style: (const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black))),
                     ],
                   ),
                 ),
-                widget.type == 'request'
+                widget.noti.type == 'request'
                     ? accepted || declined
                         ? accepted
                             ? InkWell(
@@ -256,16 +246,17 @@ class _NotificationsItemState extends State<NotificationsItem> {
                                     if (mounted) {
                                       setState(() {
                                         accepted = true;
-                                        notificationItemText =
+                                        widget.notificationItemText =
                                             'đang theo dõi bạn';
                                       });
                                     }
-                                    widget.databaseService.acceptRequest(
-                                        widget.ownerID,
-                                        widget.ownerName,
-                                        widget.userDp,
-                                        widget.userID,
-                                        widget.senderEmail);
+                                    //TODO: ACCEPT REQUEST
+                                    // widget.databaseService.acceptRequest(
+                                    //     widget.ownerID,
+                                    //     widget.ownerName,
+                                    //     widget.userDp,
+                                    //     widget.userID,
+                                    //     widget.senderEmail);
                                   }),
                               SizedBox(
                                 width: MediaQuery.of(context).size.width / 13,
@@ -275,9 +266,9 @@ class _NotificationsItemState extends State<NotificationsItem> {
                                     style: TextStyle(fontSize: 10)),
                                 onTap: () {
                                   widget.databaseService.feedRef
-                                      .doc(widget.ownerID)
-                                      .collection('feed')
-                                      .doc(widget.senderEmail)
+                                      .doc(widget.noti.userId)
+                                      .collection('feedItems')
+                                      .doc(widget.noti.userId)
                                       .get()
                                       .then((doc) {
                                     if (doc.exists) {
@@ -304,9 +295,9 @@ class _NotificationsItemState extends State<NotificationsItem> {
               child: SizedBox(
                 width: 56,
                 height: 56,
-                child: widget.userDp != ""
+                child: widget.noti.avatar != ""
                     ? Image.network(
-                        widget.userDp,
+                        widget.noti.avatar,
                         fit: BoxFit.cover,
                       )
                     : Image.asset('assets/images/profile1.png',
@@ -320,9 +311,9 @@ class _NotificationsItemState extends State<NotificationsItem> {
               ),
             ),
           ),
-          subtitle: Text(tAgo.format(widget.timestamp.toDate()),
+          subtitle: Text(tAgo.format(widget.noti.timestamp.toDate()),
               overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12)),
-          trailing: mediaPreview,
+          trailing: widget.mediaPreview,
         ),
       ),
     );

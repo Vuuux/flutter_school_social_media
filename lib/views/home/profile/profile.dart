@@ -35,12 +35,12 @@ class MyProfile extends StatefulWidget {
 class _MyProfileState extends State<MyProfile> {
   int countTotalFollowers = 0;
   int countTotalFollowings = 0;
-  late String personalEmail;
+  late String userUid;
 
   getAllFollowings() async {
     QuerySnapshot querySnapshot = await DatabaseServices(uid: '')
         .followingRef
-        .doc(personalEmail)
+        .doc(userUid)
         .collection('userFollowing')
         .get();
     if (mounted) {
@@ -53,7 +53,7 @@ class _MyProfileState extends State<MyProfile> {
   getAllFollowers() async {
     QuerySnapshot querySnapshot = await DatabaseServices(uid: '')
         .followerRef
-        .doc(personalEmail)
+        .doc(userUid)
         .collection('userFollowers')
         .get();
     if (mounted) {
@@ -140,6 +140,7 @@ class _MyProfileState extends State<MyProfile> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<CurrentUser?>();
+    userUid = user!.uid;
     //final hmmies = Provider.of<List<Ctuer>>(context);
     ScreenUtil.init(
         const BoxConstraints(
@@ -152,11 +153,11 @@ class _MyProfileState extends State<MyProfile> {
     getAllFollowers();
     getAllFollowings();
     return StreamBuilder<UserData>(
-        stream: DatabaseServices(uid: user!.uid).userData,
+        stream: DatabaseServices(uid: user.uid).userData,
         builder: (context, snapshot) {
           UserData? userData = snapshot.data;
           if (userData != null) {
-            personalEmail = userData.email;
+            userUid = userData.email;
             return Scaffold(
               appBar: AppBar(
                 elevation: 0,

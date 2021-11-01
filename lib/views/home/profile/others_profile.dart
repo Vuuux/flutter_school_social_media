@@ -22,7 +22,7 @@ class OthersProfile extends StatefulWidget {
   final UserData ctuer;
   CurrentUser? currentUser;
 
-  OthersProfile({required this.ctuer});
+  OthersProfile({Key? key, required this.ctuer}) : super(key: key);
 
   @override
   _OthersProfileState createState() => _OthersProfileState();
