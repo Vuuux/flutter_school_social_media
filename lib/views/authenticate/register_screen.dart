@@ -129,7 +129,7 @@ class _RegisterState extends State<Register> {
 
           Helper.saveUserLoggedInSharedPreference(true);
           Helper.saveUserEmailSharedPreference(email);
-          Helper.saveUserNameSharedPreference(name);
+          Helper.saveUserIdSharedPreference(name);
           context.read<AuthService>().signIn(email, password);
           Navigator.of(context).pushAndRemoveUntil(
               FadeRoute(page: const OnBoarding()), ModalRoute.withName('Onboarding'));

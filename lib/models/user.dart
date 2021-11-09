@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/profile_notifier.dart';
 
 //class User đăng nhập
@@ -88,15 +89,9 @@ class UserData {
         id: data['id']);
   }
 
-  getUserData(ProfileNotifier profileNotifier) async {
-    QuerySnapshot snapshot =
-        await FirebaseFirestore.instance.collection("users").get();
-    List<UserData> _profileList = [];
-    snapshot.docs.forEach((doc) {
-      UserData data = UserData.fromMap(doc.data() as Map<String, dynamic>);
-      _profileList.add(data);
-    });
-
-    profileNotifier.profileList = _profileList;
+  getUserData(ProfileNotifier profileNotifier, String uid) async {
+    DocumentSnapshot snapshot = await DatabaseServices(uid: uid).getUserByUserId();
+    UserData data = UserData.fromDocumentSnapshot(snapshot);
+    profileNotifier.currentProfile = data;
   }
 }

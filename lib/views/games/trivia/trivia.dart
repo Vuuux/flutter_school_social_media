@@ -11,8 +11,8 @@ import 'answerscreen.dart';
 
 class Trivia extends StatefulWidget {
   UserData userData;
-  List<Ctuer> ctuerList;
-  Ctuer ctuer;
+  List<UserData> ctuerList;
+  UserData ctuer;
 
   Trivia(this.ctuer, this.userData, this.ctuerList);
 

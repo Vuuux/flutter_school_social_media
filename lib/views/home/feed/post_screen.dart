@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 
 import 'package:animator/animator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,8 +8,9 @@ import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/loading.dart';
+import 'package:luanvanflutter/views/home/feed/post_detail.dart';
 import 'package:provider/src/provider.dart';
-
+import 'package:timeago/timeago.dart' as timeago;
 import 'comment_screen.dart';
 
 class PostItem extends StatefulWidget {
@@ -25,7 +25,8 @@ class PostItem extends StatefulWidget {
 }
 
 class _PostItemState extends State<PostItem> {
-  buildPostHeader(String uid) {
+  
+  buildPostHeader(String uid, BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
       future:
           DatabaseServices(uid: uid).ctuerRef.doc(widget.post.ownerId).get(),
@@ -49,7 +50,7 @@ class _PostItemState extends State<PostItem> {
             backgroundColor: Colors.grey,
           ),
           title: GestureDetector(
-            onTap: () => print('showing profile'),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => PostDetail(postId: widget.post.postId, ownerId: user.id))),
             child: Text(
               user.username,
               style: const TextStyle(
@@ -58,15 +59,38 @@ class _PostItemState extends State<PostItem> {
               ),
             ),
           ),
-          subtitle: Text(widget.post.location),
+          subtitle: Text(widget.post.location +' - ' + timeago.format(widget.post.timestamp.toDate())),
           trailing: IconButton(
             //TODO: DELETE POST
-            onPressed: () => print('deleting post'),
+            onPressed: () => onOpenPostOption(context),
             icon: const Icon(Icons.more_vert),
           ),
         );
       },
     );
+  }
+
+  onOpenPostOption(BuildContext nContext) {
+    return widget.currentUser!.id == widget.post.ownerId ? showDialog(
+        context: nContext,
+        builder: (context) {
+          return SimpleDialog(
+            children: <Widget>[
+              SimpleDialogOption(
+                child: const Text(
+                  "Xóa bài viết",
+                ),
+                onPressed: () => DatabaseServices(uid: '').deletePost(widget.post.ownerId, widget.post.postId),
+              ),
+              SimpleDialogOption(
+                child: const Text(
+                  "Đóng",
+                ),
+                onPressed: () {},
+              )
+            ],
+          );
+        }) : null;
   }
 
   buildPostImage() {
@@ -76,7 +100,9 @@ class _PostItemState extends State<PostItem> {
       child: Stack(
         alignment: Alignment.center,
         children: <Widget>[
-          Image.network(widget.post.url),
+          ClipRRect(
+              borderRadius: BorderRadius.circular(15.0),
+              child: Image.network(widget.post.url)),
           //TODO: ANIMATOR HERE
           showHeart
               ? Animator(
@@ -200,13 +226,16 @@ class _PostItemState extends State<PostItem> {
         widget.currentUser = UserData.fromDocumentSnapshot(value);
       });
     });
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        buildPostHeader(user!.uid),
-        buildPostImage(),
-        buildPostFooter()
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          buildPostHeader(user!.uid, context),
+          buildPostImage(),
+          buildPostFooter()
+        ],
+      ),
     );
   }
 

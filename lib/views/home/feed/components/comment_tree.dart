@@ -119,7 +119,7 @@ class _CommentTreeState extends State<CommentTree> {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => userDetail!.id == uid
                         ? const MyProfile()
-                        : OthersProfile(ctuer: userDetail)));
+                        : OthersProfile(ctuerId: userDetail.id)));
               }),
         TextSpan(
           text: data.comment,

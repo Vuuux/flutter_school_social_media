@@ -121,7 +121,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               );
 
               Helper.saveUserEmailSharedPreference(email);
-              Helper.saveUserNameSharedPreference(name);
+              Helper.saveUserIdSharedPreference(name);
               Helper.saveUserLoggedInSharedPreference(true);
 
               Navigator.of(context).pushAndRemoveUntil(

@@ -8,6 +8,7 @@ import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
+import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/views/home/feed/post_screen.dart';
 import 'package:luanvanflutter/views/home/feed/upload_image_screen.dart';
 import 'package:provider/provider.dart';
@@ -27,15 +28,12 @@ class _FeedState extends State<Feed> {
   ScrollController scrollController = new ScrollController();
   Ctuer currentCtuer = Ctuer();
   final picker = ImagePicker(); //API chọn hình ảnh
-  List<Ctuer> ctuers = [];
-
   //lấy time từ post
 
-  Widget postList(List<Ctuer> owner, CurrentUser currentUser) {
+  Widget postList( CurrentUser currentUser) {
     return StreamBuilder<QuerySnapshot>(
-      //TODO: FIX STREAM HERE
       stream: Stream.fromFuture(
-          DatabaseServices(uid: currentUser.uid).getPosts(owner[0].id)),
+          DatabaseServices(uid: currentUser.uid).getTimelinePosts(currentUser.uid)),
       builder: (context, snapshot) {
         return snapshot.hasData
             ? ListView.builder(
@@ -44,7 +42,7 @@ class _FeedState extends State<Feed> {
             itemBuilder: (context, index) {
               String postId = snapshot.data!.docs[index].get('postId');
               String ownerId = snapshot.data!.docs[index].get('ownerId');
-              String name = snapshot.data!.docs[index].get('name');
+              String username = snapshot.data!.docs[index].get('username');
               String location = snapshot.data!.docs[index].get('location');
               String description =
               snapshot.data!.docs[index].get('description');
@@ -56,31 +54,25 @@ class _FeedState extends State<Feed> {
 
               final post = PostModel(postId: postId,
                   ownerId: ownerId,
-                  username: name,
+                  username: username,
                   location: location,
                   description: description,
                   url: url,
                   likes: likes,
                   timestamp: timestamp);
 
-              for (int i = 0; i < ctuers.length; i++) {
-                if (ctuers[i].id == ownerId || currentUser.uid == ownerId) {
-                  return Column(
-                      children: <Widget>[
-                        PostItem(post: post),
-                        //const Divider(height: 20, thickness: 5),
-                      ]
-                  );
-                }
-              }
-
-              return const SizedBox.shrink();
+              return Column(
+                        children: <Widget>[
+                          PostItem(post: post),
+                          const Divider(height: 20, thickness: 5, color: kPrimaryLightColor,),
+                        ]
+                    );
             })
-            : Container(
-          child: const Center(
-            child: Text("Chưa có bài viết nào."),
-          ),
-        );
+            : const Center(
+              child: Text("Chưa có bài viết nào.",
+              style: TextStyle(color: Colors.black),
+              ),
+            );
       },
     );
   }
@@ -129,8 +121,7 @@ class _FeedState extends State<Feed> {
     PickedFile? pickedFile = await ImagePicker()
         .getImage(source: ImageSource.camera, maxHeight: 680, maxWidth: 970);
     File imageFile = File(pickedFile!.path);
-    // File imageFile = await ImagePicker.pickImage(
-    //     source: ImageSource.camera, maxHeight: 680, maxWidth: 970);
+
     if (imageFile == null) {
       // Navigator.of(context).pushAndRemoveUntil(
       //     FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
@@ -188,14 +179,6 @@ class _FeedState extends State<Feed> {
         designSize: const Size(360, 690),
         orientation: Orientation.portrait);
     final user = context.watch<CurrentUser?>();
-    if (mounted) {
-      DatabaseServices(uid: user!.uid).getFollowings().then((value) {
-        setState(() {
-          ctuers = value;
-        });
-      }
-      );
-    }
 
 
     return StreamBuilder<UserData>(
@@ -204,9 +187,14 @@ class _FeedState extends State<Feed> {
           UserData? userData = snapshot.data;
           return Scaffold(
             appBar: AppBar(
+              shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(15),
+            )),
               title: const Text("F E E D",
                   textAlign: TextAlign.right,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
+              centerTitle: true,
               actions: <Widget>[
                 IconButton(
                     highlightColor: Colors.transparent,
@@ -217,7 +205,7 @@ class _FeedState extends State<Feed> {
                     }),
               ],
             ),
-            body: postList(ctuers, user),
+            body: postList(user),
           );
           // RefreshIndicator(
           //     child: createTimeLine(), onRefresh: () => retrieveTimeline()));

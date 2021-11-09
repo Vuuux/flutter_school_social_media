@@ -7,10 +7,11 @@ import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
+import 'package:provider/src/provider.dart';
 
 class SimpleSearch extends StatefulWidget {
-  const SimpleSearch({Key? key}) : super(key: key);
-
+  SimpleSearch({Key? key}) : super(key: key);
+  CurrentUser? currentUserData;
   @override
   _SimpleSearchState createState() => _SimpleSearchState();
 }
@@ -21,7 +22,7 @@ class _SimpleSearchState extends State<SimpleSearch> {
 
   handleSearch(String query) {
     Future<QuerySnapshot> users = DatabaseServices(uid: '').ctuerRef
-        .where("name", isGreaterThanOrEqualTo: query)
+        .where("username", isGreaterThanOrEqualTo: query)
         .get();
     setState(() {
       searchResultsFuture = users;
@@ -38,7 +39,7 @@ class _SimpleSearchState extends State<SimpleSearch> {
       title: TextFormField(
         controller: searchController,
         decoration: InputDecoration(
-          hintText: "Search for a user...",
+          hintText: "Nhập tên ctuer bạn muốn tìm...",
           filled: true,
           prefixIcon: const Icon(
             Icons.account_box,
@@ -66,7 +67,7 @@ class _SimpleSearchState extends State<SimpleSearch> {
               height: orientation == Orientation.portrait ? 300.0 : 200.0,
             ),
             const Text(
-              "Find Users",
+              "Tìm Ctuer",
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -91,7 +92,9 @@ class _SimpleSearchState extends State<SimpleSearch> {
         List<UserResult> searchResults = [];
         snapshot.data!.docs.forEach((doc) {
           UserData user = UserData.fromDocumentSnapshot(doc);
-          searchResults.add(UserResult(user: user));
+          if(user.id != widget.currentUserData!.uid){
+            searchResults.add(UserResult(user: user));
+          }
         });
         return ListView(
           children: searchResults,
@@ -102,6 +105,7 @@ class _SimpleSearchState extends State<SimpleSearch> {
 
   @override
   Widget build(BuildContext context) {
+    widget.currentUserData = context.watch<CurrentUser?>();
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor.withOpacity(0.8),
       appBar: buildSearchField(),
@@ -139,9 +143,9 @@ class UserResult extends StatelessWidget {
               ),),
             ),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)
-            => OthersProfile(ctuer: user))),
+            => OthersProfile(ctuerId: user.id))),
           ),
-          Divider(height: 2.0,
+          const Divider(height: 2.0,
           )
         ],
       ),

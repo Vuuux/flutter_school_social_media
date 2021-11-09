@@ -7,16 +7,16 @@ import 'intro_page2.dart';
 
 class IntroPage1 extends StatefulWidget {
   UserData userData;
-  List<Ctuer> ctuerList;
+  List<UserData> ctuerList;
 
-  IntroPage1({required this.userData, required this.ctuerList});
+  IntroPage1({Key? key, required this.userData, required this.ctuerList}) : super(key: key);
   @override
   _IntroPage1State createState() => _IntroPage1State();
 }
 
 class _IntroPage1State extends State<IntroPage1> {
   late int index;
-  late Ctuer chosenCtuer;
+  late UserData chosenCtuer;
   @override
   void initState() {
     index = Random().nextInt(widget.ctuerList.length);
@@ -100,14 +100,14 @@ class _IntroPage1State extends State<IntroPage1> {
                   ),
                   onPressed: () {
                     //TODO: ADD UID
-                    DatabaseServices(uid: '').uploadBondData(
-                      userData: widget.userData,
-                      myAnon: true,
-                      ctuer: chosenCtuer,
-                      friendAnon: true,
-                      chatRoomID: getChatRoomID(
-                          widget.userData.nickname, chosenCtuer.nickname),
-                    );
+                    // DatabaseServices(uid: '').uploadBondData(
+                    //   userData: widget.userData,
+                    //   myAnon: true,
+                    //   ctuer: chosenCtuer,
+                    //   friendAnon: true,
+                    //   chatRoomID: getChatRoomID(
+                    //       widget.userData.nickname, chosenCtuer.nickname),
+                    // );
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
                         builder: (context) => IntroPage2(

@@ -31,13 +31,13 @@ class _HomeState extends State<Home> {
 
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
-  showSnackBar(RemoteMessage message) {
-    RemoteNotification? notification = message.notification;
-    AndroidNotification? androidNotification = message.notification?.android;
+  showSnackBar(String message) {
+    // RemoteNotification? notification = message.notification;
+    // AndroidNotification? androidNotification = message.notification?.android;
 
     final snackBar = SnackBar(
       behavior: SnackBarBehavior.fixed,
-      content: Text(notification!.body!),
+      content: Text(message),
       action: SnackBarAction(
         textColor: Colors.black,
         label: 'Hmmie!',
@@ -45,12 +45,12 @@ class _HomeState extends State<Home> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => NotificationPage(),
+                builder: (context) => NotificationPage(uid: user!.uid),
               ),
             ),
       ),
-      duration: Duration(seconds: 3),
-      backgroundColor: Colors.deepPurpleAccent,
+      duration: const Duration(seconds: 3),
+      backgroundColor: Colors.amber,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
@@ -86,12 +86,15 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     //TODO: Add Day Night Switch
-    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    //   showSnackBar(message);
-    //   print('onMessage: $message');
-    // });
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      showSnackBar(message);
+      var messageData = message.data;
+      final String recipientId = messageData["recipient"];
+      final String? body = message.notification!.body;
+      if(recipientId == user!.uid && body!.isNotEmpty) {
+        showSnackBar(body);
+      }
+
       print('onMessage: $message');
     });
 
@@ -115,8 +118,6 @@ class _HomeState extends State<Home> {
       alert: true,
     );
 
-    // _fcm.requestNotificationPermissions(
-    //     const IosNotificationSettings(sound: true, badge: true, alert: true));
   }
 
   changePage(int index) {
@@ -133,9 +134,9 @@ class _HomeState extends State<Home> {
     final tabs = [
       const  Feed(),
       const ChatScreen(),
-      const NotificationPage(),
+      NotificationPage(uid: user!.uid,),
       const MyProfile(),
-      const SimpleSearch(),
+      SimpleSearch(),
     ];
 
     //Các tab ở chế độ ẩn danh
@@ -267,7 +268,7 @@ class _HomeState extends State<Home> {
         body: tabs[_currentIndex],
         floatingActionButton: FloatingActionButton(
           splashColor: Colors.transparent,
-          backgroundColor: Colors.transparent,
+          backgroundColor: kPrimaryLightColor,
           child: ClipOval(
             child: Image.asset('assets/images/ghosty2.png',
                 fit: BoxFit.fill, color: kPrimaryColor),
@@ -282,7 +283,7 @@ class _HomeState extends State<Home> {
         floatingActionButtonLocation:
         FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: BottomAppBar(
-          color: Colors.white38,
+          color: Colors.blueGrey,
           shape: const CircularNotchedRectangle(),
           notchMargin: 10,
           child: SizedBox(
@@ -291,7 +292,7 @@ class _HomeState extends State<Home> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     MaterialButton(
                       highlightColor: Colors.transparent,
@@ -305,6 +306,7 @@ class _HomeState extends State<Home> {
                             : Colors.white,
                       ),
                     ),
+                    const SizedBox(width: 50,),
                     MaterialButton(
                       highlightColor: Colors.transparent,
                       splashColor: Colors.transparent,

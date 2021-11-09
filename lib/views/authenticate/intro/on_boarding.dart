@@ -213,73 +213,85 @@ class CustomDialog extends StatelessWidget {
 
   dialogContent(BuildContext context) {
     final user = Provider.of<CurrentUser?>(context);
-    final ctuerList = Provider.of<List<Ctuer>>(context);
+    List<UserData> ctuerList;
     return StreamBuilder<Object>(
         stream: DatabaseServices(uid: user!.uid).userData,
         builder: (context, snapshot) {
           Object? userData = snapshot.data;
           if (userData != null) {
-            return Stack(
-              children: <Widget>[
-                Container(
-                    padding: const EdgeInsets.only(
-                        top: 100, bottom: 16, left: 14, right: 14),
-                    margin: const EdgeInsets.only(top: 50),
-                    decoration: BoxDecoration(
-                        color: const Color(0xFF505050),
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.circular(17),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 10,
-                            offset: Offset(0, 10),
-                          )
-                        ]),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(title,
-                            style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.deepPurpleAccent)),
-                        Text(description,
-                            style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w100,
-                                color: Colors.deepPurpleAccent)),
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: FlatButton(
-                            onPressed: () {
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (context) => Filterpage(
-                                      userData: userData as UserData,
-                                      ctuerList: ctuerList),
+            return StreamBuilder<List<UserData>>(
+              stream: DatabaseServices(uid: user.uid).ctuerList,
+              builder: (context, snapshot) {
+                if(snapshot.hasData){
+                  ctuerList = snapshot.data!;
+
+                  return Stack(
+                    children: <Widget>[
+                      Container(
+                          padding: const EdgeInsets.only(
+                              top: 100, bottom: 16, left: 14, right: 14),
+                          margin: const EdgeInsets.only(top: 50),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(17),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 10),
+                                )
+                              ]),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Text(title,
+                                  style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                      color: kPrimaryColor)),
+                              Text(description,
+                                  style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w100,
+                                      color: Colors.black)),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: FlatButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                        builder: (context) => Filterpage(
+                                            userData: userData as UserData,
+                                            ctuerList: ctuerList),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text(
+                                    'DZÔ',
+                                    style: TextStyle(
+                                      color: kPrimaryColor,
+                                      fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
-                              );
-                            },
-                            child: const Text(
-                              'DZÔ',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )),
-                const Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: CircleAvatar(
-                      backgroundColor: Colors.blueGrey,
-                      radius: 60,
-                      backgroundImage: AssetImage('assets/images/WTaB.gif'),
-                    ))
-              ],
+                              ),
+                            ],
+                          )),
+                      const Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          child: CircleAvatar(
+                            backgroundColor: Colors.blueGrey,
+                            radius: 60,
+                            backgroundImage: AssetImage('assets/images/WTaB.gif'),
+                          ))
+                    ],
+                  );
+                }
+                return Loading();
+              }
             );
           } else {
             return Loading();

@@ -119,6 +119,10 @@ class AuthService {
 
   }
 
+  Future sendEmailResetPassword(String email) async {
+    await _auth.sendPasswordResetEmail(email: email);
+  }
+
   Future updateProfilePicture(String avatar) async {
     //vars
   }

@@ -41,7 +41,7 @@ class _MyProfileState extends State<MyProfile> {
     QuerySnapshot querySnapshot = await DatabaseServices(uid: '')
         .followingRef
         .doc(userUid)
-        .collection('userFollowing')
+        .collection('userFollowings')
         .get();
     if (mounted) {
       setState(() {
@@ -160,6 +160,12 @@ class _MyProfileState extends State<MyProfile> {
             userUid = userData.email;
             return Scaffold(
               appBar: AppBar(
+                title: const Text("C Á   N H Â N"),
+                centerTitle: true,
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      bottom: Radius.circular(15),
+                    )),
                 elevation: 0,
                 actions: <Widget>[
                   IconButton(
@@ -169,7 +175,26 @@ class _MyProfileState extends State<MyProfile> {
                       LineAwesomeIcons.alternate_sign_out,
                     ),
                     onPressed: () async {
-                      await context.read<AuthService>().signOut();
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Bạn chắc chắn muốn đăng xuất chứ?'),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () async {
+                                await context.read<AuthService>().signOut();
+                                Navigator.of(context).pop(false);
+                              },
+                              child: const Text('Xác nhận'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text('Đóng'),
+                            ),
+                          ],
+                        ),
+                      );
+
                     },
                   ),
                 ],
@@ -467,7 +492,7 @@ class _MyProfileState extends State<MyProfile> {
                                                       .get('ownerId'),
                                                   username: snapshot
                                                       .data!.docs[index]
-                                                      .get('name'),
+                                                      .get('username'),
                                                   location: snapshot
                                                       .data!.docs[index]
                                                       .get('location'),
@@ -519,7 +544,7 @@ class _MyProfileState extends State<MyProfile> {
                                               Navigator.push(context,
                                                   MaterialPageRoute(
                                                       builder: (context) =>
-                                                          PostDetail(post: post)));
+                                                          PostDetail(postId: post.post.postId, ownerId: user.uid,)));
                                             },
                                             menuItems: <
                                                 FocusedMenuItem>[

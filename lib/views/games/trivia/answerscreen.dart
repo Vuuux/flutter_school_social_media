@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +11,8 @@ class AnswerScreen extends StatefulWidget {
   String triviaRoomID;
   String question;
   UserData userData;
-  Ctuer ctuer;
-  List<Ctuer> ctuerList;
+  UserData ctuer;
+  List<UserData> ctuerList;
 
   AnswerScreen(
       {required this.ctuerList,
@@ -53,7 +51,7 @@ class _AnswerScreenState extends State<AnswerScreen> {
     }
   }
 
-  createChatRoomAndStartConversation(UserData userData, Ctuer hmmie) {
+  createChatRoomAndStartConversation(UserData userData, UserData hmmie) {
     String chatRoomID = getChatRoomID(userData.nickname, hmmie.nickname);
     List<String> users = [userData.email, hmmie.email];
 
@@ -62,7 +60,7 @@ class _AnswerScreenState extends State<AnswerScreen> {
       "chatRoomId": chatRoomID
     };
     //TODO: ADD uid
-    DatabaseServices(uid: '').createAnonChatRoom(chatRoomID, chatRoomMap);
+    //DatabaseServices(uid: '').createAnonChatRoom(chatRoomID, chatRoomMap);
   }
 
   sendMessage() {
@@ -107,27 +105,27 @@ class _AnswerScreenState extends State<AnswerScreen> {
       });
 
       setState(() {
-        saveReceiverCloud(widget.ctuer);
+        //saveReceiverCloud(widget.ctuer);
         message = "";
         messageTextEditingController.clear();
       });
     }
   }
 
-  saveReceiverCloud(Ctuer hmmie) async {
-    QuerySnapshot query =
-        (await DatabaseServices(uid: hmmie.id).getReceiverToken(hmmie.email)) as QuerySnapshot<Object?>;
-    String val = query.docs[0].get('token').toString();
-    DatabaseServices(uid: '').cloudRef.doc().set({
-      'type': 'question',
-      'ownerID': hmmie.email,
-      'ownerName': hmmie.username,
-      'timestamp': DateTime.now(),
-      'userDp': widget.userData.anonAvatar,
-      'userID': widget.userData.nickname,
-      'token': val,
-    });
-  }
+  // saveReceiverCloud(UserData hmmie) async {
+  //   QuerySnapshot query =
+  //       (await DatabaseServices(uid: hmmie.id).getReceiverToken(hmmie.email)) as QuerySnapshot<Object?>;
+  //   String val = query.docs[0].get('token').toString();
+  //   DatabaseServices(uid: '').cloudRef.doc().set({
+  //     'type': 'question',
+  //     'ownerID': hmmie.email,
+  //     'ownerName': hmmie.username,
+  //     'timestamp': DateTime.now(),
+  //     'userDp': widget.userData.anonAvatar,
+  //     'userID': widget.userData.nickname,
+  //     'token': val,
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {

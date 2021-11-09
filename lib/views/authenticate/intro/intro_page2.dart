@@ -11,8 +11,8 @@ import 'package:luanvanflutter/views/home/home.dart';
 
 class IntroPage2 extends StatefulWidget {
   UserData userData;
-  List<Ctuer> ctuerList;
-  Ctuer chosenCtuer;
+  List<UserData> ctuerList;
+  UserData chosenCtuer;
 
   IntroPage2(
       {required this.chosenCtuer,

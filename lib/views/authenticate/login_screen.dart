@@ -48,9 +48,10 @@ class _LoginScreenState extends State<LoginScreen> {
           .getUserByEmail(email.toString())
           .then((value) async {
         snapshotUserinfo = value;
-        await Helper.saveUserNameSharedPreference(
-            snapshotUserinfo.docs[0].get('name'));
-        Helper.getUserNameSharedPreference()
+        await Helper.saveUserIdSharedPreference(
+            snapshotUserinfo.docs[0].get('id'));
+
+        Helper.getUserIdSharedPreference()
             .then((value) => print("USERNAME:" + value.toString()));
         Helper.getUserEmailSharedPreference()
             .then((value) => print("EMAIL:" + value.toString()));

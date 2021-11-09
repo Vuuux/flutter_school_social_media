@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/user.dart';
+import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/decoration.dart';
 
 import 'intro_page1.dart';
@@ -10,7 +11,7 @@ import 'intro_page1.dart';
 
 class Filterpage extends StatefulWidget {
   UserData userData;
-  List<Ctuer> ctuerList;
+  List<UserData> ctuerList;
 
   Filterpage({required this.userData, required this.ctuerList});
   @override
@@ -21,8 +22,8 @@ class _FilterpageState extends State<Filterpage> {
   var isMaleSelected = true;
   var isFemaleSelected = false;
   var noresult= false;
-  List<Ctuer> filtered = [];
-  List<Ctuer> toremove = [];
+  List<UserData> filtered = [];
+  List<UserData> toremove = [];
 
   //List item
   final List<String> _majors = <String>[
@@ -73,7 +74,7 @@ class _FilterpageState extends State<Filterpage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     "Tôi muốn làm quen với...",
                     style: TextStyle(
                       fontWeight: FontWeight.w100,
@@ -81,7 +82,7 @@ class _FilterpageState extends State<Filterpage> {
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 30,
                   ),
                   Row(
@@ -95,20 +96,20 @@ class _FilterpageState extends State<Filterpage> {
                               isFemaleSelected = false;
                               selectedGender = "Male";
                             });
-                            // widget.wiggles.forEach((element) {
-                            //   if (element.gender == 'Male' &&
-                            //       !filtered.contains(element)) {
-                            //     filtered.add(element);
-                            //   } else if (element.gender == 'Female') {
-                            //     filtered.remove(element);
-                            //   }
+                            widget.ctuerList.forEach((element) {
+                              if (element.gender == 'Male' &&
+                                  !filtered.contains(element)) {
+                                filtered.add(element);
+                              } else if (element.gender == 'Female') {
+                                filtered.remove(element);
+                              }
 
-                            //   ;
-                            // });
+                              ;
+                            });
 
-                            // filtered.forEach((element) {
-                            //   print(element.name);
-                            // });
+                            filtered.forEach((element) {
+                              print(element.username);
+                            });
                           },
                           child: ChoiceChip(
                               LineAwesomeIcons.male, 'Nam', isMaleSelected)),
@@ -120,19 +121,19 @@ class _FilterpageState extends State<Filterpage> {
                               selectedGender = "Female";
                             });
 
-                            // widget.wiggles.forEach((element) {
-                            //   if (element.gender == 'Female' &&
-                            //       !filtered.contains(element)) {
-                            //     filtered.add(element);
-                            //   } else if (element.gender == 'Male') {
-                            //     filtered.remove(element);
-                            //   }
-                            //   ;
-                            // });
+                            widget.ctuerList.forEach((element) {
+                              if (element.gender == 'Female' &&
+                                  !filtered.contains(element)) {
+                                filtered.add(element);
+                              } else if (element.gender == 'Male') {
+                                filtered.remove(element);
+                              }
+                              ;
+                            });
 
-                            // filtered.forEach((element) {
-                            //   print(element.name);
-                            // });
+                            filtered.forEach((element) {
+                              print(element.username);
+                            });
                           },
                           child: ChoiceChip(
                               LineAwesomeIcons.female, 'Nữ', isFemaleSelected)),
@@ -146,7 +147,7 @@ class _FilterpageState extends State<Filterpage> {
                       const Icon(
                         FontAwesomeIcons.book,
                         size: 25.0,
-                        color: Colors.deepPurpleAccent,
+                        color: kPrimaryColor,
                       ),
                       const SizedBox(width: 20.0),
                       Expanded(
@@ -155,7 +156,7 @@ class _FilterpageState extends State<Filterpage> {
                                 .map((value) => DropdownMenuItem(
                               child: Text(
                                 value,
-                                style: TextStyle(color: Colors.deepPurpleAccent),
+                                style: TextStyle(color: Colors.black),
                               ),
                               value: value,
                             ))
@@ -195,7 +196,7 @@ class _FilterpageState extends State<Filterpage> {
                       const Icon(
                       FontAwesomeIcons.idCard,
                       size: 25.0,
-                      color: Colors.deepPurpleAccent,
+                      color: kPrimaryColor,
                     ),
                       const SizedBox(width: 20.0),
                       Expanded(
@@ -204,7 +205,7 @@ class _FilterpageState extends State<Filterpage> {
                               .map((value) => DropdownMenuItem(
                             child: Text(
                               value,
-                              style: TextStyle(color: Colors.deepPurpleAccent),
+                              style: TextStyle(color: Colors.black),
                             ),
                             value: value,
                           ))
@@ -244,12 +245,12 @@ class _FilterpageState extends State<Filterpage> {
                       child: Container(
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: Colors.deepPurpleAccent,
+                          color: kPrimaryColor,
                           borderRadius: BorderRadius.circular(25),
                         ),
-                        child: const Text(
-                          'Tìm',
-                          style: TextStyle(
+                        child: Text(
+                          'Tìm'.toUpperCase(),
+                          style: const TextStyle(
                             fontWeight: FontWeight.w100,
                             fontSize: 24,
                             color: Colors.black,
@@ -341,7 +342,7 @@ class _ChoiceChipState extends State<ChoiceChip> {
       decoration: widget.isSelected
           ? BoxDecoration(
           color: Colors.white.withOpacity(0.15),
-          borderRadius: BorderRadius.all(Radius.circular(25.0)))
+          borderRadius: BorderRadius.all(const Radius.circular(25.0)))
           : null,
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -352,11 +353,11 @@ class _ChoiceChipState extends State<ChoiceChip> {
             size: 25,
             color: Colors.white,
           ),
-          SizedBox(
+          const SizedBox(
             width: 8,
           ),
           Text(widget.text,
-              style: TextStyle(
+              style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15.0,
                   fontWeight: FontWeight.w100))

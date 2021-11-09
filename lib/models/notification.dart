@@ -10,6 +10,7 @@ class NotificationModel {
   final String mediaUrl;
   final String? comment;
   final String status;
+  final String? messageData;
 
   NotificationModel({
     required this.type,
@@ -21,6 +22,7 @@ class NotificationModel {
     required this.mediaUrl,
     required this.status,
     this.comment = '',
+    this.messageData = '',
   });
 
   factory NotificationModel.fromDocument(DocumentSnapshot doc) {
@@ -34,6 +36,7 @@ class NotificationModel {
         mediaUrl: doc.data().toString().contains('mediaUrl') ? doc.get('mediaUrl') : '',
         status: doc.data().toString().contains('status') ? doc.get('status') : '',
         comment: doc.data().toString().contains('commentData') ? doc.get('commentData') : '',
+        messageData: doc.data().toString().contains('messageData') ? doc.get('messageData') : '',
     );
   }
 

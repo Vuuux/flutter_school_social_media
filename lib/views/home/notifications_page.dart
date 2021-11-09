@@ -1,74 +1,113 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:date_format/date_format.dart';
 import "package:flutter/material.dart";
 import 'package:luanvanflutter/models/notification.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
+import 'package:luanvanflutter/views/authenticate/helper.dart';
+import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as tAgo;
 
 import '../../controller/controller.dart';
+import 'feed/post_detail.dart';
 
 //Class quản lý thông báo
 class NotificationPage extends StatefulWidget {
-  const NotificationPage({Key? key}) : super(key: key);
+  final String uid;
+
+  const NotificationPage({
+    Key? key,
+    required this.uid,
+  }) : super(key: key);
 
   @override
   _NotificationPageState createState() => _NotificationPageState();
 }
 
 class _NotificationPageState extends State<NotificationPage> {
+  Future<QuerySnapshot>? notificationFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    notificationFuture =
+        DatabaseServices(uid: widget.uid).getAllNotifications();
+  }
+
+  Future _onRefresh() async {
+    QuerySnapshot snapshot =
+        await DatabaseServices(uid: widget.uid).getAllNotifications();
+    setState(() {
+      notificationFuture = Future<QuerySnapshot>.value(snapshot);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<CurrentUser?>(context);
-    DatabaseServices databaseService = DatabaseServices(uid: user!.uid);
+    DatabaseServices databaseService = DatabaseServices(uid: widget.uid);
 
     return StreamBuilder<UserData>(
         stream: databaseService.userData,
         builder: (context, snapshot) {
-          UserData? userData = snapshot.data;
-          if (userData != null) {
-            return Scaffold(
-              appBar: AppBar(
-                centerTitle: true,
-                elevation: 0,
-                title: const Text("T H Ô N G    B Á O",
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
-              ),
-              body: FutureBuilder<QuerySnapshot>(
-                  future: databaseService.getNotifications(),
-                  builder: (context, dataSnapshot) {
-                    List<NotificationModel> notificationsItems = [];
-                    if (dataSnapshot.connectionState != ConnectionState.done) {
-                      return Loading();
-                    }
-                    if (dataSnapshot.hasData) {
-
-                      for (var document in dataSnapshot.data!.docs) {
-                        notificationsItems.add(NotificationModel.fromDocument(document));
-                      }
-                      return ListView.separated(
-                        itemBuilder: (context, index) {
-                          return NotificationsItem(
-                              noti: notificationsItems[index]);
-                        },
-                        itemCount: notificationsItems.length,
-                        separatorBuilder: (BuildContext context, int index) {
-                          return const Divider(height: 1, thickness: 1,);
-                        },
-                      );
-                    }
-
-                    return const Center(
-                      child: Text("Bạn chưa có thông báo nào"),
-                    );
-                  }),
-            );
-          } else {
+          if(snapshot.connectionState == ConnectionState.waiting){
             return Loading();
           }
+          if(snapshot.hasData){
+            UserData? userData = snapshot.data;
+            if (userData != null) {
+              return Scaffold(
+                appBar: AppBar(
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        bottom: Radius.circular(15),
+                      )),
+                  centerTitle: true,
+                  elevation: 0,
+                  title: const Text("T H Ô N G    B Á O",
+                      style:
+                      TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
+                ),
+                body: FutureBuilder<QuerySnapshot>(
+                    future: notificationFuture,
+                    builder: (context, dataSnapshot) {
+                      List<NotificationModel> notificationsItems = [];
+                      if (dataSnapshot.connectionState != ConnectionState.done) {
+                        return Loading();
+                      }
+                      if (dataSnapshot.hasData) {
+                        for (var document in dataSnapshot.data!.docs) {
+                          notificationsItems
+                              .add(NotificationModel.fromDocument(document));
+                        }
+                        return RefreshIndicator(
+                          onRefresh: () => _onRefresh(),
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              return NotificationsItem(
+                                  noti: notificationsItems[index]);
+                            },
+                            itemCount: notificationsItems.length,
+                            separatorBuilder: (BuildContext context, int index) {
+                              return const Divider(
+                                height: 1,
+                                thickness: 1,
+                              );
+                            },
+                          ),
+                        );
+                      }
+                      return const Center(
+                        child: Text("Bạn chưa có thông báo nào"),
+                      );
+                    }),
+              );
+            }
+          }
+            return Center(child: const Text("Bạn không có thông báo nào!"),);
         });
   }
 }
@@ -77,6 +116,7 @@ class NotificationsItem extends StatefulWidget {
   final NotificationModel noti;
   late String notificationItemText;
   late Widget mediaPreview;
+  UserData? userData;
 
   NotificationsItem({Key? key, required this.noti}) : super(key: key);
 
@@ -86,16 +126,18 @@ class NotificationsItem extends StatefulWidget {
     mediaPreview = SizedBox(
       child: CachedNetworkImage(imageUrl: noti.mediaUrl),
     );
-    if (noti.type == 'follow') {
+    if (noti.type == 'following') {
       notificationItemText = 'đang theo dõi bạn';
     } else if (noti.type == 'like') {
       notificationItemText = 'đã thích bài viết của bạn';
     } else if (noti.type == 'comment') {
-      notificationItemText = 'đã bình luận: ' + noti.comment!;
+      notificationItemText = 'đã bình luận bài viết';
     } else if (noti.type == 'message') {
       notificationItemText = 'gởi bạn 1 tin nhắn';
     } else if (noti.type == 'request') {
       notificationItemText = 'yêu cầu theo dõi bạn';
+    } else if (noti.type == 'accept-request') {
+      notificationItemText = 'đã chấp nhận yêu cầu theo dõi của bạn';
     } else if (noti.type == 'compatibility') {
       notificationItemText = 'muốn chơi trò QnA với bạn';
     } else if (noti.type == 'anonmessage') {
@@ -117,35 +159,29 @@ class _NotificationsItemState extends State<NotificationsItem> {
 
   @override
   void initState() {
-    checkAcceptedOrDeclinedforfollow();
-    checkAcceptedOrDeclinedfortictactoe();
     super.initState();
   }
 
-  checkAcceptedOrDeclinedforfollow() {
+  checkFollowRequestStatus(String uid) {
     if (widget.noti.type == 'request') {
-      //TODO: ACCEP REQUEST
+      widget.databaseService
+          .getRequestNotification(uid, widget.noti.userId)
+          .then((doc) {
+        if (doc.exists) {
+          if (doc.data()!['status'] == 'followed' ||
+              doc.data()!['status'] == 'accepted') {
+            if (mounted) {
+              setState(() {
+                accepted = true;
+              });
+            }
+          }
+        }
+      });
     }
-    //   widget.databaseService.feedRef
-    //       .doc(widget.ownerID)
-    //       .collection('feed')
-    //       .doc(widget.senderEmail)
-    //       .get()
-    //       .then((doc) {
-    //     if (doc.exists) {
-    //       if (doc.data()!['status'] == 'followed') {
-    //         if (mounted) {
-    //           setState(() {
-    //             accepted = true;
-    //           });
-    //         }
-    //       }
-    //     }
-    //   });
-    // }
   }
 
-  checkAcceptedOrDeclinedfortictactoe() {
+  checkAcceptedOrDeclinedfortictactoe(String uid) {
     if (widget.noti.type == 'tictactoe') {
       // widget.databaseService.feedRef
       //     .doc(widget.ownerID)
@@ -190,101 +226,148 @@ class _NotificationsItemState extends State<NotificationsItem> {
     }
   }
 
+  Future getCurrentUserData(String uid) async {
+    return await DatabaseServices(uid: uid).getUserByUserId();
+  }
+
+  handleAcceptRequest(CurrentUser user) async {
+    await getCurrentUserData(user.uid).then((value) {
+      setState(() {
+        widget.userData = UserData.fromDocumentSnapshot(value);
+      });
+    });
+    widget.databaseService.acceptRequest(user.uid, widget.noti.userId);
+
+    widget.databaseService.addNotifiCation(widget.noti.userId, user.uid, {
+      'type': 'accept-request',
+      'timestamp': DateTime.now(),
+      'avatar': widget.userData!.avatar,
+      'username': widget.userData!.username,
+      'status': 'following',
+      'userId': widget.userData!.id
+    });
+
+    widget.databaseService.addFollowing(user.uid, widget.noti.userId, {
+      'userId': widget.userData!.id,
+      'username': widget.userData!.username,
+      'avatar': widget.userData!.avatar
+    });
+
+    widget.databaseService.addFollower(user.uid, widget.noti.userId, {
+      'userId': widget.noti.userId,
+      'username': widget.noti.username,
+      'avatar': widget.noti.avatar
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<CurrentUser?>(context);
+    checkFollowRequestStatus(user!.uid);
+    checkAcceptedOrDeclinedfortictactoe(user.uid);
     widget.configureMediaPreview(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 1.0),
       child: Container(
+        width: MediaQuery.of(context).size.width,
         color: kPrimaryLightColor,
         child: ListTile(
           title: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          widget.noti.type == 'accept-request' ||
+                                  widget.noti.type == 'request'
+                              ? OthersProfile(ctuerId: widget.noti.userId)
+                              : PostDetail(
+                                  postId: widget.noti.postId,
+                                  ownerId: user.uid,
+                                )));
+            },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                RichText(
-                  overflow: TextOverflow.ellipsis,
-                  text: TextSpan(
-                    style: const TextStyle(fontSize: 10.0, color: Colors.black),
-                    children: [
-                      TextSpan(
-                          text: widget.noti.username,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Colors.black)),
-                      TextSpan(
-                          text: " " + widget.notificationItemText,
-                          style: (const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black))),
-                    ],
+                Flexible(
+                  flex: 7,
+                  child: RichText(
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                      style: const TextStyle(
+                          fontSize: 10.0, color: Colors.black),
+                      children: [
+                        TextSpan(
+                            text: widget.noti.username,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black)),
+                        TextSpan(
+                            text: " " + widget.notificationItemText,
+                            style: (const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black))),
+                      ],
+                    ),
                   ),
                 ),
-                widget.noti.type == 'request'
-                    ? accepted || declined
-                        ? accepted
-                            ? InkWell(
-                                child: const Text('ĐỒNG Ý',
-                                    style: TextStyle(fontSize: 10)),
-                                onTap: () {
-                                  print('NHẤN');
-                                })
-                            : InkWell(
-                                child: const Text('TỪ CHỐI',
-                                    style: TextStyle(fontSize: 10.0)),
-                                onTap: () {
-                                  print('NHẤN');
-                                })
-                        : Row(
-                            children: <Widget>[
-                              InkWell(
-                                  child: const Text('ĐỒNG Ý',
-                                      style: TextStyle(fontSize: 10.0)),
+                Flexible(
+                  flex: widget.noti.type == 'request' || widget.noti.type == 'accept-request'? 3 : 0,
+                  child: widget.noti.type == 'request'
+                      ? accepted || declined
+                          ? accepted
+                              ? InkWell(
+                                  child: const Text('ĐÃ ĐỒNG Ý!',
+                                      style: TextStyle(fontSize: 12.0,
+                                      fontWeight: FontWeight.bold
+                                      )),
+                                  onTap: () {})
+                              : InkWell(
+                                  child: const Text('ĐÃ TỪ CHỐI',
+                                      style: TextStyle(fontSize: 12.0)),
+                                  onTap: () {})
+                          : Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                InkWell(
+                                    child: const Text('OK!',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontSize: 10.0,
+                                            fontWeight: FontWeight.bold)),
+                                    onTap: () {
+                                      if (mounted) {
+                                        setState(() {
+                                          accepted = true;
+                                          widget.notificationItemText =
+                                              'đang theo dõi bạn';
+                                        });
+                                      }
+                                      handleAcceptRequest(user);
+                                    }),
+                                InkWell(
+                                  child: const Text('TỪ CHỐI',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 10.0,
+                                          fontWeight: FontWeight.bold)),
                                   onTap: () {
+                                    widget.databaseService.declineRequest(
+                                        user.uid, widget.noti.userId);
                                     if (mounted) {
                                       setState(() {
-                                        accepted = true;
-                                        widget.notificationItemText =
-                                            'đang theo dõi bạn';
+                                        declined = true;
                                       });
                                     }
-                                    //TODO: ACCEPT REQUEST
-                                    // widget.databaseService.acceptRequest(
-                                    //     widget.ownerID,
-                                    //     widget.ownerName,
-                                    //     widget.userDp,
-                                    //     widget.userID,
-                                    //     widget.senderEmail);
-                                  }),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width / 13,
-                              ),
-                              InkWell(
-                                child: const Text('TỪ CHỐI',
-                                    style: TextStyle(fontSize: 10)),
-                                onTap: () {
-                                  widget.databaseService.feedRef
-                                      .doc(widget.noti.userId)
-                                      .collection('feedItems')
-                                      .doc(widget.noti.userId)
-                                      .get()
-                                      .then((doc) {
-                                    if (doc.exists) {
-                                      doc.reference.delete();
-                                    }
-                                  });
-                                  if (mounted) {
-                                    setState(() {
-                                      declined = true;
-                                    });
-                                  }
-                                },
-                              ),
-                            ],
-                          )
-                    : Container(),
+                                  },
+                                )
+                              ],
+                            )
+                      : Container(),
+                ),
               ],
             ),
           ),
@@ -302,18 +385,16 @@ class _NotificationsItemState extends State<NotificationsItem> {
                       )
                     : Image.asset('assets/images/profile1.png',
                         fit: BoxFit.cover),
-
-                // Image.network(
-                //       widget.userDp,
-                //       fit: BoxFit.fill,
-                //     ) ??
-                //     Image.asset('assets/images/profile1.png', fit: BoxFit.fill),
               ),
             ),
           ),
           subtitle: Text(tAgo.format(widget.noti.timestamp.toDate()),
-              overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12)),
-          trailing: widget.mediaPreview,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 12)),
+          trailing: widget.noti.type == 'request' ||
+                  widget.noti.type == 'accept-request'
+              ? null
+              : widget.mediaPreview,
         ),
       ),
     );
