@@ -9,7 +9,7 @@ import 'package:luanvanflutter/views/components/rounded_password_field.dart';
 import 'package:provider/provider.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:luanvanflutter/views/home/home.dart';
+import 'package:luanvanflutter/home.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';
 
 class ForgotPassword extends StatefulWidget {

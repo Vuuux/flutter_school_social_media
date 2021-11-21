@@ -12,22 +12,22 @@ import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as tAgo;
 
 import '../../controller/controller.dart';
-import 'feed/post_detail.dart';
+import 'feed/anon_forum_detail.dart';
 
 //Class quản lý thông báo
-class NotificationPage extends StatefulWidget {
+class AnonNotificationPage extends StatefulWidget {
   final String uid;
 
-  const NotificationPage({
+  const AnonNotificationPage({
     Key? key,
     required this.uid,
   }) : super(key: key);
 
   @override
-  _NotificationPageState createState() => _NotificationPageState();
+  _AnonNotificationPageState createState() => _AnonNotificationPageState();
 }
 
-class _NotificationPageState extends State<NotificationPage> {
+class _AnonNotificationPageState extends State<AnonNotificationPage> {
   Future<QuerySnapshot>? notificationFuture;
 
   @override
@@ -87,7 +87,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           child: ListView.separated(
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
-                              return NotificationsItem(
+                              return AnonNotificationsItem(
                                   noti: notificationsItems[index]);
                             },
                             itemCount: notificationsItems.length,
@@ -112,13 +112,13 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 }
 
-class NotificationsItem extends StatefulWidget {
+class AnonNotificationsItem extends StatefulWidget {
   final NotificationModel noti;
   late String notificationItemText;
   late Widget mediaPreview;
   UserData? userData;
 
-  NotificationsItem({Key? key, required this.noti}) : super(key: key);
+  AnonNotificationsItem({Key? key, required this.noti}) : super(key: key);
 
   DatabaseServices databaseService = DatabaseServices(uid: '');
 
@@ -150,10 +150,10 @@ class NotificationsItem extends StatefulWidget {
   }
 
   @override
-  _NotificationsItemState createState() => _NotificationsItemState();
+  _AnonNotificationsItemState createState() => _AnonNotificationsItemState();
 }
 
-class _NotificationsItemState extends State<NotificationsItem> {
+class _AnonNotificationsItemState extends State<AnonNotificationsItem> {
   bool accepted = false;
   bool declined = false;
 
@@ -281,8 +281,8 @@ class _NotificationsItemState extends State<NotificationsItem> {
                           widget.noti.type == 'accept-request' ||
                                   widget.noti.type == 'request'
                               ? OthersProfile(ctuerId: widget.noti.userId)
-                              : PostDetail(
-                                  postId: widget.noti.postId!,
+                              : ForumDetail(
+                                  forumId: widget.noti.postId!,
                                   ownerId: user.uid,
                                 )));
             },

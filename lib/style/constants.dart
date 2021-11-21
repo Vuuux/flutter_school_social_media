@@ -23,7 +23,7 @@ const textInputDecoration = InputDecoration(
 );
 
 const kSpacingUnit = 10;
-
+const kPrimaryDarkColor = Color(0xFF373737);
 const kPrimaryColor = Color(0xFFFFAFBD);
 const kSecondaryColor = Color(0xFFFFC3A0);
 //const kPrimaryColor = Color(0xFF6F35A5);

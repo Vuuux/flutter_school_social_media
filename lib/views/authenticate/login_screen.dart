@@ -14,7 +14,7 @@ import 'package:luanvanflutter/views/components/forgot_password_check.dart';
 import 'package:luanvanflutter/views/components/rounded_button.dart';
 import 'package:luanvanflutter/views/components/rounded_input_field.dart';
 import 'package:luanvanflutter/views/components/rounded_password_field.dart';
-import 'package:luanvanflutter/views/home/home.dart';
+import 'package:luanvanflutter/home.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';
 import 'package:provider/src/provider.dart';
 

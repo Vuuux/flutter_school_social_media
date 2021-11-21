@@ -5,7 +5,7 @@ import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/decoration.dart';
-import 'package:luanvanflutter/views/home/home.dart';
+import 'package:luanvanflutter/home.dart';
 
 class AnswerScreen extends StatefulWidget {
   String triviaRoomID;

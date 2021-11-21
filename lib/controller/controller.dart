@@ -211,6 +211,7 @@ class DatabaseServices {
     });
   }
 
+
   //trả về User bằng user username
   Future getUserByUserName(String username) async {
     return FirebaseFirestore.instance
@@ -227,39 +228,7 @@ class DatabaseServices {
         .get();
   }
 
-  //thêm blog data
-  Future<void> addBlogData(blogData, String description) async {
-    return await forumRef.doc('$description').set(blogData).catchError((e) {
-      print(e);
-    });
-  }
 
-  //trả về blog data
-  getBlogData() async {
-    return await FirebaseFirestore.instance
-        .collection('blogs')
-        .orderBy('time', descending: true)
-        .snapshots();
-  }
-
-  addForumMessages(String des, messageMap) async {
-    forumRef
-        .doc(des)
-        .collection("blogsdetail")
-        .doc(messageMap["time"].toString())
-        .set(messageMap)
-        .catchError((onError) {
-      print(onError.toString());
-    });
-  }
-
-  getForumMessages(String des) async {
-    return forumRef
-        .doc(des)
-        .collection("blogsdetail")
-        .orderBy("time", descending: true)
-        .snapshots();
-  }
 
   Future updateGame(String gameRoomID, String player1, String player2) async {
     return gameRef
@@ -403,7 +372,7 @@ class DatabaseServices {
     return ctuerRef.doc(uid).collection('photos').snapshots();
   }
 
-  Future updateAnon(bool isAnon) async {
+  Future changeAnonymousMode(bool isAnon) async {
     return await ctuerRef.doc(uid).update({"isAnon": isAnon});
   }
 
@@ -456,7 +425,6 @@ class DatabaseServices {
   }
 
   //tăng điểm danh tiếng
-  //check this
   Future increaseFame(
       int initialValue, String raterEmail, bool isAdditional) async {
     if (isAdditional) {
@@ -652,12 +620,12 @@ class DatabaseServices {
     });
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> getConversationMessages( String chatRoomId) async {
-    return await chatRef
+  Stream<QuerySnapshot<Map<String, dynamic>>> getConversationMessages( String chatRoomId) {
+    return chatRef
         .doc(chatRoomId)
         .collection('conversation')
         .orderBy('timestamp', descending: false)
-        .get();
+        .snapshots();
   }
 
   Future<Stream<QuerySnapshot<Map<String, dynamic>>>>
@@ -687,6 +655,7 @@ class DatabaseServices {
         .orderBy("timestamp", descending: true)
         .get();
   }
+
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getPostById(
       String ownerId, String postId) {
@@ -1043,5 +1012,79 @@ class DatabaseServices {
         .collection('userFollowers')
         .doc(uid)
         .get();
+  }
+  
+  
+  //ANONYMOUS MODE
+  Future updateAnon(bool isAnon) async {
+    return await ctuerRef.doc(uid).update({"isAnon": isAnon});
+  }
+
+  //thêm blog data
+  Future<void> addForumData(blogData, String description) async {
+    return await forumRef.doc('$description').set(blogData).catchError((e) {
+      print(e);
+    });
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getForums() async {
+    return forumRef
+        .get();
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getForumsByCategory(String category) async {
+    return forumRef.where('category', isEqualTo: category)
+        .get();
+  }
+
+  //trả về blog data
+  getForumData() async {
+    return await FirebaseFirestore.instance
+        .collection('blogs')
+        .orderBy('time', descending: true)
+        .snapshots();
+  }
+
+  Future createForum(
+      String forumId,
+      String username,
+      Timestamp timestamp,
+      String ownerId,
+      String description,
+      Map<String, dynamic> upVotes,
+      Map<String, dynamic> downVotes,
+      String category,
+      String url,
+      ) async {
+    await forumRef.doc(forumId).set({
+      "forumId": forumId,
+      "username": username,
+      "timestamp": Timestamp.now(),
+      "ownerId": ownerId,
+      "description": description,
+      "upVotes": upVotes,
+      "downVotes": downVotes,
+      "category": category,
+      "url": url
+    });
+  }
+
+  addForumMessages(String des, messageMap) async {
+    forumRef
+        .doc(des)
+        .collection("blogsdetail")
+        .doc(messageMap["time"].toString())
+        .set(messageMap)
+        .catchError((onError) {
+      print(onError.toString());
+    });
+  }
+
+  getForumMessages(String des) async {
+    return forumRef
+        .doc(des)
+        .collection("blogsdetail")
+        .orderBy("time", descending: true)
+        .snapshots();
   }
 }

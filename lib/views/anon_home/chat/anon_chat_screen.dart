@@ -11,17 +11,17 @@ import 'package:luanvanflutter/views/home/chat/components/chat_screen_tiles.dart
 import 'package:luanvanflutter/views/home/search/search_screen.dart';
 import 'package:provider/provider.dart';
 
-class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+class AnonChatScreen extends StatefulWidget {
+  const AnonChatScreen({Key? key}) : super(key: key);
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  _AnonChatScreenState createState() => _AnonChatScreenState();
 }
 
 var f = DateFormat('h:mm a');
 
 
-class _ChatScreenState extends State<ChatScreen> {
+class _AnonChatScreenState extends State<AnonChatScreen> {
   Stream<QuerySnapshot>? chatsScreenStream;
   late UserData currentCtuer;
   late String userId;

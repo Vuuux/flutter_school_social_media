@@ -15,12 +15,12 @@ import 'package:provider/provider.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class ConversationScreen extends StatefulWidget {
+class AnonConversationScreen extends StatefulWidget {
   final String chatRoomId;
   final UserData ctuer;
   final String userId;
 
-  const ConversationScreen(
+  const AnonConversationScreen(
       {Key? key,
       required this.chatRoomId,
       required this.ctuer,
@@ -28,12 +28,12 @@ class ConversationScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ConversationScreenState createState() => _ConversationScreenState();
+  _AnonConversationScreenState createState() => _AnonConversationScreenState();
 }
 
 final f = new DateFormat('h:mm a');
 
-class _ConversationScreenState extends State<ConversationScreen> {
+class _AnonConversationScreenState extends State<AnonConversationScreen> {
   String message = '';
   TextEditingController messageTextEditingController = TextEditingController();
 

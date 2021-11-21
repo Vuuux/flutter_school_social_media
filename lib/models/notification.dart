@@ -6,8 +6,8 @@ class NotificationModel {
   final String username;
   final Timestamp timestamp;
   final String avatar;
-  final String postId;
-  final String mediaUrl;
+  final String? postId;
+  final String? mediaUrl;
   final String? comment;
   final String status;
   final String? messageData;

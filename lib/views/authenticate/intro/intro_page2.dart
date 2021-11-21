@@ -7,7 +7,7 @@ import 'package:luanvanflutter/models/user.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:luanvanflutter/views/games/trivia/trivia.dart';
-import 'package:luanvanflutter/views/home/home.dart';
+import 'package:luanvanflutter/home.dart';
 
 class IntroPage2 extends StatefulWidget {
   UserData userData;
