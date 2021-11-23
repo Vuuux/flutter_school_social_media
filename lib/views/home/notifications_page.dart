@@ -244,7 +244,8 @@ class _NotificationsItemState extends State<NotificationsItem> {
       'avatar': widget.userData!.avatar,
       'username': widget.userData!.username,
       'status': 'following',
-      'userId': widget.userData!.id
+      'userId': widget.userData!.id,
+      'isAnon': false
     });
 
     widget.databaseService.addFollowing(user.uid, widget.noti.userId, {

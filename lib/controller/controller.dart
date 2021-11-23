@@ -314,7 +314,8 @@ class DatabaseServices {
       "postId": postId,
       "mediaUrl": mediaUrl,
       "timestamp": timestamp,
-      "status": "unseen"
+      "status": "unseen",
+      "isAnon": false
     });
   }
 
@@ -965,7 +966,8 @@ class DatabaseServices {
       "avatar": avatar,
       "mediaUrl": url,
       "timestamp": timestamp,
-      "status": "unseen"
+      "status": "unseen",
+      "isAnon": false
     });
   }
 
@@ -1029,27 +1031,23 @@ class DatabaseServices {
 
   Future<QuerySnapshot<Map<String, dynamic>>> getForums() async {
     return forumRef
+        .orderBy('timestamp', descending: true)
         .get();
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getForumsByCategory(String category) async {
     return forumRef.where('category', isEqualTo: category)
+        .orderBy('timestamp', descending: true)
         .get();
   }
 
-  //trả về blog data
-  getForumData() async {
-    return await FirebaseFirestore.instance
-        .collection('blogs')
-        .orderBy('time', descending: true)
-        .snapshots();
-  }
 
   Future createForum(
       String forumId,
       String username,
       Timestamp timestamp,
       String ownerId,
+      String title,
       String description,
       Map<String, dynamic> upVotes,
       Map<String, dynamic> downVotes,
@@ -1061,11 +1059,12 @@ class DatabaseServices {
       "username": username,
       "timestamp": Timestamp.now(),
       "ownerId": ownerId,
+      "title": title,
       "description": description,
       "upVotes": upVotes,
       "downVotes": downVotes,
       "category": category,
-      "url": url
+      "mediaUrl": url
     });
   }
 
@@ -1086,5 +1085,66 @@ class DatabaseServices {
         .collection("blogsdetail")
         .orderBy("time", descending: true)
         .snapshots();
+  }
+  Future updateVoteForum(String voterId, String forumId, bool upVote, bool downVote) async {
+    await forumRef
+        .doc(forumId)
+        .update({'upVotes.$voterId': upVote});
+    await forumRef
+        .doc(forumId)
+        .update({'downVotes.$voterId': downVote});
+  }
+
+
+  Future upVoteForum(String voterId, String forumId) async {
+    await forumRef
+        .doc(forumId)
+        .update({'upVotes.$voterId': true});
+    await forumRef
+        .doc(forumId)
+        .update({'downVotes.$voterId': false});
+  }
+
+  Future downVoteForum(String voterId, String forumId) async {
+    await forumRef
+        .doc(forumId)
+        .update({'upVotes.$voterId': false});
+    await forumRef
+        .doc(forumId)
+        .update({'downVotes.$voterId': true});
+  }
+
+  Future removeVoteNotifications(String ownerId, String forumId) async {
+    return await feedRef
+        .doc(ownerId)
+        .collection('feedItems')
+        .doc(forumId)
+        .get()
+        .then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+  }
+
+  Future addVoteNotifications(
+      String ownerId,
+      String nickname,
+      String userId,
+      String avatar,
+      String forumId,
+      String mediaUrl,
+      Timestamp timestamp) async {
+    return await feedRef.doc(ownerId).collection('feedItems').doc(forumId).set({
+      "type": "vote",
+      "username": nickname,
+      "userId": userId,
+      "avatar": avatar,
+      "forumId": forumId,
+      "mediaUrl": mediaUrl,
+      "timestamp": timestamp,
+      "status": "unseen",
+      "isAnon": true
+    });
   }
 }

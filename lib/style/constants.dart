@@ -24,7 +24,8 @@ const textInputDecoration = InputDecoration(
 
 const kSpacingUnit = 10;
 const kPrimaryDarkColor = Color(0xFF373737);
-const kPrimaryColor = Color(0xFFFFAFBD);
+const kPrimaryColor = Color(0xFFFFC3A0);
+//Color(0xFFFFAFBD);
 const kSecondaryColor = Color(0xFFFFC3A0);
 //const kPrimaryColor = Color(0xFF6F35A5);
 const kPrimaryLightColor = Color(0xFFFDE1E5);
@@ -34,7 +35,12 @@ const kWarninngColor = Color(0xFFF3BB1C);
 const kErrorColor = Color(0xFFF03738);
 
 const kDefaultPadding = 20.0;
-
+//Forum color
+const kStudyColor = Colors.lightBlueAccent;
+const kQuestionColor = Colors.amber;
+const kAdviseColor = Colors.pinkAccent;
+const kSecretColor = Colors.deepPurpleAccent;
+const kSupportColor = Colors.red;
 
 class FadeRoute extends PageRouteBuilder {
   final Widget page;

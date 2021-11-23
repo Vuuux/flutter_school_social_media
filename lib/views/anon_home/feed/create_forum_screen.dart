@@ -31,6 +31,8 @@ class _CreateForumState extends State<CreateForum>
   File? file;
   TextEditingController descriptionTextEditingController =
   TextEditingController();
+  TextEditingController titleTextEditingController =
+  TextEditingController();
   bool uploading = false;
   final Reference storageReference =
   FirebaseStorage.instance.ref().child("Đăng ảnh");
@@ -71,6 +73,7 @@ class _CreateForumState extends State<CreateForum>
         widget.userData.nickname,
         Timestamp.now(),
         uid,
+        titleTextEditingController.text,
         descriptionTextEditingController.text,
         {},
         {},
@@ -84,7 +87,7 @@ class _CreateForumState extends State<CreateForum>
       forumId = Uuid().v4();
     });
 
-    Navigator.pop(context);
+    Navigator.pop(context, "UPLOADED");
   }
 
   displayUploadFormScreen(CurrentUser user) {
@@ -140,24 +143,25 @@ class _CreateForumState extends State<CreateForum>
             padding: EdgeInsets.only(top: 12),
           ),
           ListTile(
-            leading: CircleAvatar(
-              radius: 27,
-              child: ClipOval(
-                child: SizedBox(
-                  width: 180,
-                  height: 180,
-                  child: Image.network(
-                    widget.userData.avatar,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
+            leading: const Icon(Icons.title),
+            title: TextFormField(
+              style: const TextStyle(color: Colors.black),
+              controller: titleTextEditingController,
+              decoration: textFieldInputDecoration(
+                  'Tựa đề diễn đàn'),
+              // decoration: InputDecoration(
+              //   hintText: 'Say something about your image',
+              //   hintStyle: TextStyle(color: Colors.grey),
+              //   border: InputBorder.none,
             ),
+          ),
+          ListTile(
+            leading: Icon(Icons.question_answer),
             title: TextFormField(
               style: const TextStyle(color: Colors.black),
               controller: descriptionTextEditingController,
               decoration: textFieldInputDecoration(
-                  ' Đặt câu hỏi cho diễn đàn của bạn'),
+                  'Đặt câu hỏi cho diễn đàn của bạn'),
               // decoration: InputDecoration(
               //   hintText: 'Say something about your image',
               //   hintStyle: TextStyle(color: Colors.grey),
@@ -203,7 +207,7 @@ class _CreateForumState extends State<CreateForum>
           case 'Thầm kín':
             category = 'secret';
             break;
-          case 'Xin hỗ trợ':
+          case 'Hỗ trợ':
             category = 'support';
             break;
         }

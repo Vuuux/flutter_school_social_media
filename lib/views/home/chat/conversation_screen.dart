@@ -85,7 +85,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
         'timestamp': Timestamp.now(),
         'avatar': userData.avatar,
         'username': userData.username,
-        'status': 'unseen'
+        'status': 'unseen',
+        'isAnon': false
       });
 
       setState(() {

@@ -59,7 +59,7 @@ class _PostItemState extends State<PostItem> {
               ),
             ),
           ),
-          subtitle: Text(widget.post.location +' - ' + timeago.format(widget.post.timestamp.toDate())),
+          subtitle: Text(widget.post.location +' - ' + timeago.format(widget.post.timestamp.toDate(), locale: "vi")),
           trailing: IconButton(
             //TODO: DELETE POST
             onPressed: () => onOpenPostOption(context),
@@ -206,6 +206,8 @@ class _PostItemState extends State<PostItem> {
   @override
   void initState() {
     super.initState();
+    timeago.setLocaleMessages('vi', timeago.ViMessages());
+    timeago.setLocaleMessages('vi_short', timeago.ViShortMessages());
     for (var val in widget.post.likes.values) {
       if (val == true) {
         likeCount += 1;

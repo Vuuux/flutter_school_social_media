@@ -6,7 +6,7 @@ import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/views/anon_home/anon_notifications_page.dart';
 import 'package:luanvanflutter/views/anon_home/chat/anon_chat_screen.dart';
-import 'package:luanvanflutter/views/anon_home/feed/anon_feed.dart';
+import 'package:luanvanflutter/views/anon_home/feed/forum_feed.dart';
 import 'package:luanvanflutter/views/anon_home/profile/anon_profile.dart';
 import 'package:luanvanflutter/views/anon_home/search/anon_example_search_screen.dart';
 import 'package:luanvanflutter/views/home/profile/profile.dart';

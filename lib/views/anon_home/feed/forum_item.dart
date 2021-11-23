@@ -1,142 +1,207 @@
+import 'dart:async';
+
+import 'package:animator/animator.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:focused_menu/focused_menu.dart';
-import 'package:focused_menu/modals.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/forum.dart';
+import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
-import 'package:luanvanflutter/style/constants.dart';
+import 'package:luanvanflutter/style/loading.dart';
+import 'package:luanvanflutter/views/anon_home/feed/anon_forum_detail.dart';
+import 'package:luanvanflutter/views/home/feed/post_detail.dart';
+import 'package:provider/src/provider.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'forum_comment_screen.dart';
+import 'forum_tile.dart';
 
-import 'anon_comment_screen.dart';
-
-class ForumTile extends StatelessWidget {
+class ForumItem extends StatefulWidget {
   final ForumModel forum;
-  final UserData userData;
-  ForumTile(
-      {Key? key, required this.forum,
-        required this.userData}) : super(key: key);
-  int upVoteCount = 0;
-  int downVoteCount = 0;
-  @override
-  Widget build(BuildContext context) {
-    upVoteCount = forum.getUpvoteCount();
-    upVoteCount = forum.getDownVoteCount();
-    return FocusedMenuHolder(
-      menuWidth: MediaQuery.of(context).size.width,
-      menuBoxDecoration: const BoxDecoration(
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(20),
-          topLeft: Radius.circular(20),
-          bottomLeft: Radius.circular(20),
-          bottomRight: Radius.circular(20),
-        ),
-      ),
-      onPressed: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => AnonShowComments(
-                context: context,
-                postId: forum.forumId,
-                ownerId: forum.ownerId,
-                mediaUrl: forum.url))),
-      menuItems: <FocusedMenuItem>[
-        FocusedMenuItem(
-            title: const Text(
-              "Xóa Forum",
-              style: TextStyle(color: Colors.black),
-            ),
-            trailingIcon: Icon(Icons.delete),
-            onPressed: () {
-              // DatabaseServices()
-              //     .blogRef
-              //     .document(description)
-              //     .collection('chats')
-              //     .getDocuments()
-              //     .then((doc) {
-              //   if (doc.documents[0].exists) {
-              //     doc.documents[0].reference.delete();
-              //   }
-              // });
+  bool isLiked = false;
+  UserData? currentUser;
 
-              // DatabaseServices()
-              //     .forumRef
-              //     .doc(forumId)
-              //     .get()
-              //     .then((doc) {
-              //   if (doc.exists) {
-              //     doc.reference.delete();
-              //   }
-              // });
-            },
-            backgroundColor: Colors.redAccent)
-      ],
-      child: GestureDetector(
-        onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AnonShowComments(
-                    context: context,
-                    postId: forum.forumId,
-                    ownerId: forum.ownerId,
-                    mediaUrl: forum.url))),
-        child: Container(
-          margin: EdgeInsets.only(bottom: 16),
-          height: 150,
-          child: Stack(
+  ForumItem({Key? key, required this.forum}) : super(key: key);
+
+  @override
+  _ForumItemState createState() => _ForumItemState();
+}
+
+class _ForumItemState extends State<ForumItem> {
+
+  onOpenPostOption(BuildContext nContext) {
+    return widget.currentUser!.id == widget.forum.ownerId ? showDialog(
+        context: nContext,
+        builder: (context) {
+          return SimpleDialog(
             children: <Widget>[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: Image.network(
-                  forum.url,
-                  width: MediaQuery.of(context).size.width,
-                  fit: BoxFit.cover,
+              SimpleDialogOption(
+                child: const Text(
+                  "Xóa bài viết",
                 ),
+                onPressed: () => DatabaseServices(uid: '').deletePost(widget.forum.ownerId, widget.forum.forumId),
               ),
-              Container(
-                height: 170,
-                decoration: BoxDecoration(
-                    color: Colors.black45.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(6)),
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      forum.category.toUpperCase(),
-                      textAlign: TextAlign.center,
-                      style:
-                      const TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(
-                      height: 4,
-                    ),
-                    Text(
-                      forum.description,
-                      style:
-                      const TextStyle(fontSize: 17, fontWeight: FontWeight.w400),
-                    ),
-                    const SizedBox(
-                      height: 4,
-                    ),
-                    Text(forum.username)
-                    ,
-                    Text(
-                      "$upVoteCount up votes",
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+              SimpleDialogOption(
+                child: const Text(
+                  "Đóng",
                 ),
+                onPressed: () {},
               )
             ],
-          ),
+          );
+        }) : null;
+  }
+
+  buildPostFooter() {
+    return Column(
+      children: <Widget>[
+        const Padding(padding: EdgeInsets.only(top: 10)),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              margin: const EdgeInsets.only(left: 20.0),
+              child: Text(
+                widget.forum.username + "  ",
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Expanded(child: Text(widget.forum.description))
+          ],
         ),
-      ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            const Padding(padding: EdgeInsets.only(top: 40.0, left: 20.0)),
+            GestureDetector(
+              onTap: () =>
+                  handleLikePost(widget.forum.ownerId, widget.forum.forumId),
+              child: widget.isLiked
+                  ? const Icon(
+                      Icons.favorite,
+                      size: 28.0,
+                      color: Colors.pink,
+                    )
+                  : const Icon(
+                      Icons.favorite_border,
+                      size: 28.0,
+                      color: Colors.pink,
+                    ),
+            ),
+            const Padding(padding: EdgeInsets.only(right: 20.0)),
+            GestureDetector(
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ShowForumComments(
+                          context: context,
+                          forum: widget.forum))),
+              child: Icon(
+                Icons.chat,
+                size: 28.0,
+                color: Colors.blue[900],
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: <Widget>[
+            Container(
+              margin: const EdgeInsets.only(left: 20.0),
+              child: Text(
+                "$likeCount up votes",
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
+  }
+
+  CurrentUser? user;
+  int likeCount = 0;
+  bool showHeart = false;
+
+  @override
+  void initState() {
+    super.initState();
+    for (var val in widget.forum.upVotes.values) {
+      if (val == true) {
+        likeCount += 1;
+      }
+    }
+  }
+
+  Future getCurrentUserData(String uid) async {
+    return await DatabaseServices(uid: uid).getUserByUserId();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    user = context.watch<CurrentUser?>();
+    widget.isLiked = (widget.forum.upVotes[user!.uid] == true);
+    getCurrentUserData(user!.uid).then((value) {
+      setState(() {
+        widget.currentUser = UserData.fromDocumentSnapshot(value);
+      });
+    });
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: ForumTile(forum: widget.forum, userId: user!.uid)
+    );
+  }
+
+  handleLikePost(String ownerId, String postId) {
+    bool _isLiked = (widget.forum.upVotes[user!.uid] == true);
+
+    if (_isLiked) {
+      DatabaseServices(uid: user!.uid)
+          .unlikePost(user!.uid, ownerId, postId)
+          .then((value) {
+        setState(() {
+          likeCount -= 1;
+          widget.forum.upVotes[user!.uid] = false;
+        });
+      });
+
+      DatabaseServices(uid: user!.uid).removeLikeNotifications(ownerId, postId);
+    } else if (!_isLiked) {
+      DatabaseServices(uid: user!.uid)
+          .likePost(user!.uid, ownerId, postId)
+          .then((value) {
+        setState(() {
+          likeCount += 1;
+          widget.isLiked = true;
+          widget.forum.upVotes[user!.uid] = true;
+          showHeart = true;
+        });
+      });
+      DatabaseServices(uid: user!.uid).addLikeNotifications(
+          ownerId,
+          widget.currentUser!.username,
+          user!.uid,
+          widget.currentUser!.avatar,
+          postId,
+          widget.forum.mediaUrl,
+          Timestamp.now());
+    }
+    Timer(const Duration(milliseconds: 1000), () {
+      setState(() {
+        showHeart = false;
+      });
+    });
+  }
+
+  buildCommentPage() {
+    return ShowForumComments(
+        context: context,
+        forum: widget.forum);
   }
 }

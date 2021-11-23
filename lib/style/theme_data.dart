@@ -8,7 +8,7 @@ import 'constants.dart';
 
 ThemeData lightThemeData(BuildContext context) {
   return ThemeData.light().copyWith(
-    primaryColor: kPrimaryColor,
+    primaryColor: kPrimaryDarkColor,
     scaffoldBackgroundColor: Colors.white,
     appBarTheme: appBarTheme,
     iconTheme: const IconThemeData(color: kContentColorLightTheme),

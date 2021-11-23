@@ -4,10 +4,11 @@ class ForumModel{
   final String forumId;
   final String ownerId;
   final String username;
+  final String title;
   final String description;
   final String category;
   final Timestamp timestamp;
-  final String url;
+  final String mediaUrl;
   final Map<String, dynamic> upVotes;
   final Map<String, dynamic> downVotes;
 
@@ -15,9 +16,10 @@ class ForumModel{
     required this.forumId,
     required this.ownerId,
     required this.username,
+    required this.title,
     required this.description,
     required this.category,
-    required this.url,
+    required this.mediaUrl,
     required this.upVotes,
     required this.downVotes,
     required this.timestamp
@@ -25,12 +27,13 @@ class ForumModel{
 
   factory ForumModel.fromDocument(DocumentSnapshot doc) {
     return ForumModel(
-      forumId: doc['postId'],
+      forumId: doc['forumId'],
       ownerId: doc['ownerId'],
       username: doc['username'],
+      title: doc['title'],
       description: doc['description'],
       category: doc['category'],
-      url: doc['url'],
+      mediaUrl: doc['mediaUrl'],
       upVotes: doc['upVotes'],
       downVotes: doc['downVotes'],
       timestamp: doc['timestamp'],

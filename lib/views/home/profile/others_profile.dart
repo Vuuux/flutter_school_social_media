@@ -247,7 +247,8 @@ class _OthersProfileState extends State<OthersProfile> {
       'avatar': userData.avatar,
       'username': userData.username,
       'status': 'requesting',
-      'userId': userData.id
+      'userId': userData.id,
+      'isAnon': false
     });
 
     // Stream<QuerySnapshot> query = await dbServer.getRequestStatus(

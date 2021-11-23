@@ -85,6 +85,7 @@ dependencies:
   animator: ^3.1.0
   timeago: ^3.1.0
   comment_tree: ^0.3.0
+  gradient_widgets: ^0.6.0
 
 dev_dependencies:
   flutter_test:
