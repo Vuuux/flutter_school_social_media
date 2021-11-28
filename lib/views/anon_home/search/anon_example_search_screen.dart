@@ -6,6 +6,7 @@ import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
+import 'package:luanvanflutter/views/anon_home/profile/others_anon_profile.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:provider/src/provider.dart';
 
@@ -143,7 +144,7 @@ class UserResult extends StatelessWidget {
               ),),
             ),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)
-            => OthersProfile(ctuerId: user.id))),
+            => OthersAnonProfile(ctuerId: user.id))),
           ),
           const Divider(height: 2.0,
           )

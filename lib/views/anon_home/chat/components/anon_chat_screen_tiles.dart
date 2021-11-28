@@ -11,7 +11,9 @@ import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/views/home/chat/conversation_screen.dart';
 import 'package:provider/src/provider.dart';
 
-class ChatScreenTile extends StatelessWidget {
+import '../anon_conversation_screen.dart';
+
+class AnonChatScreenTile extends StatelessWidget {
   final String userId;
   final UserData ctuer;
   final String chatRoomId;
@@ -20,7 +22,7 @@ class ChatScreenTile extends StatelessWidget {
   String latestMsg = '';
   String latestTime = '';
 
-  ChatScreenTile({
+  AnonChatScreenTile({
     Key? key,
     required this.userId,
     required this.ctuer,
@@ -55,7 +57,7 @@ class ChatScreenTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<CurrentUser?>();
-    chatMessagesStream = DatabaseServices(uid: '').getConversationMessages(chatRoomId);
+    chatMessagesStream = DatabaseServices(uid: '').getAnonConversationMessages(chatRoomId);
     return StreamBuilder<UserData>(
         stream: DatabaseServices(uid: user!.uid).userData,
         builder: (context, snapshot) {
@@ -72,7 +74,7 @@ class ChatScreenTile extends StatelessWidget {
             ),
             onPressed: () {
 
-               Navigator.of(context).push(MaterialPageRoute(builder: (context) => ConversationScreen(chatRoomId: chatRoomId, ctuer: ctuer, userId: userId)));
+               Navigator.of(context).push(MaterialPageRoute(builder: (context) => AnonConversationScreen(chatRoomId: chatRoomId, ctuer: ctuer, userId: userId)));
               // .pushAndRemoveUntil(
               //   FadeRoute(
               //     page: ConversationScreen(
@@ -94,7 +96,7 @@ class ChatScreenTile extends StatelessWidget {
                   trailingIcon: Icon(Icons.delete),
                   onPressed: () {
                     DatabaseServices(uid: '')
-                        .chatRef
+                        .anonChatRef
                         .doc(chatRoomId)
                         .collection('conversation')
                         .get()
@@ -105,7 +107,7 @@ class ChatScreenTile extends StatelessWidget {
                     });
 
                     DatabaseServices(uid: '')
-                        .chatRef
+                        .anonChatRef
                         .doc(chatRoomId)
                         .get()
                         .then((doc) {
@@ -148,7 +150,7 @@ class ChatScreenTile extends StatelessWidget {
                             height: 180,
                             child: ctuer.avatar.isNotEmpty
                                 ? Image.network(
-                                    ctuer.avatar,
+                                    ctuer.anonAvatar,
                                     fit: BoxFit.fill,
                                   )
                                 : Image.asset('assets/images/profile1.png',
@@ -161,7 +163,7 @@ class ChatScreenTile extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            ctuer.username,
+                            ctuer.nickname,
                             style: const TextStyle(color: Colors.black),
                           ),
                           getLatestMsg()

@@ -6,6 +6,7 @@ import 'package:luanvanflutter/models/notification.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
+import 'package:luanvanflutter/views/anon_home/profile/others_anon_profile.dart';
 import 'package:luanvanflutter/views/authenticate/helper.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +35,7 @@ class _AnonNotificationPageState extends State<AnonNotificationPage> {
   void initState() {
     super.initState();
     notificationFuture =
-        DatabaseServices(uid: widget.uid).getAllNotifications();
+        DatabaseServices(uid: widget.uid).getAllAnonNotifications();
   }
 
   Future _onRefresh() async {
@@ -138,12 +139,16 @@ class AnonNotificationsItem extends StatefulWidget {
       notificationItemText = 'yêu cầu theo dõi bạn';
     } else if (noti.type == 'accept-request') {
       notificationItemText = 'đã chấp nhận yêu cầu theo dõi của bạn';
-    } else if (noti.type == 'compatibility') {
+    } else if (noti.type == 'qa-game') {
       notificationItemText = 'muốn chơi trò QnA với bạn';
     } else if (noti.type == 'anonmessage') {
-      notificationItemText = 'đã gởi 1 tin nhắn (Vô danh)';
+      notificationItemText = 'đã gởi 1 tin nhắn mật';
     } else if (noti.type == 'question') {
       notificationItemText = 'muốn chơi đố vui cùng bạn';
+    } else if (noti.type == 'vote') {
+      notificationItemText = 'đã bỏ phiếu cho bài viết của bạn';
+    } else if (noti.type == 'approved') {
+      notificationItemText = 'Admin đã duyệt bài viết của bạn';
     } else {
       notificationItemText = 'Lỗi, Unknown type = ' + noti.type;
     }
@@ -280,7 +285,7 @@ class _AnonNotificationsItemState extends State<AnonNotificationsItem> {
                       builder: (context) =>
                           widget.noti.type == 'accept-request' ||
                                   widget.noti.type == 'request'
-                              ? OthersProfile(ctuerId: widget.noti.userId)
+                              ? OthersAnonProfile(ctuerId: widget.noti.userId)
                               : ForumDetail(
                                   forumId: widget.noti.postId!,
                                   ownerId: user.uid,

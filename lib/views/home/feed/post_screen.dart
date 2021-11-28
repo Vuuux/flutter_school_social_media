@@ -31,41 +31,40 @@ class _PostItemState extends State<PostItem> {
       future:
           DatabaseServices(uid: uid).ctuerRef.doc(widget.post.ownerId).get(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Loading();
-        }
-        UserData user = UserData.fromDocumentSnapshot(snapshot.data);
-        return ListTile(
-          leading: CircleAvatar(
-            child: ClipOval(
-              child: SizedBox(
-                  width: 180,
-                  height: 180,
-                  child: Image.network(
-                    user.avatar,
-                    fit: BoxFit.fill,
-                  )),
+        if (snapshot.hasData) {
+          UserData user = UserData.fromDocumentSnapshot(snapshot.data!);
+          return ListTile(
+            leading: CircleAvatar(
+              child: ClipOval(
+                child: SizedBox(
+                    width: 180,
+                    height: 180,
+                    child: Image.network(
+                      user.avatar,
+                      fit: BoxFit.fill,
+                    )),
+              ),
+              //CachedNetworkImageProvider(user.photoUrl),
+              backgroundColor: Colors.grey,
             ),
-            //CachedNetworkImageProvider(user.photoUrl),
-            backgroundColor: Colors.grey,
-          ),
-          title: GestureDetector(
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => PostDetail(postId: widget.post.postId, ownerId: user.id))),
-            child: Text(
-              user.username,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
+            title: GestureDetector(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => PostDetail(postId: widget.post.postId, ownerId: user.id))),
+              child: Text(
+                user.username,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          subtitle: Text(widget.post.location +' - ' + timeago.format(widget.post.timestamp.toDate(), locale: "vi")),
-          trailing: IconButton(
-            //TODO: DELETE POST
-            onPressed: () => onOpenPostOption(context),
-            icon: const Icon(Icons.more_vert),
-          ),
-        );
+            subtitle: Text(widget.post.location +' - ' + timeago.format(widget.post.timestamp.toDate(), locale: "vi")),
+            trailing: IconButton(
+              onPressed: () => onOpenPostOption(context),
+              icon: const Icon(Icons.more_vert),
+            ),
+          );
+        }
+        return const SizedBox.shrink();
       },
     );
   }
@@ -216,18 +215,18 @@ class _PostItemState extends State<PostItem> {
   }
 
   Future getCurrentUserData(String uid) async {
-    return await DatabaseServices(uid: uid).getUserByUserId();
+    return await DatabaseServices(uid: uid).getUserByUserId().then((value) {
+      setState(() {
+        widget.currentUser = UserData.fromDocumentSnapshot(value);
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     user = context.watch<CurrentUser?>();
     widget.isLiked = (widget.post.likes[user!.uid] == true);
-    getCurrentUserData(user!.uid).then((value) {
-      setState(() {
-        widget.currentUser = UserData.fromDocumentSnapshot(value);
-      });
-    });
+    getCurrentUserData(user!.uid);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(

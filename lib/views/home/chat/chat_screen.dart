@@ -66,7 +66,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     return ChatScreenTile(
                       chatRoomId: roomId,
                       userId: user.uid,
-                      ctuer: UserData.fromDocumentSnapshot(childSnapshot.data),
+                      ctuer: UserData.fromDocumentSnapshot(childSnapshot.data!),
                     );
                   }
                   return const Center(

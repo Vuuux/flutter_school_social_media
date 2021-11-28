@@ -124,6 +124,7 @@ class NotificationsItem extends StatefulWidget {
 
   configureMediaPreview(context) {
     mediaPreview = noti.mediaUrl!.isNotEmpty ? SizedBox(
+      width: 25,
       child: CachedNetworkImage(imageUrl: noti.mediaUrl!),
     ) : SizedBox.shrink();
     if (noti.type == 'following') {
@@ -377,8 +378,8 @@ class _NotificationsItemState extends State<NotificationsItem> {
             radius: 25,
             child: ClipOval(
               child: SizedBox(
-                width: 56,
-                height: 56,
+                width: 35,
+                height: 35,
                 child: widget.noti.avatar != ""
                     ? Image.network(
                         widget.noti.avatar,

@@ -2,6 +2,8 @@ import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
+import 'package:luanvanflutter/views/anon_home/profile/others_anon_profile.dart';
+import 'package:luanvanflutter/views/games/compatibility/compatibility_start.dart';
 import 'package:luanvanflutter/views/home/chat/chat_screen.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';
@@ -171,7 +173,7 @@ class _AnonConversationScreenState extends State<AnonConversationScreen> {
                       onTap: () {
                         Navigator.of(context).pushAndRemoveUntil(
                             FadeRoute(
-                              page: OthersProfile(
+                              page: OthersAnonProfile(
                                 ctuerId: widget.ctuer.id,
                               ),
                             ),
@@ -185,16 +187,22 @@ class _AnonConversationScreenState extends State<AnonConversationScreen> {
                     highlightColor: Colors.transparent,
                     splashColor: Colors.transparent,
                     icon: const Icon(Icons.gamepad),
-                    onPressed: () {
-                      // Navigator.of(context).pushAndRemoveUntil(
-                      //     FadeRoute(
-                      //       page: CompatibilityStart(
-                      //           friendAnon: false,
-                      //           userData: widget.userData,
-                      //           ctuer: widget.ctuer,
-                      //           ctuerList: widget.ctuerList),
-                      //     ),
-                      //     ModalRoute.withName('CompatibilityStart'));
+                    onPressed: () async {
+                      await DatabaseServices(uid: '').getQAGameRoomId(widget.ctuer.id, userData.id).then((QuerySnapshot<Map<String, dynamic>> value){
+                        value.docs.forEach((val) {
+                          List<dynamic> list = val.get('players');
+                          if(list.contains(widget.ctuer.id)){
+                            Navigator.of(context).push(MaterialPageRoute(builder: (
+                                context) => CompatibilityStart(
+                              ctuer: widget.ctuer,
+                              userData: userData,
+                              gameRoomId: val.id,
+                            )));
+                          }
+                        });
+
+                      });
+
                     },
                   ),
                 ],

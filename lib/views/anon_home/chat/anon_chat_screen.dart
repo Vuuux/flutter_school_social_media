@@ -7,9 +7,12 @@ import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
+import 'package:luanvanflutter/views/anon_home/search/anon_search_screen.dart';
 import 'package:luanvanflutter/views/home/chat/components/chat_screen_tiles.dart';
 import 'package:luanvanflutter/views/home/search/search_screen.dart';
 import 'package:provider/provider.dart';
+
+import 'components/anon_chat_screen_tiles.dart';
 
 class AnonChatScreen extends StatefulWidget {
   const AnonChatScreen({Key? key}) : super(key: key);
@@ -35,7 +38,7 @@ class _AnonChatScreenState extends State<AnonChatScreen> {
   }
 
   getUserInfo(CurrentUser user) async {
-    chatsScreenStream = DatabaseServices(uid: '').getChatRooms(user.uid);
+    chatsScreenStream = DatabaseServices(uid: '').getAnonChatRooms(user.uid);
   }
 
   Widget chatRoomList(CurrentUser user) {
@@ -63,10 +66,10 @@ class _AnonChatScreenState extends State<AnonChatScreen> {
                     return Loading();
                   }
                   if(childSnapshot.hasData){
-                    return ChatScreenTile(
+                    return AnonChatScreenTile(
                       chatRoomId: roomId,
                       userId: user.uid,
-                      ctuer: UserData.fromDocumentSnapshot(childSnapshot.data),
+                      ctuer: UserData.fromDocumentSnapshot(childSnapshot.data!),
                     );
                   }
                   return const Center(
@@ -102,7 +105,7 @@ class _AnonChatScreenState extends State<AnonChatScreen> {
             splashColor: Colors.transparent,
             icon: const Icon(Icons.add),
             onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => SearchScreen(userId: user.uid)));
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => AnonSearchScreen(userId: user.uid)));
             },
           ),
         ],

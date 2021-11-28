@@ -357,7 +357,7 @@ class _OthersProfileState extends State<OthersProfile> {
                   }
                   else{
                     if(snapshot.hasData){
-                      widget.ctuer = UserData.fromDocumentSnapshot(snapshot.data);
+                      widget.ctuer = UserData.fromDocumentSnapshot(snapshot.data!);
                       getAllFollowers();
                       getAllFollowings();
                       checkIfAlreadyFollowing();

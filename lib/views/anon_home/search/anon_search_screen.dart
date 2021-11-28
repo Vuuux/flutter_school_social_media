@@ -3,14 +3,14 @@ import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
-import 'package:luanvanflutter/views/authenticate/helper.dart';
-import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:luanvanflutter/views/home/search/components/search_tile.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+
+import 'components/anon_search_tile.dart';
 
 class AnonSearchScreen extends StatefulWidget {
   final String userId;
@@ -37,7 +37,7 @@ class _AnonSearchScreenState extends State<AnonSearchScreen> {
 
       Future<QuerySnapshot> users = DatabaseServices(uid: '')
           .ctuerRef
-          .where("username",
+          .where("nickname",
               isGreaterThanOrEqualTo: searchTextEditingController.text)
           .get();
       setState(() {
@@ -71,7 +71,7 @@ class _AnonSearchScreenState extends State<AnonSearchScreen> {
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
                       UserData user =  UserData.fromDocumentSnapshot(snapshot.data!.docs[index]);
-                      return SearchTile(
+                      return AnonSearchTile(
                           userData: user);
                     });
           } else {

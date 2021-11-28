@@ -18,18 +18,18 @@ import 'anon_follower_list.dart';
 import 'anon_following_list.dart';
 
 //Xem profile người khác
-class OthersProfile extends StatefulWidget {
+class OthersAnonProfile extends StatefulWidget {
   final ctuerId;
   UserData? ctuer;
   CurrentUser? currentUser;
   Stream<DocumentSnapshot>? userDataStream;
-  OthersProfile({Key? key, required this.ctuerId}) : super(key: key);
+  OthersAnonProfile({Key? key, required this.ctuerId}) : super(key: key);
 
   @override
-  _OthersProfileState createState() => _OthersProfileState();
+  _OthersAnonProfileState createState() => _OthersAnonProfileState();
 }
 
-class _OthersProfileState extends State<OthersProfile> {
+class _OthersAnonProfileState extends State<OthersAnonProfile> {
   int countTotalFollowers = 0;
   int countTotalFollowings = 0;
   bool following = false;
@@ -356,7 +356,7 @@ class _OthersProfileState extends State<OthersProfile> {
                   }
                   else{
                     if(snapshot.hasData){
-                      widget.ctuer = UserData.fromDocumentSnapshot(snapshot.data);
+                      widget.ctuer = UserData.fromDocumentSnapshot(snapshot.data!);
                       getAllFollowers();
                       getAllFollowings();
                       checkIfAlreadyFollowing();

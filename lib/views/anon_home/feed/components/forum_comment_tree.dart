@@ -9,44 +9,47 @@ import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/comment.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
+import 'package:luanvanflutter/views/anon_home/profile/anon_profile.dart';
+import 'package:luanvanflutter/views/anon_home/profile/others_anon_profile.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:luanvanflutter/views/home/profile/profile.dart';
 import 'package:provider/src/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-class CommentTree extends StatefulWidget {
-  final String postId;
+class ForumCommentTree extends StatefulWidget {
+  final String forumId;
   final CommentModel comment;
   final List<CommentModel> cmtList;
   final Function onClickReply;
 
-  const CommentTree(
+  const ForumCommentTree(
       {Key? key,
-      required this.postId,
+      required this.forumId,
       required this.comment,
       required this.cmtList,
       required this.onClickReply})
       : super(key: key);
 
   @override
-  State<CommentTree> createState() => _CommentTreeState();
+  State<ForumCommentTree> createState() => _ForumCommentTreeState();
 }
 
-class _CommentTreeState extends State<CommentTree> {
+class _ForumCommentTreeState extends State<ForumCommentTree> {
+
   Future<bool> handleLikeComment(
-      String postId, String uid, CommentModel data) async {
+      String forumId, String uid, CommentModel data) async {
     if (data.likes[uid] == false || data.likes.isEmpty) {
-      await DatabaseServices(uid: uid).likeComment(postId, data.commentId);
+      await DatabaseServices(uid: uid).likeForumComment(forumId, data.commentId);
       data.likes[uid] = true;
       return true;
     } else {
-      await DatabaseServices(uid: uid).unlikeComment(postId, data.commentId);
+      await DatabaseServices(uid: uid).unlikeForumComment(forumId, data.commentId);
       data.likes[uid] = false;
       return false;
     }
   }
 
-  Widget _buildLikeReply(String rootCommentId, String postId, String uid,
+  Widget _buildLikeReply(String rootCommentId, String forumId, String uid,
       CommentModel data, bool isLiked) =>
       Row(
         children: [
@@ -55,7 +58,7 @@ class _CommentTreeState extends State<CommentTree> {
           ),
           GestureDetector(
               onTap: () async {
-                await handleLikeComment(postId, uid, data)
+                await handleLikeComment(forumId, uid, data)
                     .then((value) {
                       setState(() {
                         isLiked = value;
@@ -101,7 +104,7 @@ class _CommentTreeState extends State<CommentTree> {
             ],
           ),
         ))
-        : SizedBox.shrink();
+        : const SizedBox.shrink();
   }
 
   _buildCommentLine(BuildContext context, CommentModel data,
@@ -109,7 +112,7 @@ class _CommentTreeState extends State<CommentTree> {
     return RichText(
       text: TextSpan(children: <TextSpan>[
         TextSpan(
-            text: userDetail != null ? userDetail.username + ' ' : '',
+            text: userDetail != null ? userDetail.nickname + ' ' : '',
             style: Theme.of(context).textTheme.caption?.copyWith(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -118,8 +121,8 @@ class _CommentTreeState extends State<CommentTree> {
               ..onTap = () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => userDetail!.id == uid
-                        ? const MyProfile()
-                        : OthersProfile(ctuerId: userDetail.id)));
+                        ? const AnonProfile()
+                        : OthersAnonProfile(ctuerId: userDetail.id)));
               }),
         TextSpan(
           text: data.comment,
@@ -195,7 +198,7 @@ class _CommentTreeState extends State<CommentTree> {
                   Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: _buildLikeReply(
-                          widget.comment.commentId, widget.postId, uid, data, isLiked))
+                          widget.comment.commentId, widget.forumId, uid, data, isLiked))
                 ],
               );
             });
@@ -239,7 +242,7 @@ class _CommentTreeState extends State<CommentTree> {
                   Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: _buildLikeReply(
-                          widget.comment.commentId, widget.postId, uid, data, isRootLiked))
+                          widget.comment.commentId, widget.forumId, uid, data, isRootLiked))
                 ],
               );
             });

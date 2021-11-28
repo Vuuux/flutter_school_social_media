@@ -3,19 +3,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
+import 'package:luanvanflutter/views/anon_home/profile/others_anon_profile.dart';
 import 'package:luanvanflutter/views/home/chat/conversation_screen.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:provider/src/provider.dart';
 import 'package:uuid/uuid.dart';
 
-class SearchTile extends StatelessWidget {
+class AnonSearchTile extends StatelessWidget {
   final UserData userData;
 
-  const SearchTile({Key? key, required this.userData}) : super(key: key);
+  const AnonSearchTile({Key? key, required this.userData}) : super(key: key);
 
   createChatRoomAndStartConversation(BuildContext context, String uid, UserData userData) {
-    //String chatRoomID = getChatRoomID(userData.email, ctuer.nickname);
-    //List<String> users =
     String chatRoomId = const Uuid().v4();
     List<String> users = [uid, userData.id];
 
@@ -23,10 +22,10 @@ class SearchTile extends StatelessWidget {
       "users": users,
       "chatRoomId": chatRoomId,
       "timestamp": Timestamp.now(),
-      "isPrivateChat": false
+      "isPrivateChat": true
     };
 
-    DatabaseServices(uid: '').createChatRoom(chatRoomId, uid, userData.id,
+    DatabaseServices(uid: '').createAnonChatRoom(chatRoomId, uid, userData.id,
         chatRoomMap);
     //TODO: START CONVERSATION
     // Map<String, dynamic> chatRoomMap = {
@@ -68,7 +67,7 @@ class SearchTile extends StatelessWidget {
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-                builder: (context) => OthersProfile(ctuerId: userData.id)),);
+                builder: (context) => OthersAnonProfile(ctuerId: userData.id)),);
           //     .pushAndRemoveUntil(
           //   FadeRoute(
           //     page: OthersProfile(
@@ -110,7 +109,7 @@ class SearchTile extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  userData.username,
+                  userData.nickname,
                   style: const TextStyle(color: Colors.black),
                 ),
               ],

@@ -14,23 +14,27 @@ class CommentModel {
   Timestamp timestamp;
   Map<String, dynamic> likes;
 
-  CommentModel(
-      {required this.commentId,
-      required this.userId,
-      required this.username,
-      required this.avatar,
-      required this.comment,
-      required this.replyTo,
-      required this.tagId,
-      required this.timestamp,
-      required this.likes,
-      });
+  CommentModel({
+    required this.commentId,
+    required this.userId,
+    required this.username,
+    required this.avatar,
+    required this.comment,
+    required this.replyTo,
+    required this.tagId,
+    required this.timestamp,
+    required this.likes,
+  });
 
   factory CommentModel.fromDocument(DocumentSnapshot doc) {
     return CommentModel(
         commentId: doc['commentId'],
         userId: doc['userId'],
-        username: doc['username'],
+        username: doc.data().toString().contains('username')
+            ? doc.get('username')
+            : doc.data().toString().contains('nickname')
+                ? doc.get('nickname')
+                : '',
         avatar: doc['avatar'],
         comment: doc['comment'],
         replyTo: doc['replyTo'],
@@ -51,5 +55,4 @@ class CommentModel {
     }
     return count;
   }
-
 }

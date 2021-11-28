@@ -68,9 +68,9 @@ class UserData {
   }
 
 
-  factory UserData.fromDocumentSnapshot(DocumentSnapshot? data) {
+  factory UserData.fromDocumentSnapshot(DocumentSnapshot data) {
     return UserData(
-        email: data!['email'],
+        email: data['email'],
         username: data['username'],
         nickname: data['nickname'],
         gender: data['gender'],

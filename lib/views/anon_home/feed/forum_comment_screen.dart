@@ -20,6 +20,8 @@ import 'package:provider/src/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import 'components/forum_comment_tree.dart';
+
 class ShowForumComments extends StatefulWidget {
   final BuildContext context;
   final ForumModel forum;
@@ -38,7 +40,7 @@ class ShowForumComments extends StatefulWidget {
 }
 
 class _ShowForumCommentsState extends State<ShowForumComments> {
-  CurrentUser? user;
+
   int upVoteCount = 0;
   int downVoteCount = 0;
   @override
@@ -60,20 +62,23 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
   }
 
   Future getCurrentUserData(String uid) async {
-    return await DatabaseServices(uid: uid).getUserByUserId();
+    return await DatabaseServices(uid: uid).getUserByUserId().then((value) {
+      setState(() {
+        widget.currentUser = UserData.fromDocumentSnapshot(value);
+      });
+    });
   }
 
-  handleUpvote(String ownerId, String forumId) {
-
+  handleUpvote(String uid, String ownerId, String forumId) {
     if (widget.isVoted &&  widget.isDownVoted) {
-      DatabaseServices(uid: user!.uid)
-          .updateVoteForum(user!.uid, forumId, true, false)
+      DatabaseServices(uid: uid)
+          .updateVoteForum(uid, forumId, true, false)
           .then((value) {
         setState(() {
           upVoteCount += 1;
           downVoteCount -=1;
-          widget.forum.upVotes[user!.uid] = true;
-          widget.forum.downVotes[user!.uid] = false;
+          widget.forum.upVotes[uid] = true;
+          widget.forum.downVotes[uid] = false;
           widget.isDownVoted = false;
           widget.isUpVoted = true;
         });
@@ -81,14 +86,14 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
 
     }
     else if (widget.isVoted &&  widget.isUpVoted) {
-      DatabaseServices(uid: user!.uid)
-          .updateVoteForum(user!.uid, forumId, false, false)
+      DatabaseServices(uid: uid)
+          .updateVoteForum(uid, forumId, false, false)
           .then((value) {
         setState(() {
           widget.isVoted = false;
           upVoteCount -= 1;
-          widget.forum.upVotes[user!.uid] = false;
-          widget.forum.downVotes[user!.uid] = false;
+          widget.forum.upVotes[uid] = false;
+          widget.forum.downVotes[uid] = false;
           widget.isDownVoted = false;
           widget.isUpVoted = false;
         });
@@ -96,37 +101,37 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
 
     }
     else if (!widget.isVoted && !widget.isDownVoted && !widget.isUpVoted) {
-      DatabaseServices(uid: user!.uid)
-          .upVoteForum(user!.uid, forumId)
+      DatabaseServices(uid: uid)
+          .upVoteForum(uid, forumId)
           .then((value) {
         setState(() {
           upVoteCount += 1;
           widget.isVoted = true;
-          widget.forum.upVotes[user!.uid] = true;
+          widget.forum.upVotes[uid] = true;
           widget.isDownVoted = false;
           widget.isUpVoted = true;
         });
       });
-      DatabaseServices(uid: user!.uid).addVoteNotifications(
+      DatabaseServices(uid: uid).addVoteNotifications(
           ownerId,
           widget.currentUser!.nickname,
-          user!.uid,
-          widget.currentUser!.avatar,
+          uid,
+          widget.currentUser!.anonAvatar,
           forumId,
           widget.forum.mediaUrl,
           Timestamp.now());
     }
   }
-  handleDownVote(String ownerId, String forumId) {
+  handleDownVote(String uid, String ownerId, String forumId) {
     if (widget.isVoted &&  widget.isDownVoted) {
-      DatabaseServices(uid: user!.uid)
-          .updateVoteForum(user!.uid, forumId, false, false)
+      DatabaseServices(uid: uid)
+          .updateVoteForum(uid, forumId, false, false)
           .then((value) {
         setState(() {
           widget.isVoted = false;
           downVoteCount -=1;
-          widget.forum.upVotes[user!.uid] = false;
-          widget.forum.downVotes[user!.uid] = false;
+          widget.forum.upVotes[uid] = false;
+          widget.forum.downVotes[uid] = false;
           widget.isDownVoted = false;
           widget.isUpVoted = false;
         });
@@ -134,14 +139,14 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
 
     }
     else if (widget.isVoted && widget.isUpVoted) {
-      DatabaseServices(uid: user!.uid)
-          .updateVoteForum(user!.uid, forumId, false, true)
+      DatabaseServices(uid: uid)
+          .updateVoteForum(uid, forumId, false, true)
           .then((value) {
         setState(() {
           downVoteCount += 1;
           upVoteCount -= 1;
-          widget.forum.upVotes[user!.uid] = false;
-          widget.forum.downVotes[user!.uid] = true;
+          widget.forum.upVotes[uid] = false;
+          widget.forum.downVotes[uid] = true;
           widget.isDownVoted = true;
           widget.isUpVoted = false;
         });
@@ -149,19 +154,19 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
 
     }
     else if (!widget.isVoted && !widget.isDownVoted && !widget.isUpVoted) {
-      DatabaseServices(uid: user!.uid)
-          .downVoteForum(user!.uid, forumId)
+      DatabaseServices(uid: uid)
+          .downVoteForum(uid, forumId)
           .then((value) {
         setState(() {
           downVoteCount += 1;
           widget.isVoted = true;
           widget.isDownVoted = true;
-          widget.forum.downVotes[user!.uid] = true;
+          widget.forum.downVotes[uid] = true;
         });
       });
     }
   }
-  buildForumFooter() {
+  buildForumFooter(String uid) {
     return Column(
       children: <Widget>[
         Row(
@@ -169,10 +174,10 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
           children: <Widget>[
             GestureDetector(
               onTap: () =>
-                  handleUpvote(widget.forum.ownerId, widget.forum.forumId),
-              child: widget.isVoted
+                  handleUpvote(uid ,widget.forum.ownerId, widget.forum.forumId),
+              child: widget.isUpVoted
                   ? const Icon(
-                Icons.thumb_up_outlined,
+                Icons.thumb_up,
                 size: 20.0,
                 color: Colors.blue,
               )
@@ -194,10 +199,10 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
             ),
             GestureDetector(
               onTap: () =>
-                  handleDownVote(widget.forum.ownerId, widget.forum.forumId),
-              child: widget.isVoted
+                  handleDownVote(uid, widget.forum.ownerId, widget.forum.forumId),
+              child: widget.isDownVoted
                   ? const Icon(
-                Icons.thumb_down_outlined,
+                Icons.thumb_down,
                 size: 20.0,
                 color: Colors.red,
               )
@@ -227,16 +232,11 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
 
   @override
   Widget build(BuildContext context) {
-    user = context.watch<CurrentUser?>();
-    widget.isVoted = (widget.forum.upVotes[user!.uid] == true || widget.forum.downVotes[user!.uid] == true);
-    widget.isUpVoted = widget.forum.upVotes[user!.uid] == true;
-    widget.isDownVoted = widget.forum.downVotes[user!.uid] == true;
+    final user = context.watch<CurrentUser?>();
+    widget.isVoted = (widget.forum.upVotes[user!.uid] == true || widget.forum.downVotes[user.uid] == true);
+    widget.isUpVoted = widget.forum.upVotes[user.uid] == true;
+    widget.isDownVoted = widget.forum.downVotes[user.uid] == true;
 
-    getCurrentUserData(user!.uid).then((value) {
-      setState(() {
-        widget.currentUser = UserData.fromDocumentSnapshot(value);
-      });
-    });
     return Scaffold(
       appBar: AppBar(
         title: const Text("B Ì N H  L U Ậ N",
@@ -287,11 +287,11 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
               const SizedBox(width: 10.0,),
             ],
           ),
-          buildForumFooter(),
+          buildForumFooter(user.uid),
           const Divider(
             thickness: 3,
           ),
-          Expanded(child: buildCommentTree(user!.uid, widget.forum.forumId)),
+          Expanded(child: buildCommentTree(user.uid, widget.forum.forumId)),
           const Divider(
             thickness: 3,
           ),
@@ -301,7 +301,7 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
               decoration: const InputDecoration(labelText: "Nhập bình luận..."),
             ),
             trailing: OutlineButton(
-              onPressed: () => handlePostComment(user!.uid),
+              onPressed: () => handlePostComment(user.uid),
               borderSide: BorderSide.none,
               child: const Text("GỬI"),
             ),
@@ -311,10 +311,10 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
     );
   }
 
-  buildCommentTree(String uid, String postId) {
+  buildCommentTree(String uid, String forumId) {
     return StreamBuilder<QuerySnapshot>(
         stream: Stream.fromFuture(
-            DatabaseServices(uid: "").getComments(widget.forum.forumId)),
+            DatabaseServices(uid: "").getForumComments(widget.forum.forumId)),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
@@ -326,7 +326,7 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
                         CommentModel.fromDocument(snapshot.data!.docs[index]);
                     return StreamBuilder<QuerySnapshot>(
                         stream: Stream.fromFuture(DatabaseServices(uid: uid)
-                            .getReplyComments(postId, comment.commentId)),
+                            .getForumReplyComments(forumId, comment.commentId)),
                         builder: (context, snapshot2) {
                           List<CommentModel> cmtList = [];
                           if (snapshot2.hasData) {
@@ -338,8 +338,8 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
                           return Container(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 12, horizontal: 16),
-                            child: CommentTree(
-                              postId: postId,
+                            child: ForumCommentTree(
+                              forumId: forumId,
                               comment: comment,
                               cmtList: cmtList,
                               onClickReply: (data, replyTo, tag) {
@@ -364,16 +364,12 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
   Future<String> getReplyName(String tagId) async {
     return DatabaseServices(uid: tagId).getUserByUserId().then((value) {
       UserData userData = UserData.fromDocumentSnapshot(value);
-      return userData.username;
+      return userData.nickname;
     }) as String;
   }
 
   handlePostComment(String uid) async {
-    await getCurrentUserData(uid).then((value) {
-      setState(() {
-        widget.currentUser = UserData.fromDocumentSnapshot(value);
-      });
-    });
+    getCurrentUserData(uid);
 
     DocumentSnapshot snapshot = await DatabaseServices(uid: uid)
         .getUserByUserId()
@@ -388,26 +384,26 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
       comment = widget.commentController.text;
     }
 
-    DatabaseServices(uid: uid).postComment(
+    DatabaseServices(uid: uid).postForumComment(
       widget.forum.forumId,
       currentUser.id,
       uuid.v4(),
-      currentUser.username,
+      currentUser.nickname,
       comment,
       Timestamp.now(),
-      currentUser.avatar,
+      currentUser.anonAvatar,
       widget.replyTo,
       widget.tag,
     );
     bool isNotPostOwner = widget.forum.ownerId != uid;
     if (isNotPostOwner) {
-      DatabaseServices(uid: uid).addCommentNotifications(
+      DatabaseServices(uid: uid).addForumCommentNotifications(
           postOwnerId: widget.forum.ownerId,
           comment: comment,
-          postId: widget.forum.forumId,
+          forumId: widget.forum.forumId,
           uid: uid,
-          username: currentUser.username,
-          avatar: currentUser.avatar,
+          nickname: currentUser.nickname,
+          avatar: currentUser.anonAvatar,
           url: widget.forum.mediaUrl,
           timestamp: Timestamp.now());
     }

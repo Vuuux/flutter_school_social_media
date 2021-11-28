@@ -8,6 +8,7 @@ class NotificationModel {
   final String avatar;
   final String? postId;
   final String? forumId;
+  final String? gameRoomId;
   final String? mediaUrl;
   final String? comment;
   final String status;
@@ -21,6 +22,7 @@ class NotificationModel {
     required this.timestamp,
     required this.avatar,
     required this.postId,
+    required this.gameRoomId,
     required this.forumId,
     required this.mediaUrl,
     required this.status,
@@ -38,6 +40,7 @@ class NotificationModel {
         avatar: doc.data().toString().contains('avatar') ? doc.get('avatar') : '',
         postId: doc.data().toString().contains('postId') ? doc.get('postId') : '',
         forumId: doc.data().toString().contains('forumId') ? doc.get('forumId') : '',
+        gameRoomId: doc.data().toString().contains('gameRoomId') ? doc.get('gameRoomId') : '',
         mediaUrl: doc.data().toString().contains('mediaUrl') ? doc.get('mediaUrl') : '',
         status: doc.data().toString().contains('status') ? doc.get('status') : '',
         isAnon: doc.data().toString().contains('isAnon') ? doc.get('isAnon') : false,
