@@ -5,6 +5,10 @@ class Constants {
   static String myName = "";
   static String myEmail = "";
   static String nickname = "";
+  static RegExp EMAIL_REGEX = RegExp(
+      "(\w{1,}[b]\d{1,7})@(\w+\.||)+(ctu.edu.vn)",
+  caseSensitive: false,
+  multiLine: false);
 }
 
 class Photo {

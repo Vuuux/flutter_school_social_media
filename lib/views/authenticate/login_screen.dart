@@ -112,123 +112,143 @@ class _LoginScreenState extends State<LoginScreen> {
     double h = MediaQuery.of(context).size.height;
     double w = MediaQuery.of(context).size.width;
 
-    return Container(
-      child: Stack(
-        children: [
-          GestureDetector(
-            onTap: () => FocusScope.of(context).unfocus(),
-            child: Scaffold(
-              body: SizedBox(
-                width: double.infinity,
-                height: size.height,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: <Widget>[
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      child: Image.asset(
-                        "assets/images/main_top.png",
-                        width: size.width * 0.35,
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Image.asset(
-                        "assets/images/login_bottom.png",
-                        width: size.width * 0.4,
-                      ),
-                    ),
-                    SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          const Text(
-                            "ĐĂNG NHẬP",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 30),
-                          ),
-                          SizedBox(height: size.height * 0.03),
-                          Form(
-                              key: _formKey,
-                              child: Column(
-                                children: <Widget>[
-                                  FloatingImage(
-                                      image: SvgPicture.asset(
-                                    "assets/icons/login.svg",
-                                    height: size.height * 0.35,
-                                  )),
-                                  SizedBox(height: size.height * 0.03),
-                                  RoundedInputField(
-                                    initialValue: email,
-                                    hintText: "Email của bạn",
-                                    icon: Icons.person,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        email = value;
-                                      });
-                                    },
-                                    validator: (val) =>
-                                        val.isEmpty ? 'Nhập email' : null,
-                                  ),
-                                  RoundedPasswordField(
-                                    validator: (val) => val.length < 6
-                                        ? 'Điền mật khẩu dưới 6 ký tự'
-                                        : null,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        password = value;
-                                      });
-                                    },
-                                    hintText: 'Mật khẩu',
-                                  ),
-                                  ForgotPasswordCheck(
-                                    key: UniqueKey(),
-                                    press: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) {
-                                            return const ForgotPassword();
-                                          },
-                                        ),
-                                      );
-                                    },
-                                  )
-                                ],
-                              )),
-                          RoundedButton(
-                            text: "ĐĂNG NHẬP",
-                            press: () async {
-                              signIn(context);
-                            },
-                          ),
-                          SizedBox(height: size.height * 0.03),
-                          AlreadyHaveAnAccountCheck(
-                            press: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return const Register();
-                                  },
-                                ),
-                              );
-                            },
-                            key: UniqueKey(),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+    return Stack(
+      children: [
+        GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Scaffold(
+            body: Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Image.asset(
+                    "assets/images/main_top.png",
+                    width: size.width * 0.35,
+                  ),
                 ),
-              ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Image.asset(
+                    "assets/images/login_bottom.png",
+                    width: size.width * 0.4,
+                  ),
+                ),
+                SizedBox(
+                  height: h,
+                  width: w,
+                  child: Column(
+                    children: [
+                      SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(height: size.height * 0.1),
+                            const Text(
+                              "ĐĂNG NHẬP",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 30),
+                            ),
+                            Form(
+                                key: _formKey,
+                                child: Column(
+                                  children: <Widget>[
+                                    FloatingImage(
+                                        image: SvgPicture.asset(
+                                      "assets/icons/login.svg",
+                                      height: size.height * 0.35,
+                                    )),
+                                    SizedBox(height: size.height * 0.03),
+                                    RoundedInputField(
+                                        initialValue: email,
+                                        hintText: "Email của bạn",
+                                        icon: Icons.person,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            email = value;
+                                          });
+                                        },
+                                        validator: (val) {
+                                          return RegExp(
+                                                      r"(\w{1,}[b]\d{1,7})@(\w+\.||)+(ctu.edu.vn)")
+                                                  .hasMatch(val!)
+                                              ? null
+                                              : "Xin nhập đúng định dạng email trường cấp!";
+                                        }),
+                                    RoundedPasswordField(
+                                      validator: (val) => val.length < 6
+                                          ? 'Điền mật khẩu dưới 6 ký tự'
+                                          : null,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          password = value;
+                                        });
+                                      },
+                                      hintText: 'Mật khẩu',
+                                    ),
+                                    ForgotPasswordCheck(
+                                      key: UniqueKey(),
+                                      press: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) {
+                                              return const ForgotPassword();
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    )
+                                  ],
+                                )),
+                            RoundedButton(
+                              text: "ĐĂNG NHẬP",
+                              press: () async {
+                                signIn(context);
+                              },
+                            ),
+                            SizedBox(height: size.height * 0.03),
+                            AlreadyHaveAnAccountCheck(
+                              press: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return const Register();
+                                    },
+                                  ),
+                                );
+                              },
+                              key: UniqueKey(),
+                            ),
+                            const SizedBox(height: 10),
+                            const Center(
+                              child: Text(
+                                "Lưu ý ứng dụng này không phải ứng dụng được "
+                                    "phát hành chính thức bởi nhà trường",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    letterSpacing: 1.0,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.w100,
+                                    color: Colors.black),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          loading ? Loading() : const Center()
-        ],
-      ),
+        ),
+        loading ? Loading() : const Center()
+      ],
     );
   }
 }

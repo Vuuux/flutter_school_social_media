@@ -1,4 +1,4 @@
-import 'dart:io' as io;
+
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
@@ -88,16 +88,18 @@ class _RegisterState extends State<Register> {
   ];
 
   signUp(BuildContext context) async {
+    final Reference storageReference =
+    FirebaseStorage.instance.ref().child("Profile Pictures");
+    UploadTask uploadTask = storageReference.putFile(_image!);
+    TaskSnapshot taskSnapshot = await uploadTask;
+    var imgURL = (await taskSnapshot.ref.getDownloadURL()).toString();
+    
     if (_formKey.currentState!.validate()) {
       setState(() {
         loading = true;
       });
 
-      final Reference storageReference =
-      FirebaseStorage.instance.ref().child("Profile Pictures");
-      UploadTask uploadTask = storageReference.putFile(_image!);
-      TaskSnapshot taskSnapshot = await uploadTask;
-      var imgURL = (await taskSnapshot.ref.getDownloadURL()).toString();
+
 
       await context
           .read<AuthService>()
@@ -186,7 +188,8 @@ class _RegisterState extends State<Register> {
     return showDialog(
         context: nContext,
         builder: (context) {
-          return SimpleDialog(
+          return
+            SimpleDialog(
             title: const Text("Bài viết mới"),
             children: <Widget>[
               SimpleDialogOption(
@@ -255,7 +258,7 @@ class _RegisterState extends State<Register> {
                                         Expanded(
                                           child: RoundedInputField(
                                             initialValue: email,
-                                            hintText: "Email của bạn",
+                                            hintText: "example@student.ctu.edu.vn",
                                             icon: Icons.alternate_email,
                                             onChanged: (val) {
                                               setState(() {
@@ -264,10 +267,10 @@ class _RegisterState extends State<Register> {
                                             },
                                             validator: (val) {
                                               return RegExp(
-                                                          r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
+                                                          r"(\w{1,}[b]\d{1,7})@(\w+\.||)+(ctu.edu.vn)")
                                                       .hasMatch(val!)
                                                   ? null
-                                                  : "Xin nhập đúng định dạng Email!";
+                                                  : "Xin nhập đúng định dạng email trường cấp!";
                                             },
                                           ),
                                         )

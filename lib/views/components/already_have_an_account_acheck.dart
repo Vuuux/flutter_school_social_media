@@ -17,7 +17,7 @@ class AlreadyHaveAnAccountCheck extends StatelessWidget {
       children: <Widget>[
         Text(
           login ? "Chưa có tài khoản? " : "Đã có tài khoản? ",
-          style: const TextStyle(color: Colors.black26),
+          style: const TextStyle(color: Colors.black87),
         ),
         GestureDetector(
           onTap: press,
