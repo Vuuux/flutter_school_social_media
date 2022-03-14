@@ -11,38 +11,41 @@ import 'package:luanvanflutter/style/loading.dart';
 
 // import 'const.dart';
 
-class Utils{
-
+class Utils {
   static Widget loadingCircle(bool isLoading) {
-    return isLoading ? Positioned(
-      child: Container(
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
-        color: Colors.white.withOpacity(0.7),
-      ),
-    ) : Container();
+    return isLoading
+        ? Positioned(
+            child: Container(
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+              color: Colors.white.withOpacity(0.7),
+            ),
+          )
+        : Container();
   }
 
   static Future<File?> cropImageFile(File image) async {
-    return await ImageCropper.cropImage(
+    return await ImageCropper().cropImage(
         sourcePath: image.path,
-        aspectRatioPresets: Platform.isAndroid ? [
-          CropAspectRatioPreset.square,
-          CropAspectRatioPreset.ratio3x2,
-          CropAspectRatioPreset.original,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio16x9
-        ] : [
-          CropAspectRatioPreset.original,
-          CropAspectRatioPreset.square,
-          CropAspectRatioPreset.ratio3x2,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio5x3,
-          CropAspectRatioPreset.ratio5x4,
-          CropAspectRatioPreset.ratio7x5,
-          CropAspectRatioPreset.ratio16x9
-        ],
+        aspectRatioPresets: Platform.isAndroid
+            ? [
+                CropAspectRatioPreset.square,
+                CropAspectRatioPreset.ratio3x2,
+                CropAspectRatioPreset.original,
+                CropAspectRatioPreset.ratio4x3,
+                CropAspectRatioPreset.ratio16x9
+              ]
+            : [
+                CropAspectRatioPreset.original,
+                CropAspectRatioPreset.square,
+                CropAspectRatioPreset.ratio3x2,
+                CropAspectRatioPreset.ratio4x3,
+                CropAspectRatioPreset.ratio5x3,
+                CropAspectRatioPreset.ratio5x4,
+                CropAspectRatioPreset.ratio7x5,
+                CropAspectRatioPreset.ratio16x9
+              ],
         androidUiSettings: AndroidUiSettings(
             toolbarTitle: 'Cropper',
             toolbarColor: Colors.blue[800],
@@ -54,20 +57,18 @@ class Utils{
         ));
   }
 
-  static Widget cacheNetworkImageWithEvent(context,String imageURL,double width, double height){
+  static Widget cacheNetworkImageWithEvent(
+      context, String imageURL, double width, double height) {
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(15.0),
-        child:
-        CachedNetworkImage(
+        child: CachedNetworkImage(
           imageUrl: imageURL,
           placeholder: (context, url) => Container(
             transform: Matrix4.translationValues(0.0, 0.0, 0.0),
             child: Container(
-                width: width,
-                height: height,
-                child: Center(child: Loading())),
+                width: width, height: height, child: Center(child: Loading())),
           ),
           errorWidget: (context, url, error) => Icon(Icons.error),
           width: 500,
@@ -134,10 +135,11 @@ class Utils{
   //   return _originalData;
   // }
 
-  static String commentWithoutReplyUser(String commentString){
+  static String commentWithoutReplyUser(String commentString) {
     List<String> splitCommentString = commentString.split(' ');
     int commentUserNameLength = splitCommentString[0].length;
-    String returnText = commentString.substring(commentUserNameLength,commentString.length);
+    String returnText =
+        commentString.substring(commentUserNameLength, commentString.length);
     return returnText;
   }
 
@@ -147,31 +149,32 @@ class Utils{
     var diff = now.difference(date);
     var time = '';
 
-    if (diff.inSeconds <= 0 || diff.inSeconds > 0 && diff.inMinutes == 0 || diff.inMinutes > 0 && diff.inHours == 0 || diff.inHours > 0 && diff.inDays == 0) {
+    if (diff.inSeconds <= 0 ||
+        diff.inSeconds > 0 && diff.inMinutes == 0 ||
+        diff.inMinutes > 0 && diff.inHours == 0 ||
+        diff.inHours > 0 && diff.inDays == 0) {
       if (diff.inHours > 0) {
         time = diff.inHours.toString() + 'h';
-      }else if (diff.inMinutes > 0) {
+      } else if (diff.inMinutes > 0) {
         time = diff.inMinutes.toString() + 'm';
-      }else if (diff.inSeconds > 0) {
+      } else if (diff.inSeconds > 0) {
         time = 'now';
-      }else if (diff.inMilliseconds > 0) {
+      } else if (diff.inMilliseconds > 0) {
         time = 'now';
-      }else if (diff.inMicroseconds > 0) {
+      } else if (diff.inMicroseconds > 0) {
         time = 'now';
-      }else {
+      } else {
         time = 'now';
       }
     } else if (diff.inDays > 0 && diff.inDays < 7) {
       time = diff.inDays.toString() + 'd';
-    } else if (diff.inDays > 6){
+    } else if (diff.inDays > 6) {
       time = (diff.inDays / 7).floor().toString() + 'w';
-    }else if (diff.inDays > 29) {
+    } else if (diff.inDays > 29) {
       time = (diff.inDays / 30).floor().toString() + 'm';
-    }else if (diff.inDays > 365){
+    } else if (diff.inDays > 365) {
       time = '${date.month} ${date.day}, ${date.year}';
     }
     return time;
   }
-
 }
-

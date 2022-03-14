@@ -94,7 +94,7 @@ class ChatScreenTile extends StatelessWidget {
                   trailingIcon: Icon(Icons.delete),
                   onPressed: () {
                     DatabaseServices(uid: '')
-                        .chatRef
+                        .chatReference
                         .doc(chatRoomId)
                         .collection('conversation')
                         .get()
@@ -105,7 +105,7 @@ class ChatScreenTile extends StatelessWidget {
                     });
 
                     DatabaseServices(uid: '')
-                        .chatRef
+                        .chatReference
                         .doc(chatRoomId)
                         .get()
                         .then((doc) {

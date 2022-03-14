@@ -324,7 +324,7 @@ class MessageTile extends StatelessWidget {
               trailingIcon: Icon(Icons.delete),
               onPressed: () {
                 DatabaseServices(uid: '')
-                    .chatRef
+                    .chatReference
                     .doc(chatRoomId)
                     .collection('conversation')
                     .where("message", isEqualTo: message)

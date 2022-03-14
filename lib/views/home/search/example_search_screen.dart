@@ -21,7 +21,7 @@ class _SimpleSearchState extends State<SimpleSearch> {
   Future<QuerySnapshot>? searchResultsFuture;
 
   handleSearch(String query) {
-    Future<QuerySnapshot> users = DatabaseServices(uid: '').ctuerRef
+    Future<QuerySnapshot> users = DatabaseServices(uid: '').userReference
         .where("username", isGreaterThanOrEqualTo: query)
         .get();
     setState(() {

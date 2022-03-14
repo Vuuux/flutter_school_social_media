@@ -39,7 +39,7 @@ class _MyProfileState extends State<MyProfile> {
 
   getAllFollowings() async {
     QuerySnapshot querySnapshot = await DatabaseServices(uid: '')
-        .followingRef
+        .followingReference
         .doc(userUid)
         .collection('userFollowings')
         .get();
@@ -52,7 +52,7 @@ class _MyProfileState extends State<MyProfile> {
 
   getAllFollowers() async {
     QuerySnapshot querySnapshot = await DatabaseServices(uid: '')
-        .followerRef
+        .followerReference
         .doc(userUid)
         .collection('userFollowers')
         .get();
@@ -103,14 +103,11 @@ class _MyProfileState extends State<MyProfile> {
         splashColor: Colors.transparent,
         onPressed: performFunction,
         child: Container(
-          width: MediaQuery
-              .of(context)
-              .size
-              .width / 2.5,
+          width: MediaQuery.of(context).size.width / 2.5,
           height: 26.0,
           child: Text(title,
               style:
-              const TextStyle(fontWeight: FontWeight.w300, fontSize: 12)),
+                  const TextStyle(fontWeight: FontWeight.w300, fontSize: 12)),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: kPrimaryLightColor,
@@ -136,7 +133,6 @@ class _MyProfileState extends State<MyProfile> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     final user = context.watch<CurrentUser?>();
@@ -147,6 +143,7 @@ class _MyProfileState extends State<MyProfile> {
           maxWidth: 414,
           maxHeight: 869,
         ),
+        context: context,
         designSize: const Size(360, 690),
         orientation: Orientation.portrait);
 
@@ -164,8 +161,8 @@ class _MyProfileState extends State<MyProfile> {
                 centerTitle: true,
                 shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(15),
-                    )),
+                  bottom: Radius.circular(15),
+                )),
                 elevation: 0,
                 actions: <Widget>[
                   IconButton(
@@ -178,7 +175,8 @@ class _MyProfileState extends State<MyProfile> {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: const Text('Bạn chắc chắn muốn đăng xuất chứ?'),
+                          title:
+                              const Text('Bạn chắc chắn muốn đăng xuất chứ?'),
                           actions: <Widget>[
                             TextButton(
                               onPressed: () async {
@@ -194,7 +192,6 @@ class _MyProfileState extends State<MyProfile> {
                           ],
                         ),
                       );
-
                     },
                   ),
                 ],
@@ -206,17 +203,14 @@ class _MyProfileState extends State<MyProfile> {
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       constraints: BoxConstraints(
-                          minHeight: MediaQuery
-                              .of(context)
-                              .size
-                              .height),
+                          minHeight: MediaQuery.of(context).size.height),
                       child: Column(children: <Widget>[
                         Column(children: <Widget>[
                           Column(
                             children: <Widget>[
                               Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Expanded(
@@ -227,9 +221,9 @@ class _MyProfileState extends State<MyProfile> {
                                         ),
                                         CustomCircleAvatar(
                                             image: Image.network(
-                                              userData.avatar,
-                                              fit: BoxFit.fill,
-                                            )),
+                                          userData.avatar,
+                                          fit: BoxFit.fill,
+                                        )),
                                         const SizedBox(height: 15),
                                         Text(userData.username,
                                             style: const TextStyle(
@@ -243,13 +237,9 @@ class _MyProfileState extends State<MyProfile> {
                               ),
                               const SizedBox(height: 10),
                               Container(
-                                width:
-                                MediaQuery
-                                    .of(context)
-                                    .size
-                                    .width / 1.17,
+                                width: MediaQuery.of(context).size.width / 1.17,
                                 padding:
-                                const EdgeInsets.only(top: 3, bottom: 3),
+                                    const EdgeInsets.only(top: 3, bottom: 3),
                                 decoration: const BoxDecoration(
                                     color: kPrimaryLightColor,
                                     borderRadius: BorderRadius.all(
@@ -258,7 +248,7 @@ class _MyProfileState extends State<MyProfile> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceAround,
+                                      MainAxisAlignment.spaceAround,
                                   //crossAxisAlignment: CrossAxisAlignment.baseline,
                                   children: <Widget>[
                                     FlatButton(
@@ -269,17 +259,17 @@ class _MyProfileState extends State<MyProfile> {
                                         child: createColumns('Người theo dõi',
                                             countTotalFollowers),
                                         onPressed: () {}
-                                      //TODO: ADD FOLLOWER LIST
-                                      // =>
-                                      //     Navigator.of(context)
-                                      //     .pushAndRemoveUntil(
-                                      //   FadeRoute(
-                                      //       page: FollowersList(
-                                      //           ctuerList: hmmies,
-                                      //           userData: userData)),
-                                      //   ModalRoute.withName('FollowersList'),
-                                      // ),
-                                    ),
+                                        //TODO: ADD FOLLOWER LIST
+                                        // =>
+                                        //     Navigator.of(context)
+                                        //     .pushAndRemoveUntil(
+                                        //   FadeRoute(
+                                        //       page: FollowersList(
+                                        //           ctuerList: hmmies,
+                                        //           userData: userData)),
+                                        //   ModalRoute.withName('FollowersList'),
+                                        // ),
+                                        ),
                                     FlatButton(
                                         highlightColor: Colors.transparent,
                                         splashColor: Colors.transparent,
@@ -288,23 +278,23 @@ class _MyProfileState extends State<MyProfile> {
                                         child: createColumns('Đang theo dõi',
                                             countTotalFollowings),
                                         onPressed: () {}
-                                      // TODO: ADD FOLLOWING LIST
-                                      // => Navigator.of(context)
-                                      //     .pushAndRemoveUntil(
-                                      //   FadeRoute(
-                                      //       page: FollowingList(
-                                      //           ctuerList: hmmies,
-                                      //           userData: userData)),
-                                      //   ModalRoute.withName('FollowingList'),
-                                      // ),
-                                    ),
+                                        // TODO: ADD FOLLOWING LIST
+                                        // => Navigator.of(context)
+                                        //     .pushAndRemoveUntil(
+                                        //   FadeRoute(
+                                        //       page: FollowingList(
+                                        //           ctuerList: hmmies,
+                                        //           userData: userData)),
+                                        //   ModalRoute.withName('FollowingList'),
+                                        // ),
+                                        ),
                                     FlatButton(
                                       highlightColor: Colors.transparent,
                                       splashColor: Colors.transparent,
                                       padding: const EdgeInsets.only(
                                           left: 21, right: 21),
-                                      child: createColumns(
-                                          'Fame', userData.fame),
+                                      child:
+                                          createColumns('Fame', userData.fame),
                                       onPressed: () {},
                                     ),
                                   ],
@@ -315,7 +305,7 @@ class _MyProfileState extends State<MyProfile> {
                                   Expanded(
                                     child: Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+                                          MainAxisAlignment.spaceEvenly,
                                       children: <Widget>[
                                         createButton(userData),
                                       ],
@@ -327,10 +317,7 @@ class _MyProfileState extends State<MyProfile> {
                           ),
                           Container(
                             padding: const EdgeInsets.all(15),
-                            width: MediaQuery
-                                .of(context)
-                                .size
-                                .width,
+                            width: MediaQuery.of(context).size.width,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -346,10 +333,10 @@ class _MyProfileState extends State<MyProfile> {
                                         : userData.bio,
                                     style: userData.bio == ''
                                         ? const TextStyle(
-                                        fontSize: 12, color: Colors.grey)
+                                            fontSize: 12, color: Colors.grey)
                                         : const TextStyle(
-                                      fontSize: 18,
-                                    )),
+                                            fontSize: 18,
+                                          )),
                                 const SizedBox(
                                   height: 5,
                                 ),
@@ -383,10 +370,10 @@ class _MyProfileState extends State<MyProfile> {
                                         : userData.media,
                                     style: userData.media == ''
                                         ? const TextStyle(
-                                        fontSize: 12, color: Colors.grey)
+                                            fontSize: 12, color: Colors.grey)
                                         : const TextStyle(
-                                      fontSize: 18,
-                                    )),
+                                            fontSize: 18,
+                                          )),
                                 SizedBox(
                                   height: kSpacingUnit.w,
                                 ),
@@ -404,10 +391,10 @@ class _MyProfileState extends State<MyProfile> {
                                         : userData.course,
                                     style: userData.course == ''
                                         ? const TextStyle(
-                                        fontSize: 10, color: Colors.grey)
+                                            fontSize: 10, color: Colors.grey)
                                         : const TextStyle(
-                                      fontSize: 15,
-                                    )),
+                                            fontSize: 15,
+                                          )),
                                 SizedBox(
                                   height: kSpacingUnit.w,
                                 ),
@@ -425,10 +412,10 @@ class _MyProfileState extends State<MyProfile> {
                                         : userData.playlist,
                                     style: userData.playlist == ''
                                         ? const TextStyle(
-                                        fontSize: 10, color: Colors.grey)
+                                            fontSize: 10, color: Colors.grey)
                                         : const TextStyle(
-                                      fontSize: 15,
-                                    )),
+                                            fontSize: 15,
+                                          )),
                                 SizedBox(
                                   height: kSpacingUnit.w,
                                 ),
@@ -446,10 +433,10 @@ class _MyProfileState extends State<MyProfile> {
                                         : userData.address,
                                     style: userData.address == ''
                                         ? const TextStyle(
-                                        fontSize: 10, color: Colors.grey)
+                                            fontSize: 10, color: Colors.grey)
                                         : const TextStyle(
-                                      fontSize: 15,
-                                    )),
+                                            fontSize: 15,
+                                          )),
                                 SizedBox(
                                   height: kSpacingUnit.w,
                                 ),
@@ -459,144 +446,142 @@ class _MyProfileState extends State<MyProfile> {
                           //GRID VIEW IMAGE
                           StreamBuilder<QuerySnapshot>(
                               stream: Stream.fromFuture(
-                                  DatabaseServices(uid: user.uid)
-                                      .getMyPosts()),
+                                  DatabaseServices(uid: user.uid).getMyPosts()),
                               builder: (context, snapshot) {
                                 return snapshot.hasData
                                     ? Padding(
-                                  padding:
-                                  const EdgeInsets.only(left: 5.0),
-                                  child: SizedBox(
-                                    height: MediaQuery
-                                        .of(context)
-                                        .size
-                                        .height *
-                                        0.30 -
-                                        50,
-                                    child: ListView.builder(
-                                        physics:
-                                        const ClampingScrollPhysics(),
-                                        shrinkWrap: true,
-                                        scrollDirection:
-                                        Axis.horizontal,
-                                        itemCount:
-                                        snapshot.data!.docs.length,
-                                        itemBuilder: (context, index) {
-                                          var post = PostItem(
-                                              post: PostModel(
-                                                  postId: snapshot
-                                                      .data!.docs[index]
-                                                      .get('postId'),
-                                                  ownerId: snapshot
-                                                      .data!.docs[index]
-                                                      .get('ownerId'),
-                                                  username: snapshot
-                                                      .data!.docs[index]
-                                                      .get('username'),
-                                                  location: snapshot
-                                                      .data!.docs[index]
-                                                      .get('location'),
-                                                  description: snapshot
-                                                      .data!.docs[index]
-                                                      .get('description'),
-                                                  url: snapshot
-                                                      .data!.docs[index]
-                                                      .get('url'),
-                                                  likes: snapshot.data!.docs[index]
-                                                      .get('likes'),
-                                                  timestamp: snapshot
-                                                      .data!.docs[index]
-                                                      .get('timestamp')
-                                              ),
-                                              );
-
-                                          Map<dynamic, dynamic> likes =
-                                          snapshot.data!.docs[index]
-                                              .get('likes');
-                                          if (index ==
-                                              snapshot
-                                                  .data!.docs.length) {
-                                            return Column(
-                                              children: <Widget>[
-                                                const Text(
-                                                    'Thêm ảnh vào profile của bạn'),
-                                                IconButton(
-                                                  icon: const Icon(
-                                                      LineAwesomeIcons
-                                                          .plus_circle),
-                                                  onPressed: () {
-                                                    ChooseImage(
-                                                        context: context,
-                                                        userData: userData);
-                                                  },
-                                                ),
-                                              ],
-                                            );
-                                          }
-                                          return FocusedMenuHolder(
-                                            menuWidth:
-                                            MediaQuery
-                                                .of(context)
-                                                .size
-                                                .width *
-                                                0.36,
-                                            onPressed: () {
-                                              Navigator.push(context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          PostDetail(postId: post.post.postId, ownerId: user.uid,)));
-                                            },
-                                            menuItems: <
-                                                FocusedMenuItem>[
-                                              FocusedMenuItem(
-                                                  title: const Text(
-                                                    "Xóa ảnh",
-                                                    style: TextStyle(
-                                                        color: Colors
-                                                            .black,
-                                                        fontSize: 12),
-                                                  ),
-                                                  trailingIcon:
-                                                  const Icon(
-                                                      Icons.delete),
-                                                  onPressed: () {
-                                                    DatabaseServices(
-                                                        uid: '')
-                                                        .deletePhotos(
-                                                        user.uid,
-                                                        index);
-                                                  },
-                                                  backgroundColor:
-                                                  Colors.redAccent)
-                                            ],
-                                            child: Container(
-                                              width: 150,
-                                              margin:
-                                              const EdgeInsets.only(
-                                                  right: 15),
-                                              height:
-                                              MediaQuery
-                                                  .of(context)
-                                                  .size
-                                                  .height *
+                                        padding:
+                                            const EdgeInsets.only(left: 5.0),
+                                        child: SizedBox(
+                                          height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
                                                   0.30 -
-                                                  50,
-                                              child: ClipRRect(
-                                                  borderRadius:
-                                                  const BorderRadius
-                                                      .all(
-                                                      Radius
-                                                          .circular(
-                                                          20.0)),
-                                                  child: Image.network(
-                                                    post.post.url,
-                                                    fit: BoxFit.fill,
-                                                  )),
-                                            ),
-                                          );
-                                        }),
-                                  ),
-                                )
+                                              50,
+                                          child: ListView.builder(
+                                              physics:
+                                                  const ClampingScrollPhysics(),
+                                              shrinkWrap: true,
+                                              scrollDirection: Axis.horizontal,
+                                              itemCount:
+                                                  snapshot.data!.docs.length,
+                                              itemBuilder: (context, index) {
+                                                var post = PostItem(
+                                                  post: PostModel(
+                                                      postId: snapshot
+                                                          .data!.docs[index]
+                                                          .get('postId'),
+                                                      ownerId: snapshot
+                                                          .data!.docs[index]
+                                                          .get('ownerId'),
+                                                      username: snapshot
+                                                          .data!.docs[index]
+                                                          .get('username'),
+                                                      location: snapshot
+                                                          .data!.docs[index]
+                                                          .get('location'),
+                                                      description: snapshot
+                                                          .data!.docs[index]
+                                                          .get('description'),
+                                                      url: snapshot
+                                                          .data!.docs[index]
+                                                          .get('url'),
+                                                      likes: snapshot.data!.docs[index].get('likes'),
+                                                      timestamp: snapshot.data!.docs[index].get('timestamp')),
+                                                );
+
+                                                Map<dynamic, dynamic> likes =
+                                                    snapshot.data!.docs[index]
+                                                        .get('likes');
+                                                if (index ==
+                                                    snapshot
+                                                        .data!.docs.length) {
+                                                  return Column(
+                                                    children: <Widget>[
+                                                      const Text(
+                                                          'Thêm ảnh vào profile của bạn'),
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                            LineAwesomeIcons
+                                                                .plus_circle),
+                                                        onPressed: () {
+                                                          ChooseImage(
+                                                              context: context,
+                                                              userData:
+                                                                  userData);
+                                                        },
+                                                      ),
+                                                    ],
+                                                  );
+                                                }
+                                                return FocusedMenuHolder(
+                                                  menuWidth:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.36,
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    PostDetail(
+                                                                      postId: post
+                                                                          .post
+                                                                          .postId,
+                                                                      ownerId:
+                                                                          user.uid,
+                                                                    )));
+                                                  },
+                                                  menuItems: <FocusedMenuItem>[
+                                                    FocusedMenuItem(
+                                                        title: const Text(
+                                                          "Xóa ảnh",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize: 12),
+                                                        ),
+                                                        trailingIcon:
+                                                            const Icon(
+                                                                Icons.delete),
+                                                        onPressed: () {
+                                                          DatabaseServices(
+                                                                  uid: '')
+                                                              .deletePhotos(
+                                                                  user.uid,
+                                                                  index);
+                                                        },
+                                                        backgroundColor:
+                                                            Colors.redAccent)
+                                                  ],
+                                                  child: Container(
+                                                    width: 150,
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                            right: 15),
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                    .size
+                                                                    .height *
+                                                                0.30 -
+                                                            50,
+                                                    child: ClipRRect(
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                    .all(
+                                                                Radius.circular(
+                                                                    20.0)),
+                                                        child: Image.network(
+                                                          post.post.url,
+                                                          fit: BoxFit.fill,
+                                                        )),
+                                                  ),
+                                                );
+                                              }),
+                                        ),
+                                      )
                                     : Loading();
                               }),
                         ])

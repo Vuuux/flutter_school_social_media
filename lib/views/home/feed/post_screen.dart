@@ -29,7 +29,7 @@ class _PostItemState extends State<PostItem> {
   buildPostHeader(String uid, BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
       future:
-          DatabaseServices(uid: uid).ctuerRef.doc(widget.post.ownerId).get(),
+          DatabaseServices(uid: uid).userReference.doc(widget.post.ownerId).get(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           UserData user = UserData.fromDocumentSnapshot(snapshot.data!);

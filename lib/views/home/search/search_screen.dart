@@ -15,8 +15,7 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 class SearchScreen extends StatefulWidget {
   final String userId;
 
-  const SearchScreen({Key? key, required this.userId})
-      : super(key: key);
+  const SearchScreen({Key? key, required this.userId}) : super(key: key);
 
   @override
   _SearchScreenState createState() => _SearchScreenState();
@@ -36,7 +35,7 @@ class _SearchScreenState extends State<SearchScreen> {
       });
 
       Future<QuerySnapshot> users = DatabaseServices(uid: '')
-          .ctuerRef
+          .userReference
           .where("username",
               isGreaterThanOrEqualTo: searchTextEditingController.text)
           .get();
@@ -62,18 +61,18 @@ class _SearchScreenState extends State<SearchScreen> {
     return FutureBuilder<QuerySnapshot>(
         future: searchSnapshot,
         builder: (context, snapshot) {
-          if(snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return Loading();
           }
           if (snapshot.hasData) {
             return ListView.builder(
-                    itemCount: snapshot.data!.docs.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      UserData user =  UserData.fromDocumentSnapshot(snapshot.data!.docs[index]);
-                      return SearchTile(
-                          userData: user);
-                    });
+                itemCount: snapshot.data!.docs.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  UserData user =
+                      UserData.fromDocumentSnapshot(snapshot.data!.docs[index]);
+                  return SearchTile(userData: user);
+                });
           } else {
             return const SizedBox.shrink();
           }
@@ -119,14 +118,13 @@ class _SearchScreenState extends State<SearchScreen> {
         body: isLoading
             ? Center(child: Loading())
             : SingleChildScrollView(
-          padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: <Widget>[
                     Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(13),
-                        border:  Border.all(color: Colors.grey)
-                      ),
+                          borderRadius: BorderRadius.circular(13),
+                          border: Border.all(color: Colors.grey)),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 24, vertical: 16),
                       child: Row(

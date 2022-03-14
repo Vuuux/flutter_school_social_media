@@ -1,42 +1,42 @@
 {
   "project_info": {
-    "project_number": "280121400479",
-    "firebase_url": "https://nienluan-8bc97.firebaseio.com",
-    "project_id": "nienluan-8bc97",
-    "storage_bucket": "nienluan-8bc97.appspot.com"
+    "project_number": "940110815704",
+    "firebase_url": "https://god-project-ctu-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "god-project-ctu",
+    "storage_bucket": "god-project-ctu.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:280121400479:android:479854869d65d8722fd6aa",
+        "mobilesdk_app_id": "1:940110815704:android:202ca7c395d7ea9b9052ad",
         "android_client_info": {
-          "package_name": "com.example.luanvanflutter"
+          "package_name": "com.example.luan_van_ctu"
         }
       },
       "oauth_client": [
         {
-          "client_id": "280121400479-2d1rifastq5fahasjo4fdtnvnnl16l8t.apps.googleusercontent.com",
+          "client_id": "940110815704-6c50hqlbo19vlk93a8fhtmge4ii7kmb1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.luanvanflutter",
-            "certificate_hash": "d6820c2c2e61acfb7781009c70f6d842576fd6ba"
+            "package_name": "com.example.luan_van_ctu",
+            "certificate_hash": "3e3ae85a3ef9b384492ab8442f185182901f4250"
           }
         },
         {
-          "client_id": "280121400479-57cj42sf7uf9nov6a10h4p5tcp6v8j1v.apps.googleusercontent.com",
+          "client_id": "940110815704-gmjerngb8rsq3g1mupeko6q32io5ni0e.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAMrstUqxt4GA3smjlPKZJGo9D-2h9E6qY"
+          "current_key": "AIzaSyABlQ0G0LvbX3h5kbRUNRuyqyMRL6BMm-Q"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "280121400479-57cj42sf7uf9nov6a10h4p5tcp6v8j1v.apps.googleusercontent.com",
+              "client_id": "940110815704-gmjerngb8rsq3g1mupeko6q32io5ni0e.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
@@ -45,35 +45,35 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:280121400479:android:94139b7661516c2e2fd6aa",
+        "mobilesdk_app_id": "1:940110815704:android:c66bc7f3bfed0aac9052ad",
         "android_client_info": {
-          "package_name": "com.example.nienluancs"
+          "package_name": "com.example.luanvanflutter"
         }
       },
       "oauth_client": [
         {
-          "client_id": "280121400479-311g5gocloclphmi1v4s019863mlovrm.apps.googleusercontent.com",
+          "client_id": "940110815704-i0p37pr5r6t38afv6a044fkcat1gjtcv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.nienluancs",
-            "certificate_hash": "d6820c2c2e61acfb7781009c70f6d842576fd6ba"
+            "package_name": "com.example.luanvanflutter",
+            "certificate_hash": "3e3ae85a3ef9b384492ab8442f185182901f4250"
           }
         },
         {
-          "client_id": "280121400479-57cj42sf7uf9nov6a10h4p5tcp6v8j1v.apps.googleusercontent.com",
+          "client_id": "940110815704-gmjerngb8rsq3g1mupeko6q32io5ni0e.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAMrstUqxt4GA3smjlPKZJGo9D-2h9E6qY"
+          "current_key": "AIzaSyABlQ0G0LvbX3h5kbRUNRuyqyMRL6BMm-Q"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "280121400479-57cj42sf7uf9nov6a10h4p5tcp6v8j1v.apps.googleusercontent.com",
+              "client_id": "940110815704-gmjerngb8rsq3g1mupeko6q32io5ni0e.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

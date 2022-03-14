@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:either_dart/either.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:luanvanflutter/models/user.dart';
 
@@ -23,16 +27,18 @@ class AuthService {
 
   //trả về user hiện tại
   Future getUser() async {
-    var firebaseUser = _auth.currentUser;
-    return CurrentUser(uid: firebaseUser!.uid);
+    User? firebaseUser = _auth.currentUser;
+    return firebaseUser != null ? CurrentUser(uid: firebaseUser.uid) : null;
   }
 
+  Future signInAnonymous() async {
+    return await _auth.signInAnonymously();
+  }
 
   //đăng nhập với email và password
   Future<String?> signIn(String email, String password) async {
     try {
-      await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
       return "OK";
     } on FirebaseAuthException catch (e) {
       print("LOGIN ERROR WITH STATUS CODE:" + e.code);
@@ -41,7 +47,7 @@ class AuthService {
   }
 
   //đăng ký với Email và Password
-  Future<String?> signUp(
+  Future<Either<bool, FirebaseAuthException>> signUp(
       String email,
       String password,
       String name,
@@ -51,72 +57,67 @@ class AuthService {
       String bio,
       String avatar,
       bool isAnon,
-      String media,
+      File media,
       String playlist,
       String course,
       String address) async {
     try {
-      UserCredential credentialResult = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
-
+      UserCredential credentialResult =
+          await _auth.createUserWithEmailAndPassword(
+              email: email.trim(), password: password.trim());
       User? user = credentialResult.user;
+      bool uploadResult = false;
+      final Reference storageReference =
+          FirebaseStorage.instance.ref().child("Profile Pictures");
+      if (user != null) {
+        await _auth.signInWithEmailAndPassword(
+            email: email.trim(), password: password.trim());
+        UploadTask uploadTask = storageReference.putFile(media);
+        TaskSnapshot taskSnapshot = await uploadTask;
+        var imgURL = (await taskSnapshot.ref.getDownloadURL()).toString();
 
-      await DatabaseServices(uid: user!.uid).uploadUserData(
-          email,
-          name,
-          nickname,
-          gender,
-          major,
-          bio,
-          avatar,
-          isAnon,
-          media,
-          playlist,
-          course,
-          address);
-
-      await DatabaseServices(uid: user.uid).uploadWhoData(
-          email: email,
-          username: name,
-          nickname: nickname,
-          isAnon: isAnon,
-          avatar: avatar,
-          gender: gender,
-          score: 0);
-
-      return "OK";
+        uploadResult = await DatabaseServices(uid: user.uid).uploadUserData(
+            email.trim(),
+            name,
+            nickname,
+            gender,
+            major,
+            bio,
+            avatar,
+            isAnon,
+            imgURL,
+            playlist,
+            course,
+            address);
+      }
+      return Left(uploadResult);
     } on FirebaseAuthException catch (e) {
-      print("REGISTER ERROR:" + e.code);
-      return e.code;
+      return Right(e);
     }
   }
 
   //xác thực mật khẩu
   Future<String> validatePassword(String password) async {
-
     var baseUser = _auth.currentUser;
-    try{
+    try {
       await baseUser!.reauthenticateWithCredential(EmailAuthProvider.credential(
           email: baseUser.email!, password: password));
       return 'OK';
-    }
-    on FirebaseAuthException catch (er){
+    } on FirebaseAuthException catch (er) {
       print("ERROR CODE:" + er.code);
       return er.code;
     }
-      // var authCredential = await _auth.signInWithEmailAndPassword(email: baseUser.email, password: password);
+    // var authCredential = await _auth.signInWithEmailAndPassword(email: baseUser.email, password: password);
   }
 
   Future<String> updatePassword(String newPassword) async {
     var firebaseUser = _auth.currentUser;
-      try{
-        firebaseUser!.updatePassword(newPassword);
-        return 'OK';
-      }
-      catch (e){
-        return e.toString();
-      }
-
+    try {
+      firebaseUser!.updatePassword(newPassword);
+      return 'OK';
+    } catch (e) {
+      return e.toString();
+    }
   }
 
   Future sendEmailResetPassword(String email) async {

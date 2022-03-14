@@ -46,7 +46,7 @@ class _OthersProfileState extends State<OthersProfile> {
   }
 
   getAllFollowings() async {
-    QuerySnapshot querySnapshot = await dbServer.followingRef
+    QuerySnapshot querySnapshot = await dbServer.followingReference
         .doc(widget.ctuerId)
         .collection('userFollowings')
         .get();
@@ -59,7 +59,7 @@ class _OthersProfileState extends State<OthersProfile> {
 
 
   checkIfAlreadyFollowing() async {
-    await dbServer.followerRef
+    await dbServer.followerReference
         .doc(widget.ctuer!.id)
         .collection('userFollowers')
         .doc(widget.currentUser!.uid)
@@ -113,7 +113,7 @@ class _OthersProfileState extends State<OthersProfile> {
 
 
   getAllFollowers() async {
-    QuerySnapshot querySnapshot = await dbServer.followerRef
+    QuerySnapshot querySnapshot = await dbServer.followerReference
         .doc(widget.ctuerId)
         .collection('userFollowers')
         .get();
@@ -187,7 +187,7 @@ class _OthersProfileState extends State<OthersProfile> {
 
   //unfollow user
   controlUnfollowUser(UserData userData) {
-    dbServer.followerRef
+    dbServer.followerReference
         .doc(widget.ctuer!.id)
         .collection('userFollowers')
         .doc(userData.id)
@@ -210,7 +210,7 @@ class _OthersProfileState extends State<OthersProfile> {
       }
     });
 
-    dbServer.followingRef
+    dbServer.followingReference
         .doc(userData.id)
         .collection('userFollowings')
         .doc(widget.ctuer!.id)
@@ -221,7 +221,7 @@ class _OthersProfileState extends State<OthersProfile> {
       }
     });
 
-    dbServer.feedRef
+    dbServer.feedReference
         .doc(widget.ctuer!.id)
         .collection('feedItems')
         .doc(userData.id)

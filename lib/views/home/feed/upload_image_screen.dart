@@ -7,6 +7,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:luanvanflutter/controller/controller.dart';
+import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/decoration.dart';
@@ -30,14 +31,15 @@ class _UploadImageState extends State<UploadImage>
     with AutomaticKeepAliveClientMixin<UploadImage> {
   File? file;
   TextEditingController descriptionTextEditingController =
-  TextEditingController();
+      TextEditingController();
   TextEditingController locationController = TextEditingController();
   bool uploading = false;
   final Reference storageReference =
-  FirebaseStorage.instance.ref().child("Đăng ảnh");
+      FirebaseStorage.instance.ref().child("Đăng ảnh");
   final postReference = FirebaseFirestore.instance.collection("posts");
-  String postId = const Uuid().v4();
+  String postId = "";
   final GoogleSignIn googleSignIn = GoogleSignIn();
+
   //nén ảnh để hiển thị nhỏ
   compressPhoto() async {
     final directory = await getTemporaryDirectory();
@@ -52,7 +54,7 @@ class _UploadImageState extends State<UploadImage>
 
   Future<String> uploadPhoto(mImageFile) async {
     UploadTask mStorageUploadTask =
-    storageReference.child("post_$postId.jpg").putFile(mImageFile);
+        storageReference.child("post_$postId.jpg").putFile(mImageFile);
     TaskSnapshot storageTaskSnapshot = await mStorageUploadTask;
     String downloadUrl = await storageTaskSnapshot.ref.getDownloadURL();
     return downloadUrl;
@@ -71,7 +73,6 @@ class _UploadImageState extends State<UploadImage>
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-
         return Future.error('Location permissions are denied');
       }
     }
@@ -80,24 +81,24 @@ class _UploadImageState extends State<UploadImage>
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
-    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
   }
 
   getUserLocation() async {
     Position position = await _determinePosition().then((value) => value);
-    List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude, position.longitude);
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
     Placemark placemark = placemarks[0];
-    String completeAddress = '${placemark.subThoroughfare} ${placemark
-        .thoroughfare}, ${placemark.subLocality} ${placemark
-        .locality}, ${placemark.subAdministrativeArea}, ${placemark
-        .administrativeArea} ${placemark.postalCode}, ${placemark.country}';
+    String completeAddress =
+        '${placemark.subThoroughfare} ${placemark.thoroughfare}, ${placemark.subLocality} ${placemark.locality}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea} ${placemark.postalCode}, ${placemark.country}';
     print("ADDRESS:" + completeAddress);
-    String formattedAddress = "${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ${placemark.country}";
+    String formattedAddress =
+        "${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ${placemark.country}";
     locationController.text = formattedAddress;
   }
 
-  controlUploadAndSave(String uid) async {
+  Future controlUploadAndSave(String uid) async {
     setState(() {
       uploading = true;
     });
@@ -105,24 +106,26 @@ class _UploadImageState extends State<UploadImage>
     await compressPhoto();
 
     String downloadUrl = await uploadPhoto(file);
-    DatabaseServices(uid: uid).createPost(
-        postId,
-        widget.userData.username,
-        Timestamp.now(),
-        uid,
-        descriptionTextEditingController.text,
-        locationController.text,
-        {},
-        downloadUrl);
+    postId = const Uuid().v4();
+    var response = await DatabaseServices(uid: uid).createPost(PostModel(
+        postId: postId,
+        username: widget.userData.username,
+        timestamp: Timestamp.now(),
+        ownerId: uid,
+        description: descriptionTextEditingController.text,
+        location: locationController.text,
+        likes: {},
+        url: downloadUrl));
 
     descriptionTextEditingController.clear();
     setState(() {
       // file = null;
       uploading = false;
-      postId = Uuid().v4();
     });
 
-    Navigator.pop(context);
+    response.fold((left) {
+      Navigator.pop(context);
+    }, (right) => {AlertDialog});
   }
 
   displayUploadFormScreen(CurrentUser user) {
@@ -151,91 +154,90 @@ class _UploadImageState extends State<UploadImage>
       ),
       body: uploading
           ? Container(
-        alignment: Alignment.center,
-        child: const CircularProgressIndicator(),
-      )
+              alignment: Alignment.center,
+              child: const CircularProgressIndicator(),
+            )
           : ListView(
-        children: <Widget>[
-          SizedBox(
-            height: 230,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width * 0.8,
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: FileImage(file!), fit: BoxFit.cover),
+              children: <Widget>[
+                SizedBox(
+                  height: 230,
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: Center(
+                    child: AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: FileImage(file!), fit: BoxFit.cover),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(top: 12),
-          ),
-          ListTile(
-            leading: CircleAvatar(
-              radius: 27,
-              child: ClipOval(
-                child: SizedBox(
+                const Padding(
+                  padding: EdgeInsets.only(top: 12),
+                ),
+                ListTile(
+                  leading: CircleAvatar(
+                    radius: 27,
+                    child: ClipOval(
+                      child: SizedBox(
+                        width: 180,
+                        height: 180,
+                        child: Image.network(
+                          widget.userData.avatar,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  title: TextFormField(
+                    style: const TextStyle(color: Colors.black),
+                    controller: descriptionTextEditingController,
+                    decoration: textFieldInputDecoration(
+                        ' Nói gì đó về ảnh của bạn đi'),
+                    // decoration: InputDecoration(
+                    //   hintText: 'Say something about your image',
+                    //   hintStyle: TextStyle(color: Colors.grey),
+                    //   border: InputBorder.none,
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.pin_drop,
+                    color: kPrimaryColor,
+                    size: 50,
+                  ),
+                  title: SizedBox(
+                    width: 180,
+                    child: TextField(
+                      controller: locationController,
+                      decoration: const InputDecoration(
+                          hintText: "Tấm ảnh này được chụp ở đâu?",
+                          border: InputBorder.none),
+                    ),
+                  ),
+                ),
+                Container(
                   width: 180,
-                  height: 180,
-                  child: Image.network(
-                    widget.userData.avatar,
-                    fit: BoxFit.cover,
+                  height: 100,
+                  alignment: Alignment.center,
+                  child: RaisedButton.icon(
+                    label: const Text(
+                      "Dùng vị trí hiện tại",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0)),
+                    color: kPrimaryColor,
+                    onPressed: () {
+                      getUserLocation();
+                    },
+                    icon: const Icon(Icons.location_on_outlined),
                   ),
-                ),
-              ),
+                )
+              ],
             ),
-            title: TextFormField(
-              style: const TextStyle(color: Colors.black),
-              controller: descriptionTextEditingController,
-              decoration: textFieldInputDecoration(
-                  ' Nói gì đó về ảnh của bạn đi'),
-              // decoration: InputDecoration(
-              //   hintText: 'Say something about your image',
-              //   hintStyle: TextStyle(color: Colors.grey),
-              //   border: InputBorder.none,
-            ),
-          ),
-          ListTile(
-            leading: const Icon(
-              Icons.pin_drop,
-              color: kPrimaryColor,
-              size: 50,
-            ),
-            title: SizedBox(
-              width: 180,
-              child: TextField(
-                controller: locationController,
-                decoration: const InputDecoration(
-                    hintText: "Tấm ảnh này được chụp ở đâu?",
-                    border: InputBorder.none),
-              ),
-            ),
-          ),
-          Container(
-            width: 180,
-            height: 100,
-            alignment: Alignment.center,
-            child: RaisedButton.icon(
-              label: const Text(
-                "Dùng vị trí hiện tại",
-                style: TextStyle(color: Colors.white),
-              ),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0)),
-              color: kPrimaryColor,
-              onPressed: () {getUserLocation();},
-              icon: const Icon(Icons.location_on_outlined),
-            ),
-          )
-        ],
-      ),
     );
   }
 

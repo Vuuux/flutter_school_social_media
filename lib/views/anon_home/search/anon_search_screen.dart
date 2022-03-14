@@ -36,7 +36,7 @@ class _AnonSearchScreenState extends State<AnonSearchScreen> {
       });
 
       Future<QuerySnapshot> users = DatabaseServices(uid: '')
-          .ctuerRef
+          .userReference
           .where("nickname",
               isGreaterThanOrEqualTo: searchTextEditingController.text)
           .get();

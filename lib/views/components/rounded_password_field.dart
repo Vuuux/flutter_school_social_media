@@ -6,10 +6,13 @@ class RoundedPasswordField extends StatefulWidget {
   final ValueChanged<String> onChanged;
   final FormFieldValidator validator;
   final String hintText;
+  final FocusNode? focusNode;
   const RoundedPasswordField({
     Key? key,
     required this.onChanged,
-    required this.validator, required this.hintText,
+    required this.validator,
+    required this.hintText,
+    this.focusNode,
   }) : super(key: key);
 
   @override
@@ -23,6 +26,7 @@ class _RoundedPasswordFieldState extends State<RoundedPasswordField> {
   Widget build(BuildContext context) {
     return TextFieldContainer(
       child: TextFormField(
+        focusNode: widget.focusNode,
         validator: widget.validator,
         obscureText: !_passwordVisible,
         onChanged: widget.onChanged,
@@ -40,17 +44,14 @@ class _RoundedPasswordFieldState extends State<RoundedPasswordField> {
                 _passwordVisible = !_passwordVisible;
               });
             },
-            icon:
-            Icon(
+            icon: Icon(
               !_passwordVisible ? Icons.visibility : Icons.visibility_off,
             ),
             color: kPrimaryColor,
-
           ),
           border: InputBorder.none,
         ),
       ),
     );
   }
-
 }

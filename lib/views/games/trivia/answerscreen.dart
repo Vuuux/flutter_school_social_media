@@ -91,7 +91,7 @@ class _AnswerScreenState extends State<AnswerScreen> {
           messageMap);
 
       DatabaseServices(uid: '')
-          .feedRef
+          .feedReference
           .doc(widget.ctuer.email)
           .collection('feed')
           .add({

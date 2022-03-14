@@ -37,11 +37,12 @@ class AnonChatScreenTile extends StatelessWidget {
           if (snapshot.data!.docs.length - 1 < 0) {
             return const Text('');
           } else {
-            latestMsg  = snapshot.data!.docs[snapshot.data!.docs.length - 1]
+            latestMsg = snapshot.data!.docs[snapshot.data!.docs.length - 1]
                 .get("message");
-            latestTime = f.format(snapshot.data!.docs[snapshot.data!.docs.length - 1]
-                .get("timestamp")
-                .toDate())
+            latestTime = f
+                .format(snapshot.data!.docs[snapshot.data!.docs.length - 1]
+                    .get("timestamp")
+                    .toDate())
                 .toString();
             return Text(latestMsg.length >= 20 ? '...' : latestMsg,
                 style: const TextStyle(color: Colors.grey));
@@ -52,12 +53,12 @@ class AnonChatScreenTile extends StatelessWidget {
       },
     );
   }
-  
 
   @override
   Widget build(BuildContext context) {
     final user = context.watch<CurrentUser?>();
-    chatMessagesStream = DatabaseServices(uid: '').getAnonConversationMessages(chatRoomId);
+    chatMessagesStream =
+        DatabaseServices(uid: '').getAnonConversationMessages(chatRoomId);
     return StreamBuilder<UserData>(
         stream: DatabaseServices(uid: user!.uid).userData,
         builder: (context, snapshot) {
@@ -73,8 +74,9 @@ class AnonChatScreenTile extends StatelessWidget {
               ),
             ),
             onPressed: () {
-
-               Navigator.of(context).push(MaterialPageRoute(builder: (context) => AnonConversationScreen(chatRoomId: chatRoomId, ctuer: ctuer, userId: userId)));
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => AnonConversationScreen(
+                      chatRoomId: chatRoomId, ctuer: ctuer, userId: userId)));
               // .pushAndRemoveUntil(
               //   FadeRoute(
               //     page: ConversationScreen(
@@ -96,7 +98,7 @@ class AnonChatScreenTile extends StatelessWidget {
                   trailingIcon: Icon(Icons.delete),
                   onPressed: () {
                     DatabaseServices(uid: '')
-                        .anonChatRef
+                        .anonChatReference
                         .doc(chatRoomId)
                         .collection('conversation')
                         .get()
@@ -107,7 +109,7 @@ class AnonChatScreenTile extends StatelessWidget {
                     });
 
                     DatabaseServices(uid: '')
-                        .anonChatRef
+                        .anonChatReference
                         .doc(chatRoomId)
                         .get()
                         .then((doc) {
