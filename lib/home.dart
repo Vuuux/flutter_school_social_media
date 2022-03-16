@@ -1,4 +1,6 @@
-
+import 'package:eventual/eventual-builder.dart';
+import 'package:eventual/eventual-notifier.dart';
+import 'package:eventual/eventual-single-builder.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:luanvanflutter/controller/controller.dart';
@@ -9,6 +11,7 @@ import 'package:luanvanflutter/views/anon_home/chat/anon_chat_screen.dart';
 import 'package:luanvanflutter/views/anon_home/feed/forum_feed.dart';
 import 'package:luanvanflutter/views/anon_home/profile/anon_profile.dart';
 import 'package:luanvanflutter/views/anon_home/search/anon_example_search_screen.dart';
+import 'package:luanvanflutter/views/components/buttons/bottom_bar_button.dart';
 import 'package:luanvanflutter/views/home/profile/profile.dart';
 import 'package:luanvanflutter/views/home/search/example_search_screen.dart';
 import 'package:provider/provider.dart';
@@ -28,11 +31,12 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   static bool anonymous = false;
-  int _currentIndex = 0;
+  EventualNotifier<int> _currentAnonymousIndex = EventualNotifier(0);
+  EventualNotifier<int> _currentIndex = EventualNotifier(0);
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late CurrentUser? user;
-  //Các tab ở chế độ thường
 
+  //Các tab ở chế độ thường
 
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
@@ -46,19 +50,17 @@ class _HomeState extends State<Home> {
       action: SnackBarAction(
         textColor: Colors.black,
         label: 'Hmmie!',
-        onPressed: () =>
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => NotificationPage(uid: user!.uid),
-              ),
-            ),
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NotificationPage(uid: user!.uid),
+          ),
+        ),
       ),
       duration: const Duration(seconds: 3),
       backgroundColor: Colors.amber,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
   }
 
   // showSnackBar(Map<String, dynamic> message) {
@@ -96,7 +98,7 @@ class _HomeState extends State<Home> {
       var messageData = message.data;
       final String recipientId = messageData["recipient"];
       final String? body = message.notification!.body;
-      if(recipientId == user!.uid && body!.isNotEmpty) {
+      if (recipientId == user!.uid && body!.isNotEmpty) {
         showSnackBar(body);
       }
 
@@ -122,12 +124,11 @@ class _HomeState extends State<Home> {
       badge: true,
       alert: true,
     );
-
   }
 
-  changePage(int index) {
+  void changePage(int index) {
     setState(() {
-      _currentIndex = index;
+      _currentIndex.value = index;
     });
   }
 
@@ -137,9 +138,11 @@ class _HomeState extends State<Home> {
     user = Provider.of<CurrentUser?>(context);
     _saveDeviceToken(user!.uid);
     final tabs = [
-      const  Feed(),
+      const Feed(),
       const ChatScreen(),
-      NotificationPage(uid: user!.uid,),
+      NotificationPage(
+        uid: user!.uid,
+      ),
       const MyProfile(),
       SimpleSearch(),
     ];
@@ -148,221 +151,162 @@ class _HomeState extends State<Home> {
     final anonymousTabs = [
       const AnonForumFeed(),
       const AnonChatScreen(),
-      AnonNotificationPage(uid: user!.uid,),
+      AnonNotificationPage(
+        uid: user!.uid,
+      ),
       const AnonProfile(),
       AnonSimpleSearch(),
     ];
     //ScreenUtil.setScreenOrientation('portrait');
     //this StreamProvider provides the list of user for WiggleList();
-    return
-      anonymous
-          ? Scaffold(
-        key: _scaffoldKey,
-        body: anonymousTabs[_currentIndex],
-        //floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-        floatingActionButton: FloatingActionButton(
-          splashColor: Colors.transparent,
-          child: const Icon(Icons.portrait),
-          onPressed: () {
-            DatabaseServices(uid: user!.uid).updateAnon(false);
-            setState(() {
-              anonymous = false;
-            });
-          },
-        ),
-        floatingActionButtonLocation:
-        FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: BottomAppBar(
-          color: kPrimaryDarkColor,
-          shape: const CircularNotchedRectangle(),
-          notchMargin: 10,
-          child: SizedBox(
-            height: 45,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    MaterialButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      minWidth: 20,
-                      onPressed: () => changePage(0),
-                      child: Icon(
-                        Icons.menu,
-                        color: _currentIndex == 0
-                            ? kPrimaryColor
-                            : Colors.white,
+    return anonymous
+        ? EventualSingleBuilder(
+            notifier: _currentAnonymousIndex,
+            builder: (context, notifier, _) => Scaffold(
+              key: _scaffoldKey,
+              body: anonymousTabs[notifier.value],
+              //floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
+              floatingActionButton: FloatingActionButton(
+                splashColor: Colors.transparent,
+                child: const Icon(Icons.portrait),
+                onPressed: () {
+                  DatabaseServices(uid: user!.uid).updateAnon(false);
+                  setState(() {
+                    anonymous = false;
+                  });
+                },
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerDocked,
+              bottomNavigationBar: BottomAppBar(
+                color: kPrimaryDarkColor,
+                shape: const CircularNotchedRectangle(),
+                notchMargin: 10,
+                child: SizedBox(
+                  height: 45,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          BottomBarButton(
+                            index: 0,
+                            icon: Icons.menu,
+                            currentIndex: _currentAnonymousIndex,
+                          ),
+                          const SizedBox(
+                            width: 50,
+                          ),
+                          BottomBarButton(
+                              index: 1,
+                              currentIndex: _currentAnonymousIndex,
+                              icon: Icons.chat),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 50,),
-                    MaterialButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      minWidth: 20,
-                      onPressed: () => changePage(1),
-                      child: Icon(
-                        Icons.chat,
-                        color: _currentIndex == 1
-                            ? kPrimaryColor
-                            : Colors.white,
-                      ),
-                    )
-                  ],
+                      // Right Tab bar icons
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          BottomBarButton(
+                              index: 2,
+                              currentIndex: _currentAnonymousIndex,
+                              icon: Icons.new_releases),
+                          BottomBarButton(
+                              index: 3,
+                              currentIndex: _currentAnonymousIndex,
+                              icon: Icons.portrait),
+                          BottomBarButton(
+                              index: 4,
+                              currentIndex: _currentAnonymousIndex,
+                              icon: Icons.search),
+                        ],
+                      )
+                    ],
+                  ),
                 ),
-                // Right Tab bar icons
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    MaterialButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      minWidth: 20,
-                      onPressed: () => changePage(2),
-                      child: Icon(
-                        Icons.new_releases,
-                        color: _currentIndex == 2
-                            ? kPrimaryColor
-                            : Colors.white,
-                      ),
-                    ),
-                    MaterialButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      minWidth: 20,
-                      onPressed: () => changePage(3),
-                      child: Icon(
-                        Icons.portrait,
-                        color: _currentIndex == 3
-                            ? kPrimaryColor
-                            : Colors.white,
-                      ),
-                    ),
-                    MaterialButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      minWidth: 20,
-                      onPressed: () => changePage(4),
-                      child: Icon(
-                        Icons.search,
-                        color: _currentIndex == 4
-                            ? kPrimaryColor
-                            : Colors.white,
-                      ),
-                    ),
-                  ],
-                )
-              ],
+              ),
             ),
-          ),
-        ),
-      )
-          :
-      Scaffold(
-        key: _scaffoldKey,
-        body: tabs[_currentIndex],
-        floatingActionButton: FloatingActionButton(
-          splashColor: Colors.transparent,
-          backgroundColor: kPrimaryLightColor,
-          child: ClipOval(
-            child: Image.asset('assets/images/ghosty2.png',
-                fit: BoxFit.fill, color: kPrimaryColor),
-          ),
-          onPressed: () {
-            DatabaseServices(uid: user!.uid).changeAnonymousMode(true);
-            setState(() {
-              anonymous = true;
-            });
-          },
-        ),
-        floatingActionButtonLocation:
-        FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: BottomAppBar(
-          color: Colors.blueGrey,
-          shape: const CircularNotchedRectangle(),
-          notchMargin: 10,
-          child: SizedBox(
-            height: 45,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    MaterialButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      minWidth: 20,
-                      onPressed: () => changePage(0),
-                      child: Icon(
-                        Icons.menu,
-                        color: _currentIndex == 0
-                            ? kPrimaryColor
-                            : Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 50,),
-                    MaterialButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      minWidth: 20,
-                      onPressed: () => changePage(1),
-                      child: Icon(
-                        Icons.chat,
-                        color: _currentIndex == 1
-                            ? kPrimaryColor
-                            : Colors.white,
-                      ),
-                    )
-                  ],
+          )
+        : EventualSingleBuilder(
+            notifier: _currentIndex,
+            builder: (context, notifier, _) => Scaffold(
+              key: _scaffoldKey,
+              body: tabs[notifier.value],
+              floatingActionButton: FloatingActionButton(
+                splashColor: Colors.transparent,
+                backgroundColor: kPrimaryLightColor,
+                child: ClipOval(
+                  child: Image.asset('assets/images/ghosty2.png',
+                      fit: BoxFit.fill, color: kPrimaryColor),
                 ),
-                // Right Tab bar icons
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    MaterialButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      minWidth: 20,
-                      onPressed: () => changePage(2),
-                      child: Icon(
-                        Icons.new_releases,
-                        color: _currentIndex == 2
-                            ? kPrimaryColor
-                            : Colors.white,
+                onPressed: () {
+                  DatabaseServices(uid: user!.uid).changeAnonymousMode(true);
+                  setState(() {
+                    anonymous = true;
+                  });
+                },
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerDocked,
+              bottomNavigationBar: BottomAppBar(
+                color: Colors.blueGrey,
+                shape: const CircularNotchedRectangle(),
+                notchMargin: 10,
+                child: Container(
+                  height: 60,
+                  // decoration: const BoxDecoration(
+                  //   gradient: LinearGradient(
+                  //     begin: Alignment.center,
+                  //     end: Alignment.topCenter,
+                  //     colors: [
+                  //       Colors.grey,
+                  //       Colors.white,
+                  //     ],
+                  //   ),
+                  // ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          BottomBarButton(
+                              index: 0,
+                              currentIndex: _currentIndex,
+                              icon: Icons.menu),
+                          const SizedBox(
+                            width: 50,
+                          ),
+                          BottomBarButton(
+                              currentIndex: _currentIndex,
+                              index: 1,
+                              icon: Icons.chat),
+                        ],
                       ),
-                    ),
-                    MaterialButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      minWidth: 20,
-                      onPressed: () => changePage(3),
-                      child: Icon(
-                        Icons.portrait,
-                        color: _currentIndex == 3
-                            ? kPrimaryColor
-                            : Colors.white,
-                      ),
-                    ),
-                    MaterialButton(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      minWidth: 20,
-                      onPressed: () => changePage(4),
-                      child: Icon(
-                        Icons.search,
-                        color: _currentIndex == 4
-                            ? kPrimaryColor
-                            : Colors.white,
-                      ),
-                    ),
-                  ],
-                )
-              ],
+                      // Right Tab bar icons
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          BottomBarButton(
+                              currentIndex: _currentIndex,
+                              index: 2,
+                              icon: Icons.new_releases),
+                          BottomBarButton(
+                              currentIndex: _currentIndex,
+                              index: 3,
+                              icon: Icons.portrait),
+                          BottomBarButton(
+                              index: 4,
+                              currentIndex: _currentIndex,
+                              icon: Icons.search),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      );
+          );
   }
 }

@@ -9,10 +9,10 @@ import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
+import 'package:luanvanflutter/views/components/search_bar.dart';
 import 'package:luanvanflutter/views/home/feed/post_screen.dart';
 import 'package:luanvanflutter/views/home/feed/upload_image_screen.dart';
 import 'package:provider/provider.dart';
-
 
 //Class feed chứa các bài post
 class Feed extends StatefulWidget {
@@ -30,49 +30,53 @@ class _FeedState extends State<Feed> {
   final picker = ImagePicker(); //API chọn hình ảnh
   //lấy time từ post
 
-  Widget postList( CurrentUser currentUser) {
+  Widget postList(CurrentUser currentUser) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Stream.fromFuture(
-          DatabaseServices(uid: currentUser.uid).getTimelinePosts(currentUser.uid)),
+      stream: Stream.fromFuture(DatabaseServices(uid: currentUser.uid)
+          .getTimelinePosts(currentUser.uid)),
       builder: (context, snapshot) {
         return snapshot.hasData
             ? ListView.builder(
-            controller: scrollController,
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              String postId = snapshot.data!.docs[index].get('postId');
-              String ownerId = snapshot.data!.docs[index].get('ownerId');
-              String username = snapshot.data!.docs[index].get('username');
-              String location = snapshot.data!.docs[index].get('location');
-              String description =
-              snapshot.data!.docs[index].get('description');
-              Timestamp timestamp =
-              snapshot.data!.docs[index].get('timestamp');
-              String url = snapshot.data!.docs[index].get('url');
-              Map<String, dynamic> likes =
-              snapshot.data!.docs[index].get('likes');
+                controller: scrollController,
+                itemCount: snapshot.data!.docs.length,
+                itemBuilder: (context, index) {
+                  String postId = snapshot.data!.docs[index].get('postId');
+                  String ownerId = snapshot.data!.docs[index].get('ownerId');
+                  String username = snapshot.data!.docs[index].get('username');
+                  String location = snapshot.data!.docs[index].get('location');
+                  String description =
+                      snapshot.data!.docs[index].get('description');
+                  Timestamp timestamp =
+                      snapshot.data!.docs[index].get('timestamp');
+                  String url = snapshot.data!.docs[index].get('url');
+                  Map<String, dynamic> likes =
+                      snapshot.data!.docs[index].get('likes');
 
-              final post = PostModel(postId: postId,
-                  ownerId: ownerId,
-                  username: username,
-                  location: location,
-                  description: description,
-                  url: url,
-                  likes: likes,
-                  timestamp: timestamp);
+                  final post = PostModel(
+                      postId: postId,
+                      ownerId: ownerId,
+                      username: username,
+                      location: location,
+                      description: description,
+                      url: url,
+                      likes: likes,
+                      timestamp: timestamp);
 
-              return Column(
-                        children: <Widget>[
-                          PostItem(post: post),
-                          const Divider(height: 20, thickness: 5, color: kPrimaryLightColor,),
-                        ]
-                    );
-            })
+                  return Column(children: <Widget>[
+                    PostItem(post: post),
+                    const Divider(
+                      height: 20,
+                      thickness: 5,
+                      color: kPrimaryLightColor,
+                    ),
+                  ]);
+                })
             : const Center(
-              child: Text("Chưa có bài viết nào.",
-              style: TextStyle(color: Colors.black),
-              ),
-            );
+                child: Text(
+                  "Chưa có bài viết nào.",
+                  style: TextStyle(color: Colors.black),
+                ),
+              );
       },
     );
   }
@@ -180,7 +184,6 @@ class _FeedState extends State<Feed> {
         orientation: Orientation.portrait);
     final user = context.watch<CurrentUser?>();
 
-
     return StreamBuilder<UserData>(
         stream: DatabaseServices(uid: user!.uid).userData,
         builder: (context, snapshot) {
@@ -188,9 +191,9 @@ class _FeedState extends State<Feed> {
           return Scaffold(
             appBar: AppBar(
               shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(15),
-            )),
+                  borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(15),
+              )),
               title: const Text("F E E D",
                   textAlign: TextAlign.right,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
@@ -205,7 +208,12 @@ class _FeedState extends State<Feed> {
                     }),
               ],
             ),
-            body: postList(user),
+            body: Column(
+              children: [
+                const CustomSearchBar(),
+                //postList(user),
+              ],
+            ),
           );
           // RefreshIndicator(
           //     child: createTimeLine(), onRefresh: () => retrieveTimeline()));
@@ -217,5 +225,3 @@ class _FeedState extends State<Feed> {
     super.dispose();
   }
 }
-
-
