@@ -42,13 +42,18 @@ class Body extends StatelessWidget {
               height: size.height * 0.35,
             ),
             RoundedInputField(
+              title: "Email",
               initialValue: '',
               icon: Icons.person,
               hintText: "Email của bạn",
-              onChanged: (value) {}, validator: (value) {  },
+              onChanged: (value) {},
+              validator: (value) {},
             ),
             RoundedPasswordField(
-              onChanged: (value) {}, validator: (value) {  }, hintText: 'Mật khẩu',
+              title: "Mật khẩu",
+              onChanged: (value) {},
+              validator: (value) {},
+              hintText: 'Mật khẩu',
             ),
             RoundedButton(
               text: "SIGNUP",
@@ -66,7 +71,8 @@ class Body extends StatelessWidget {
                     },
                   ),
                 );
-              }, key: UniqueKey(),
+              },
+              key: UniqueKey(),
             ),
             OrDivider(),
             Row(
@@ -132,4 +138,3 @@ class Background extends StatelessWidget {
     );
   }
 }
-

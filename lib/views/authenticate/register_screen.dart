@@ -249,6 +249,7 @@ class _RegisterState extends State<Register> {
                                             ? null
                                             : "Xin nhập đúng định dạng email trường cấp!";
                                       },
+                                      title: 'Email',
                                     ),
                                   )
                                 ],
@@ -257,6 +258,7 @@ class _RegisterState extends State<Register> {
                                 const SizedBox(width: 3),
                                 Expanded(
                                     child: RoundedPasswordField(
+                                  title: "Mật khẩu",
                                   onChanged: (val) {
                                     setState(() => password = val);
                                   },
@@ -272,6 +274,7 @@ class _RegisterState extends State<Register> {
                                 const SizedBox(width: 3),
                                 Expanded(
                                     child: RoundedPasswordField(
+                                  title: "Nhập lại mật khẩu",
                                   onChanged: (val) {},
                                   validator: (val) {
                                     return val != password
@@ -328,6 +331,7 @@ class _RegisterState extends State<Register> {
                                       },
                                       icon: Icons.face,
                                       hintText: 'Tên của bạn',
+                                      title: 'Tên hiển thị',
                                     ),
                                   ),
                                 ],
@@ -336,6 +340,7 @@ class _RegisterState extends State<Register> {
                                 const SizedBox(width: 3),
                                 Expanded(
                                   child: RoundedInputField(
+                                    title: 'Biệt danh',
                                     initialValue: nickname,
                                     validator: (val) {
                                       return val!.isEmpty
@@ -355,6 +360,7 @@ class _RegisterState extends State<Register> {
                                   const SizedBox(height: 3),
                                   Expanded(
                                     child: RoundedDropDown(
+                                      title: "Giới tính",
                                       validator: (val) {
                                         return val == null
                                             ? 'Vui lòng cung cấp giới tính hợp lệ'
@@ -391,6 +397,7 @@ class _RegisterState extends State<Register> {
                                 children: <Widget>[
                                   Expanded(
                                     child: RoundedDropDown(
+                                      title: "Quê quán",
                                       validator: (val) {
                                         return val == null
                                             ? 'Xin cung cấp quê quán của bạn'
@@ -425,6 +432,7 @@ class _RegisterState extends State<Register> {
                                 children: <Widget>[
                                   Expanded(
                                     child: RoundedDropDown(
+                                      title: "Khóa",
                                       validator: (val) {
                                         return val == null
                                             ? 'Xin cung cấp khóa của bạn'
@@ -460,6 +468,7 @@ class _RegisterState extends State<Register> {
                                 children: <Widget>[
                                   Expanded(
                                       child: RoundedDropDown(
+                                    title: "Ngành học",
                                     validator: (val) {
                                       return val == null
                                           ? "Vui lòng cung cấp thông tin này"
@@ -499,7 +508,7 @@ class _RegisterState extends State<Register> {
                                         decoration: const InputDecoration(
                                             enabledBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(
-                                                    color: Colors.transparent),
+                                                    color: Colors.black),
                                                 borderRadius: BorderRadius.all(
                                                     Radius.circular(30))),
                                             focusedBorder: OutlineInputBorder(
@@ -513,7 +522,7 @@ class _RegisterState extends State<Register> {
                                             ),
                                             filled: true,
                                             fillColor: kPrimaryLightColor,
-                                            border: InputBorder.none)),
+                                            border: OutlineInputBorder())),
                                   ),
                                 ],
                               ),

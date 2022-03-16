@@ -25,7 +25,8 @@ class Feed extends StatefulWidget {
 class _FeedState extends State<Feed> {
   Stream<QuerySnapshot>? postsStream;
   final timelineReference = FirebaseFirestore.instance.collection('posts');
-  ScrollController scrollController = new ScrollController();
+  ScrollController scrollController = ScrollController();
+  TextEditingController searchController = TextEditingController();
   Ctuer currentCtuer = Ctuer();
   final picker = ImagePicker(); //API chọn hình ảnh
   //lấy time từ post
@@ -210,7 +211,20 @@ class _FeedState extends State<Feed> {
             ),
             body: Column(
               children: [
-                const CustomSearchBar(),
+                CustomSearchBar(
+                  onSearchSubmit: (String query) {
+                    Future<QuerySnapshot> post = DatabaseServices(uid: '')
+                        .postReference
+                        .where("username", isGreaterThanOrEqualTo: query)
+                        .get();
+                    setState(() {
+                      //searchResultsFuture = users;
+                    });
+                  },
+                  onTapCancel: () {},
+                  searchController: searchController,
+                  hintText: 'Tìm kiếm bài viết...',
+                ),
                 //postList(user),
               ],
             ),

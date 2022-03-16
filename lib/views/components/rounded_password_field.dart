@@ -3,6 +3,7 @@ import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/views/components/text_field_container.dart';
 
 class RoundedPasswordField extends StatefulWidget {
+  final String title;
   final ValueChanged<String> onChanged;
   final FormFieldValidator validator;
   final String hintText;
@@ -13,6 +14,7 @@ class RoundedPasswordField extends StatefulWidget {
     required this.validator,
     required this.hintText,
     this.focusNode,
+    required this.title,
   }) : super(key: key);
 
   @override
@@ -24,34 +26,49 @@ class _RoundedPasswordFieldState extends State<RoundedPasswordField> {
 
   @override
   Widget build(BuildContext context) {
-    return TextFieldContainer(
-      child: TextFormField(
-        focusNode: widget.focusNode,
-        validator: widget.validator,
-        obscureText: !_passwordVisible,
-        onChanged: widget.onChanged,
-        cursorColor: kPrimaryColor,
-        decoration: InputDecoration(
-          hintText: widget.hintText,
-          hintStyle: const TextStyle(color: Colors.black45),
-          icon: const Icon(
-            Icons.lock,
-            color: kPrimaryColor,
-          ),
-          suffixIcon: IconButton(
-            onPressed: () {
-              setState(() {
-                _passwordVisible = !_passwordVisible;
-              });
-            },
-            icon: Icon(
-              !_passwordVisible ? Icons.visibility : Icons.visibility_off,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        widget.title.isNotEmpty
+            ? Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  widget.title + ":",
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              )
+            : const SizedBox.shrink(),
+        TextFieldContainer(
+          child: TextFormField(
+            focusNode: widget.focusNode,
+            validator: widget.validator,
+            obscureText: !_passwordVisible,
+            onChanged: widget.onChanged,
+            cursorColor: kPrimaryColor,
+            decoration: InputDecoration(
+              hintText: widget.hintText,
+              hintStyle: const TextStyle(color: Colors.black45),
+              icon: const Icon(
+                Icons.lock,
+                color: kPrimaryColor,
+              ),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  setState(() {
+                    _passwordVisible = !_passwordVisible;
+                  });
+                },
+                icon: Icon(
+                  !_passwordVisible ? Icons.visibility : Icons.visibility_off,
+                ),
+                color: kPrimaryColor,
+              ),
+              border: InputBorder.none,
             ),
-            color: kPrimaryColor,
           ),
-          border: InputBorder.none,
         ),
-      ),
+      ],
     );
   }
 }

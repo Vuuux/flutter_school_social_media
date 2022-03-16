@@ -3,6 +3,7 @@ import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/views/components/text_field_container.dart';
 
 class RoundedDropDown extends StatelessWidget {
+  final String title;
   final String hintText;
   final IconData icon;
   final ValueChanged onChanged;
@@ -20,32 +21,46 @@ class RoundedDropDown extends StatelessWidget {
     required this.items,
     required this.value,
     required this.isExpanded,
-
+    required this.title,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return TextFieldContainer(
-      child: DropdownButtonFormField(
-        autofocus: false,
-        validator: validator,
-        onChanged: onChanged,
-        iconEnabledColor: Colors.black45,
-        dropdownColor: kPrimaryLightColor,
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: const TextStyle(
-              color: Colors.black45
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        title.isNotEmpty
+            ? Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  title + ":",
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              )
+            : const SizedBox.shrink(),
+        TextFieldContainer(
+          child: DropdownButtonFormField(
+            autofocus: false,
+            validator: validator,
+            onChanged: onChanged,
+            iconEnabledColor: Colors.black45,
+            dropdownColor: kPrimaryLightColor,
+            decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: const TextStyle(color: Colors.black45),
+              icon: Icon(
+                icon,
+                color: kPrimaryColor,
+              ),
+              border: InputBorder.none,
+            ),
+            items: items,
+            value: value,
+            isExpanded: isExpanded,
           ),
-          icon: Icon(
-            icon,
-            color: kPrimaryColor,
-          ),
-          border: InputBorder.none,
-        ), items: items,
-        value: value,
-        isExpanded: isExpanded,
-      ),
+        ),
+      ],
     );
   }
 }

@@ -40,7 +40,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future getImage() async {
     var image =
-    await ImagePicker.platform.getImage(source: ImageSource.gallery);
+        await ImagePicker.platform.getImage(source: ImageSource.gallery);
     setState(() {
       _image = File(image!.path);
     });
@@ -58,7 +58,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   updateUser(BuildContext context, CurrentUser user) async {
     Future uploadPic() async {
       Reference firebaseStorageReference =
-      FirebaseStorage.instance.ref().child(_image!.path);
+          FirebaseStorage.instance.ref().child(_image!.path);
 
       UploadTask uploadTask = firebaseStorageReference.putFile(_image!);
       TaskSnapshot taskSnapshot = await uploadTask;
@@ -66,18 +66,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       //TODO: CATCH ERROR HERE
       DatabaseServices(uid: user.uid)
           .updateUserData(
-          email,
-          name,
-          nickname,
-          selectedGenderType,
-          selectedMajorType,
-          bio,
-          x,
-          false,
-          media,
-          playlist,
-          selectedCourse,
-          home)
+              email,
+              name,
+              nickname,
+              selectedGenderType,
+              selectedMajorType,
+              bio,
+              x,
+              false,
+              media,
+              playlist,
+              selectedCourse,
+              home)
           .then((value) => print("RESULT:" + value));
     }
 
@@ -91,34 +91,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       await DatabaseServices(uid: user.uid)
           .updateUserData(
-          email,
-          name,
-          nickname,
-          selectedGenderType,
-          selectedMajorType,
-          bio,
-          y,
-          false,
-          media,
-          playlist,
-          selectedCourse,
-          home)
+              email,
+              name,
+              nickname,
+              selectedGenderType,
+              selectedMajorType,
+              bio,
+              y,
+              false,
+              media,
+              playlist,
+              selectedCourse,
+              home)
           .then((value) async {
         if (value == 'OK') {
-          await DatabaseServices(uid: user.uid).uploadWhoData(
-              email: email,
-              username: name,
-              avatar: y,
-              gender: selectedGenderType,
-              score: 0,
-              nickname: nickname,
-              isAnon: false).then((value) {
+          await DatabaseServices(uid: user.uid)
+              .uploadWhoData(
+                  email: email,
+                  username: name,
+                  avatar: y,
+                  gender: selectedGenderType,
+                  score: 0,
+                  nickname: nickname,
+                  isAnon: false)
+              .then((value) {
             if (value == 'OK') {
-              Fluttertoast.showToast(msg: 'Cập nhật thành công',
+              Fluttertoast.showToast(
+                  msg: 'Cập nhật thành công',
                   toastLength: Toast.LENGTH_SHORT,
                   gravity: ToastGravity.CENTER,
-                  timeInSecForIosWeb: 1
-              );
+                  timeInSecForIosWeb: 1);
 
               Helper.saveUserEmailSharedPreference(email);
               Helper.saveUserIdSharedPreference(name);
@@ -126,8 +128,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               Navigator.of(context).pushAndRemoveUntil(
                   FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
-            }
-            else {
+            } else {
               final snackBar = SnackBar(content: Text(value));
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
             }
@@ -135,8 +136,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           setState(() {
             loading = false;
           });
-        }
-        else {
+        } else {
           final snackBar = SnackBar(content: Text(value));
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
@@ -226,7 +226,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     const SizedBox(height: 10),
                                     Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.center,
+                                          MainAxisAlignment.center,
                                       children: <Widget>[
                                         const SizedBox(width: 50),
                                         Align(
@@ -234,17 +234,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             child: CustomCircleAvatar(
                                               image: (_image != null)
                                                   ? Image.file(
-                                                _image!,
-                                                fit: BoxFit.fill,
-                                              )
+                                                      _image!,
+                                                      fit: BoxFit.fill,
+                                                    )
                                                   : Image.network(
-                                                userData!.avatar,
-                                                fit: BoxFit.fill,
-                                              ),
+                                                      userData!.avatar,
+                                                      fit: BoxFit.fill,
+                                                    ),
                                             )),
                                         Padding(
                                           padding:
-                                          const EdgeInsets.only(top: 60),
+                                              const EdgeInsets.only(top: 60),
                                           child: IconButton(
                                             color: kPrimaryColor,
                                             icon: const Icon(Icons.camera_alt,
@@ -272,6 +272,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             },
                                             hintText: 'Tên của bạn',
                                             icon: Icons.face,
+                                            title: 'Tên',
                                           ),
                                         ),
                                       ],
@@ -284,32 +285,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 children: <Widget>[
                                   Expanded(
                                       child: RoundedDropDown(
-                                        value: userData.gender,
-                                        validator: (val) {
-                                          return val.isEmpty
-                                              ? 'Vui lòng cung cấp giới tính chính xác'
-                                              : null;
-                                        },
-                                        items: _genderType
-                                            .map((value) =>
-                                            DropdownMenuItem(
+                                    title: "Giới tính",
+                                    value: userData.gender,
+                                    validator: (val) {
+                                      return val.isEmpty
+                                          ? 'Vui lòng cung cấp giới tính chính xác'
+                                          : null;
+                                    },
+                                    items: _genderType
+                                        .map((value) => DropdownMenuItem(
                                               child: Text(
                                                 value,
                                               ),
                                               value: value,
                                             ))
-                                            .toList(),
-                                        onChanged: (selectedGender) {
-                                          setState(() {
-                                            selectedGenderType = selectedGender;
-                                          });
-                                        },
-                                        isExpanded: false,
-                                        hintText: 'Chọn giới tính',
-                                        icon: userData.gender == _genderType[0]
-                                            ? Icons.male
-                                            : Icons.female,
-                                      )),
+                                        .toList(),
+                                    onChanged: (selectedGender) {
+                                      setState(() {
+                                        selectedGenderType = selectedGender;
+                                      });
+                                    },
+                                    isExpanded: false,
+                                    hintText: 'Chọn giới tính',
+                                    icon: userData.gender == _genderType[0]
+                                        ? Icons.male
+                                        : Icons.female,
+                                  )),
                                 ],
                               ),
                               const SizedBox(height: 3),
@@ -317,6 +318,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 children: <Widget>[
                                   Expanded(
                                     child: RoundedDropDown(
+                                      title: "Ngành học",
                                       value: userData.major,
                                       validator: (val) {
                                         return val!.isEmpty
@@ -324,13 +326,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             : null;
                                       },
                                       items: _majorsType
-                                          .map((value) =>
-                                          DropdownMenuItem(
-                                            child: Text(
-                                              value,
-                                            ),
-                                            value: value,
-                                          ))
+                                          .map((value) => DropdownMenuItem(
+                                                child: Text(
+                                                  value,
+                                                ),
+                                                value: value,
+                                              ))
                                           .toList(),
                                       onChanged: (selectedBlock) {
                                         setState(() {
@@ -356,7 +357,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       },
                                       validator: (value) {},
                                       icon: Icons.favorite,
-                                      hintText: 'Bio',
+                                      hintText: 'Bio', title: 'Tiểu sử',
                                     ),
                                   ),
                                 ],
@@ -366,32 +367,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 children: <Widget>[
                                   Expanded(
                                       child: RoundedDropDown(
-                                        value: userData.course == ""
-                                            ? null
-                                            : userData.course,
-                                        validator: (val) {
-                                          return val == null
-                                              ? 'Vui lòng cung cấp khóa học'
-                                              : null;
-                                        },
-                                        items: _courses
-                                            .map((value) =>
-                                            DropdownMenuItem(
+                                    title: "Khóa",
+                                    value: userData.course == ""
+                                        ? null
+                                        : userData.course,
+                                    validator: (val) {
+                                      return val == null
+                                          ? 'Vui lòng cung cấp khóa học'
+                                          : null;
+                                    },
+                                    items: _courses
+                                        .map((value) => DropdownMenuItem(
                                               child: Text(
                                                 value,
                                               ),
                                               value: value,
                                             ))
-                                            .toList(),
-                                        onChanged: (val) {
-                                          setState(() {
-                                            selectedCourse = val;
-                                          });
-                                        },
-                                        isExpanded: false,
-                                        hintText: 'Chọn khóa',
-                                        icon: Icons.school,
-                                      )),
+                                        .toList(),
+                                    onChanged: (val) {
+                                      setState(() {
+                                        selectedCourse = val;
+                                      });
+                                    },
+                                    isExpanded: false,
+                                    hintText: 'Chọn khóa',
+                                    icon: Icons.school,
+                                  )),
                                 ],
                               ),
                               const SizedBox(height: 3),
@@ -399,18 +400,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 children: <Widget>[
                                   Expanded(
                                       child: RoundedInputField(
-                                        initialValue: userData.media,
-                                        validator: (val) {
-                                          return val.isEmpty
-                                              ? 'Vui lòng cung cấp playlist'
-                                              : null;
-                                        },
-                                        onChanged: (val) {
-                                          setState(() => media = val);
-                                        },
-                                        icon: Icons.playlist_play_outlined,
-                                        hintText: 'Instagram',
-                                      )),
+                                    initialValue: userData.media,
+                                    validator: (val) {
+                                      return val.isEmpty
+                                          ? 'Vui lòng cung cấp playlist'
+                                          : null;
+                                    },
+                                    onChanged: (val) {
+                                      setState(() => media = val);
+                                    },
+                                    icon: Icons.playlist_play_outlined,
+                                    hintText: 'Instagram',
+                                    title: 'Instagram',
+                                  )),
                                 ],
                               ),
                               const SizedBox(height: 3),
@@ -429,6 +431,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       },
                                       hintText: 'Nghệ sĩ ưa thích',
                                       icon: FontAwesomeIcons.music,
+                                      title: 'Nghệ sĩ ưu thích',
                                     ),
                                   ),
                                 ],
@@ -438,6 +441,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 children: <Widget>[
                                   Expanded(
                                     child: RoundedDropDown(
+                                      title: "Quê quán",
                                       value: userData.address == ""
                                           ? null
                                           : userData.address,
@@ -448,13 +452,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       },
                                       items: _homeArea
                                           .map((value) =>
-                                          DropdownMenuItem<String>(
-                                              child: Text(
-                                                value,
-                                                style: const TextStyle(
-                                                    color: Colors.black),
-                                              ),
-                                              value: value))
+                                              DropdownMenuItem<String>(
+                                                  child: Text(
+                                                    value,
+                                                    style: const TextStyle(
+                                                        color: Colors.black),
+                                                  ),
+                                                  value: value))
                                           .toList(),
                                       onChanged: (selectedhome) {
                                         setState(() {
@@ -514,12 +518,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 },
                                 child: Container(
                                   alignment: Alignment.center,
-                                  width: MediaQuery
-                                      .of(context)
-                                      .size
-                                      .width,
+                                  width: MediaQuery.of(context).size.width,
                                   padding:
-                                  const EdgeInsets.symmetric(vertical: 16),
+                                      const EdgeInsets.symmetric(vertical: 16),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(25),
                                       color: kPrimaryColor),

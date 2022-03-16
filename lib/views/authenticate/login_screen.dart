@@ -162,6 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     )),
                                     SizedBox(height: size.height * 0.03),
                                     RoundedInputField(
+                                        title: email,
                                         initialValue: email,
                                         hintText: "Email của bạn",
                                         icon: Icons.person,
@@ -178,6 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               : "Xin nhập đúng định dạng email trường cấp!";
                                         }),
                                     RoundedPasswordField(
+                                      title: "",
                                       validator: (val) => val.length < 6
                                           ? 'Điền mật khẩu dưới 6 ký tự'
                                           : null,
@@ -227,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             const Center(
                               child: Text(
                                 "Lưu ý ứng dụng này không phải ứng dụng được "
-                                    "phát hành chính thức bởi nhà trường",
+                                "phát hành chính thức bởi nhà trường",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontSize: 14,

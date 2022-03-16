@@ -90,6 +90,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                         children: <Widget>[
                                           Expanded(
                                             child: RoundedInputField(
+                                              title: 'Email',
                                               initialValue: email,
                                               hintText:
                                                   "Email tài khoản đã đăng ký của bạn",
@@ -109,7 +110,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                       const SizedBox(height: 18),
                                       GestureDetector(
                                         onTap: () async {
-                                          context.read<AuthService>().sendEmailResetPassword(email);
+                                          context
+                                              .read<AuthService>()
+                                              .sendEmailResetPassword(email);
                                           Navigator.of(context)
                                               .pushAndRemoveUntil(
                                                   FadeRoute(page: Wrapper()),
@@ -127,16 +130,18 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                               borderRadius:
                                                   BorderRadius.circular(25),
                                               color: kPrimaryColor),
-                                          child: const Text(
-                                              'XÁC NHẬN',
+                                          child: const Text('XÁC NHẬN',
                                               style: TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.w400)),
                                         ),
                                       ),
-                                      const SizedBox(height: 50,),
+                                      const SizedBox(
+                                        height: 50,
+                                      ),
                                       const Center(
-                                        child: Text("Đường dẫn khôi phục mật khẩu sẽ được gửi đến email của bạn sau khi nhấn XÁC NHẬN"),
+                                        child: Text(
+                                            "Đường dẫn khôi phục mật khẩu sẽ được gửi đến email của bạn sau khi nhấn XÁC NHẬN"),
                                       )
                                     ],
                                   ),

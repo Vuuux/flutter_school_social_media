@@ -27,7 +27,6 @@ class _EditPasswordState extends State<EditPassword> {
 
   bool checkCurrentPasswordValid = false;
 
-
   @override
   Widget build(BuildContext context) {
     final user = context.watch<CurrentUser?>();
@@ -75,6 +74,7 @@ class _EditPasswordState extends State<EditPassword> {
                                             const SizedBox(width: 3),
                                             Expanded(
                                               child: RoundedPasswordField(
+                                                title: "Mật khẩu hiện tại",
                                                 validator: (val) {
                                                   return checkCurrentPasswordValid
                                                       ? null
@@ -94,6 +94,7 @@ class _EditPasswordState extends State<EditPassword> {
                                             const SizedBox(width: 3),
                                             Expanded(
                                               child: RoundedPasswordField(
+                                                title: "Mật khẩu mới",
                                                 validator: (val) {
                                                   return val.isEmpty ||
                                                           val.length <= 6
@@ -113,6 +114,7 @@ class _EditPasswordState extends State<EditPassword> {
                                           children: <Widget>[
                                             Expanded(
                                               child: RoundedPasswordField(
+                                                title: "Nhập lại mật khẩu mới",
                                                 validator: (val) {
                                                   return newPassword == val
                                                       ? null
@@ -133,9 +135,12 @@ class _EditPasswordState extends State<EditPassword> {
                                           onTap: () async {
                                             checkCurrentPasswordValid =
                                                 await context
-                                                    .read<AuthService>()
-                                                    .validatePassword(
-                                                        oldPassword) == 'OK' ? true : false;
+                                                            .read<AuthService>()
+                                                            .validatePassword(
+                                                                oldPassword) ==
+                                                        'OK'
+                                                    ? true
+                                                    : false;
 
                                             if (_formKey.currentState!
                                                 .validate()) {
@@ -143,37 +148,38 @@ class _EditPasswordState extends State<EditPassword> {
                                                 loading = false;
                                               });
 
-                                              if(checkCurrentPasswordValid){
+                                              if (checkCurrentPasswordValid) {
                                                 context
                                                     .read<AuthService>()
                                                     .updatePassword(newPassword)
                                                     .then((value) {
-                                                      if(value == 'OK'){
-                                                        Fluttertoast.showToast(
-                                                            msg: "Đổi mật khẩu thành công",
-                                                            toastLength: Toast.LENGTH_SHORT,
-                                                            gravity: ToastGravity.CENTER,
-                                                            timeInSecForIosWeb: 1
-                                                        );
-                                                        Navigator.of(context)
-                                                            .pushAndRemoveUntil(
+                                                  if (value == 'OK') {
+                                                    Fluttertoast.showToast(
+                                                        msg:
+                                                            "Đổi mật khẩu thành công",
+                                                        toastLength:
+                                                            Toast.LENGTH_SHORT,
+                                                        gravity:
+                                                            ToastGravity.CENTER,
+                                                        timeInSecForIosWeb: 1);
+                                                    Navigator.of(context)
+                                                        .pushAndRemoveUntil(
                                                             FadeRoute(
-                                                                page: Wrapper()),
+                                                                page:
+                                                                    Wrapper()),
                                                             ModalRoute.withName(
                                                                 'Wrapper'));
-                                                      }
-                                                      else {
-                                                        final SnackBar snackBar = SnackBar(content: Text(value));
-                                                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                                      }
-                                                })
-                                                ;
-
-
+                                                  } else {
+                                                    final SnackBar snackBar =
+                                                        SnackBar(
+                                                            content:
+                                                                Text(value));
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(snackBar);
+                                                  }
+                                                });
                                               }
-
-
-
                                             }
                                           },
                                           child: Container(
@@ -187,11 +193,12 @@ class _EditPasswordState extends State<EditPassword> {
                                                 borderRadius:
                                                     BorderRadius.circular(25),
                                                 color: kPrimaryColor),
-                                            child: const Text('Xác nhận mật khẩu mới',
+                                            child: const Text(
+                                                'Xác nhận mật khẩu mới',
                                                 style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w400
-                                                )),
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.w400)),
                                           ),
                                         ),
                                       ],
