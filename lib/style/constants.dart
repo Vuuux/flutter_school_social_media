@@ -7,8 +7,8 @@ class Constants {
   static String nickname = "";
   static RegExp EMAIL_REGEX = RegExp(
       "(\w{1,}[b]\d{1,7})@(\w+\.||)+(ctu.edu.vn)",
-  caseSensitive: false,
-  multiLine: false);
+      caseSensitive: false,
+      multiLine: false);
 }
 
 class Photo {
@@ -28,11 +28,11 @@ const textInputDecoration = InputDecoration(
 
 const kSpacingUnit = 10;
 const kPrimaryDarkColor = Color(0xFF373737);
-const kPrimaryColor = Color(0xFFFFC3A0);
+const kPrimaryColor = Colors.amber;
 //Color(0xFFFFAFBD);
-const kSecondaryColor = Color(0xFFFFC3A0);
+const kSecondaryColor = Colors.orange;
 //const kPrimaryColor = Color(0xFF6F35A5);
-const kPrimaryLightColor = Color(0xFFFDE1E5);
+const kPrimaryLightColor = Colors.orange;
 const kContentColorLightTheme = Color(0xFF1D1D35);
 const kContentColorDarkTheme = Color(0xFFF5FCF9);
 const kWarninngColor = Color(0xFFF3BB1C);
@@ -54,13 +54,15 @@ class FadeRoute extends PageRouteBuilder {
             BuildContext context,
             Animation<double> animation,
             Animation<double> secondaryAnimation,
-          ) => page,
+          ) =>
+              page,
           transitionsBuilder: (
             BuildContext context,
             Animation<double> animation,
             Animation<double> secondaryAnimation,
             Widget child,
-          ) => FadeTransition(
+          ) =>
+              FadeTransition(
             opacity: animation,
             child: child,
           ),

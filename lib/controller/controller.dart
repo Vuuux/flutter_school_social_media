@@ -464,10 +464,16 @@ class DatabaseServices {
     }
   }
 
+  //--------------- POST ------------------//
   Future likePost(String likerId, String ownerId, String postId) async {
     await postReference
         .doc(ownerId)
         .collection('userPosts')
+        .doc(postId)
+        .update({'likes.$likerId': true});
+    await feedReference
+        .doc(ownerId)
+        .collection('timelinePosts')
         .doc(postId)
         .update({'likes.$likerId': true});
   }
@@ -478,6 +484,172 @@ class DatabaseServices {
         .collection('userPosts')
         .doc(postId)
         .update({'likes.$unlikerId': false});
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getTimelinePosts(
+      String ownerId) async {
+    return timelineReference
+        .doc(ownerId)
+        .collection('timelinePosts')
+        .orderBy("timestamp", descending: true)
+        .get();
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> getPostById(
+      String ownerId, String postId) {
+    return postReference
+        .doc(ownerId)
+        .collection('userPosts')
+        .where('postId', isEqualTo: postId)
+        .snapshots();
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getMyPosts() async {
+    return postReference
+        .doc(uid)
+        .collection('userPosts')
+        .orderBy("timestamp", descending: true)
+        .get();
+  }
+
+  deletePost(String userId, String postId) async {
+    return await postReference
+        .doc(userId)
+        .collection('userPosts')
+        .doc(postId)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        value.reference.delete();
+      }
+    });
+  }
+
+  Future<Either<bool, FirebaseException>> createPost(PostModel post) async {
+    try {
+      await postReference
+          .doc(post.ownerId)
+          .collection('userPosts')
+          .doc(post.postId)
+          .set({
+        "postId": post.postId,
+        "username": post.username,
+        "timestamp": Timestamp.now(),
+        "ownerId": post.ownerId,
+        "description": post.description,
+        "location": post.location,
+        "likes": post.likes,
+        "url": post.url
+      });
+
+      await addPostToTimeline(post);
+
+      return const Left(true);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
+  }
+
+  Future addPostToTimeline(PostModel post) async {
+    await timelineReference
+        .doc(post.ownerId)
+        .collection('timelinePosts')
+        .doc(post.postId)
+        .set({
+      "postId": post.postId,
+      "username": post.username,
+      "timestamp": Timestamp.now(),
+      "ownerId": post.ownerId,
+      "description": post.description,
+      "location": post.location,
+      "likes": post.likes,
+      "url": post.url
+    });
+  }
+
+  Future postComment(
+      String postId,
+      String userId,
+      String commentId,
+      String username,
+      String comment,
+      Timestamp timestamp,
+      String avatar,
+      String replyTo,
+      String tagId) async {
+    return await commentReference
+        .doc(postId)
+        .collection('userComments')
+        .doc(commentId)
+        .set({
+      "userId": userId,
+      "commentId": commentId,
+      "username": username,
+      "comment": comment,
+      "timestamp": timestamp,
+      "avatar": avatar,
+      "replyTo": replyTo,
+      "tagId": tagId,
+      "likes": {},
+    });
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getComments(String postId) async {
+    return await commentReference
+        .doc(postId)
+        .collection('userComments')
+        .where('replyTo', isEqualTo: "")
+        .orderBy('timestamp', descending: true)
+        .get();
+  }
+
+  likeComment(String postId, String commentId) async {
+    return await commentReference
+        .doc(postId)
+        .collection('userComments')
+        .doc(commentId)
+        .update({'likes.$uid': true});
+  }
+
+  unlikeComment(String postId, String commentId) async {
+    return await commentReference
+        .doc(postId)
+        .collection('userComments')
+        .doc(commentId)
+        .update({'likes.$uid': false});
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> getReplyComments(
+      String postId, String commentId) async {
+    return await commentReference
+        .doc(postId)
+        .collection('userComments')
+        .where('replyTo', isEqualTo: commentId)
+        .orderBy('timestamp', descending: true)
+        .get();
+  }
+
+  Future addCommentNotifications(
+      {required String postOwnerId,
+      required String comment,
+      required String postId,
+      required String uid,
+      required String username,
+      required String avatar,
+      required String url,
+      required Timestamp timestamp}) async {
+    return await feedReference.doc(postOwnerId).collection('feedItems').add({
+      "type": "comment",
+      "commentData": comment,
+      "postId": postId,
+      "userId": uid,
+      "username": username,
+      "avatar": avatar,
+      "mediaUrl": url,
+      "timestamp": timestamp,
+      "status": "unseen",
+      "isAnon": false
+    });
   }
 
   List<UserData> _ctuerListFromSnapshot(QuerySnapshot snapshot) {
@@ -652,49 +824,10 @@ class DatabaseServices {
         .snapshots();
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> getTimelinePosts(
-      String ownerId) async {
-    return timelineReference
-        .doc(ownerId)
-        .collection('timelinePosts')
-        .orderBy("timestamp", descending: true)
-        .get();
-  }
-
-  Stream<QuerySnapshot<Map<String, dynamic>>> getPostById(
-      String ownerId, String postId) {
-    return postReference
-        .doc(ownerId)
-        .collection('userPosts')
-        .where('postId', isEqualTo: postId)
-        .snapshots();
-  }
-
-  Future<QuerySnapshot<Map<String, dynamic>>> getMyPosts() async {
-    return postReference
-        .doc(uid)
-        .collection('userPosts')
-        .orderBy("timestamp", descending: true)
-        .get();
-  }
-
   deletePhotos(String uid, int index) async {
     return await userReference.doc().collection('photos').get().then((doc) {
       if (doc.docs[index].exists) {
         doc.docs[index].reference.delete();
-      }
-    });
-  }
-
-  deletePost(String userId, String postId) async {
-    return await postReference
-        .doc(userId)
-        .collection('userPosts')
-        .doc(postId)
-        .get()
-        .then((value) {
-      if (value.exists) {
-        value.reference.delete();
       }
     });
   }
@@ -730,133 +863,6 @@ class DatabaseServices {
     // List<NotificationModel> notificationsItems = [];
 
     //return notificationsItems;
-  }
-
-  Future<Either<bool, FirebaseException>> createPost(PostModel post) async {
-    try {
-      await postReference
-          .doc(post.ownerId)
-          .collection('userPosts')
-          .doc(post.postId)
-          .set({
-        "postId": post.postId,
-        "username": post.username,
-        "timestamp": Timestamp.now(),
-        "ownerId": post.ownerId,
-        "description": post.description,
-        "location": post.location,
-        "likes": post.likes,
-        "url": post.url
-      });
-
-      await addPostToTimeline(post);
-
-      return const Left(true);
-    } on FirebaseException catch (error) {
-      return Right(error);
-    }
-  }
-
-  Future addPostToTimeline(PostModel post) async {
-    await timelineReference
-        .doc(post.ownerId)
-        .collection('timelinePosts')
-        .doc(post.postId)
-        .set({
-      "postId": post.postId,
-      "username": post.username,
-      "timestamp": Timestamp.now(),
-      "ownerId": post.ownerId,
-      "description": post.description,
-      "location": post.location,
-      "likes": post.likes,
-      "url": post.url
-    });
-  }
-
-  Future postComment(
-      String postId,
-      String userId,
-      String commentId,
-      String username,
-      String comment,
-      Timestamp timestamp,
-      String avatar,
-      String replyTo,
-      String tagId) async {
-    return await commentReference
-        .doc(postId)
-        .collection('userComments')
-        .doc(commentId)
-        .set({
-      "userId": userId,
-      "commentId": commentId,
-      "username": username,
-      "comment": comment,
-      "timestamp": timestamp,
-      "avatar": avatar,
-      "replyTo": replyTo,
-      "tagId": tagId,
-      "likes": {},
-    });
-  }
-
-  Future<QuerySnapshot<Map<String, dynamic>>> getComments(String postId) async {
-    return await commentReference
-        .doc(postId)
-        .collection('userComments')
-        .where('replyTo', isEqualTo: "")
-        .orderBy('timestamp', descending: true)
-        .get();
-  }
-
-  likeComment(String postId, String commentId) async {
-    return await commentReference
-        .doc(postId)
-        .collection('userComments')
-        .doc(commentId)
-        .update({'likes.$uid': true});
-  }
-
-  unlikeComment(String postId, String commentId) async {
-    return await commentReference
-        .doc(postId)
-        .collection('userComments')
-        .doc(commentId)
-        .update({'likes.$uid': false});
-  }
-
-  Future<QuerySnapshot<Map<String, dynamic>>> getReplyComments(
-      String postId, String commentId) async {
-    return await commentReference
-        .doc(postId)
-        .collection('userComments')
-        .where('replyTo', isEqualTo: commentId)
-        .orderBy('timestamp', descending: true)
-        .get();
-  }
-
-  Future addCommentNotifications(
-      {required String postOwnerId,
-      required String comment,
-      required String postId,
-      required String uid,
-      required String username,
-      required String avatar,
-      required String url,
-      required Timestamp timestamp}) async {
-    return await feedReference.doc(postOwnerId).collection('feedItems').add({
-      "type": "comment",
-      "commentData": comment,
-      "postId": postId,
-      "userId": uid,
-      "username": username,
-      "avatar": avatar,
-      "mediaUrl": url,
-      "timestamp": timestamp,
-      "status": "unseen",
-      "isAnon": false
-    });
   }
 
   Future addNotifiCation(String ownerId, String userId, dynamic data) async {

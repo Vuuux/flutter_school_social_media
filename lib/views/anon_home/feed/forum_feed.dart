@@ -16,7 +16,6 @@ import 'package:luanvanflutter/views/components/chips/model/choice_chips.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';
 import 'package:provider/provider.dart';
 
-
 class AnonForumFeed extends StatefulWidget {
   const AnonForumFeed({Key? key}) : super(key: key);
 
@@ -39,57 +38,70 @@ class _AnonForumFeedState extends State<AnonForumFeed> {
       builder: (context, snapshot) {
         return snapshot.hasData
             ? Expanded(
-              child: isGrid ? GridView.builder(
-              controller: scrollController,
-              itemCount: snapshot.data!.docs.length,
-              itemBuilder: (context, index) {
-                final post = ForumModel.fromDocument(snapshot.data!.docs[index]);
+                child: isGrid
+                    ? GridView.builder(
+                        controller: scrollController,
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          final post = ForumModel.fromDocument(
+                              snapshot.data!.docs[index]);
 
-                return ForumItem(forum: post);
-              }, gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          childAspectRatio: 0.9,
-          crossAxisCount: 2,
-          crossAxisSpacing: 5.0,
-          mainAxisSpacing: 5.0,
-        ),) :
-              ListView.builder(
-                controller: scrollController,
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (context, index) {
-                  String forumId = snapshot.data!.docs[index].get('forumId');
-                  String ownerId = snapshot.data!.docs[index].get('ownerId');
-                  String username = snapshot.data!.docs[index].get('username');
-                  String category = snapshot.data!.docs[index].get('category');
-                  String title =
-                  snapshot.data!.docs[index].get('title');
-                  String description =
-                  snapshot.data!.docs[index].get('description');
-                  Timestamp timestamp =
-                  snapshot.data!.docs[index].get('timestamp');
-                  String url = snapshot.data!.docs[index].get('mediaUrl');
-                  Map<String, dynamic> upVotes =
-                  snapshot.data!.docs[index].get('upVotes');
-                  Map<String, dynamic> downVotes =
-                  snapshot.data!.docs[index].get('downVotes');
-                  final post = ForumModel(forumId: forumId,
-                      ownerId: ownerId,
-                      username: username,
-                      title: title,
-                      description: description,
-                      mediaUrl: url,
-                      upVotes: upVotes,
-                      downVotes: downVotes,
-                      timestamp: timestamp,
-                      category: category);
+                          return ForumItem(forum: post);
+                        },
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          childAspectRatio: 0.9,
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 5.0,
+                          mainAxisSpacing: 5.0,
+                        ),
+                      )
+                    : ListView.builder(
+                        controller: scrollController,
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context, index) {
+                          String forumId =
+                              snapshot.data!.docs[index].get('forumId');
+                          String ownerId =
+                              snapshot.data!.docs[index].get('ownerId');
+                          String username =
+                              snapshot.data!.docs[index].get('username');
+                          String category =
+                              snapshot.data!.docs[index].get('category');
+                          String title =
+                              snapshot.data!.docs[index].get('title');
+                          String description =
+                              snapshot.data!.docs[index].get('description');
+                          Timestamp timestamp =
+                              snapshot.data!.docs[index].get('timestamp');
+                          String url =
+                              snapshot.data!.docs[index].get('mediaUrl');
+                          Map<String, dynamic> upVotes =
+                              snapshot.data!.docs[index].get('upVotes');
+                          Map<String, dynamic> downVotes =
+                              snapshot.data!.docs[index].get('downVotes');
+                          final post = ForumModel(
+                              forumId: forumId,
+                              ownerId: ownerId,
+                              username: username,
+                              title: title,
+                              description: description,
+                              mediaUrl: url,
+                              upVotes: upVotes,
+                              downVotes: downVotes,
+                              timestamp: timestamp,
+                              category: category);
 
-                  return ForumItem(forum: post);
-                },),
-            )
+                          return ForumItem(forum: post);
+                        },
+                      ),
+              )
             : Container(
-              child: Text("Chưa có bài viết nào.",
-              style: TextStyle(color: Colors.black),
-              ),
-            );
+                child: Text(
+                  "Chưa có bài viết nào.",
+                  style: TextStyle(color: Colors.black),
+                ),
+              );
       },
     );
   }
@@ -97,8 +109,7 @@ class _AnonForumFeedState extends State<AnonForumFeed> {
   @override
   void initState() {
     super.initState();
-    forumsStream = Stream.fromFuture(
-        DatabaseServices(uid: '').getForums());
+    forumsStream = Stream.fromFuture(DatabaseServices(uid: '').getForums());
   }
 
   circularProgress() {
@@ -120,7 +131,10 @@ class _AnonForumFeedState extends State<AnonForumFeed> {
       pickedFile!.path,
     );
     if (imageFile == null) {
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Wrapper()), ModalRoute.withName('Wrapper'));
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => Wrapper()),
+          ModalRoute.withName('Wrapper'));
     } else {
       final String result = await Navigator.push(
         context,
@@ -130,12 +144,12 @@ class _AnonForumFeedState extends State<AnonForumFeed> {
         ),
       );
 
-      if(result == "UPLOADED") {
+      if (result == "UPLOADED") {
         setState(() {
-          forumsStream = Stream.fromFuture(DatabaseServices(uid: '').getForums());
+          forumsStream =
+              Stream.fromFuture(DatabaseServices(uid: '').getForums());
         });
       }
-
     }
   }
 
@@ -146,7 +160,10 @@ class _AnonForumFeedState extends State<AnonForumFeed> {
     File imageFile = File(pickedFile!.path);
 
     if (imageFile == null) {
-      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Wrapper()), ModalRoute.withName('Wrapper'));
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => Wrapper()),
+          ModalRoute.withName('Wrapper'));
     } else {
       final result = await Navigator.push(
         context,
@@ -156,63 +173,73 @@ class _AnonForumFeedState extends State<AnonForumFeed> {
         ),
       );
 
-      if(result == "UPLOADED") {
+      if (result == "UPLOADED") {
         setState(() {
-          forumsStream = Stream.fromFuture(DatabaseServices(uid: '').getForums());
+          forumsStream =
+              Stream.fromFuture(DatabaseServices(uid: '').getForums());
         });
       }
-
     }
   }
+
   List<ChoiceChipData> choiceChips = ChoiceChips.allOption;
 
   Widget buildChoiceChips() => Wrap(
-    runSpacing: 5.0,
-    spacing: 5.0,
-    alignment: WrapAlignment.center,
-    children: choiceChips
-        .map((choiceChip) => ChoiceChip(
-      label:  Text(choiceChip.label!),
-      labelStyle: const TextStyle(
-          fontWeight: FontWeight.bold, color: Colors.white),
-      onSelected: (isSelected) => setState(() {
+        runSpacing: 5.0,
+        spacing: 5.0,
+        alignment: WrapAlignment.center,
+        children: choiceChips
+            .map((choiceChip) => ChoiceChip(
+                  label: Text(choiceChip.label!),
+                  labelStyle: const TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                  onSelected: (isSelected) => setState(() {
+                    choiceChips = choiceChips.map((otherChip) {
+                      final newChip = otherChip.copy(isSelected: false);
 
-        choiceChips = choiceChips.map((otherChip) {
-          final newChip = otherChip.copy(isSelected: false);
+                      return choiceChip == newChip
+                          ? newChip.copy(isSelected: isSelected)
+                          : newChip;
+                    }).toList();
 
-          return choiceChip == newChip
-              ? newChip.copy(isSelected: isSelected)
-              : newChip;
-        }).toList();
-
-        switch(choiceChip.label){
-          case 'Hỏi đáp':
-            forumsStream = Stream.fromFuture(DatabaseServices(uid: '').getForumsByCategory('questions'));
-            break;
-          case 'Học tập':
-            forumsStream = Stream.fromFuture(DatabaseServices(uid: '').getForumsByCategory('studying'));
-            break;
-          case 'Tư vấn':
-            forumsStream = Stream.fromFuture(DatabaseServices(uid: '').getForumsByCategory('advise'));
-            break;
-          case 'Thầm kín':
-            forumsStream = Stream.fromFuture(DatabaseServices(uid: '').getForumsByCategory('secret'));
-            break;
-          case 'Hỗ trợ':
-            forumsStream = Stream.fromFuture(DatabaseServices(uid: '').getForumsByCategory('support'));
-            break;
-          default:
-            forumsStream = Stream.fromFuture(DatabaseServices(uid: '').getForums());
-            break;
-        }
-
-      }),
-      selected: choiceChip.isSelected,
-      selectedColor: kPrimaryColor,
-      backgroundColor: kPrimaryDarkColor,
-    ))
-        .toList(),
-  );
+                    switch (choiceChip.label) {
+                      case 'Hỏi đáp':
+                        forumsStream = Stream.fromFuture(
+                            DatabaseServices(uid: '')
+                                .getForumsByCategory('questions'));
+                        break;
+                      case 'Học tập':
+                        forumsStream = Stream.fromFuture(
+                            DatabaseServices(uid: '')
+                                .getForumsByCategory('studying'));
+                        break;
+                      case 'Tư vấn':
+                        forumsStream = Stream.fromFuture(
+                            DatabaseServices(uid: '')
+                                .getForumsByCategory('advise'));
+                        break;
+                      case 'Thầm kín':
+                        forumsStream = Stream.fromFuture(
+                            DatabaseServices(uid: '')
+                                .getForumsByCategory('secret'));
+                        break;
+                      case 'Hỗ trợ':
+                        forumsStream = Stream.fromFuture(
+                            DatabaseServices(uid: '')
+                                .getForumsByCategory('support'));
+                        break;
+                      default:
+                        forumsStream = Stream.fromFuture(
+                            DatabaseServices(uid: '').getForums());
+                        break;
+                    }
+                  }),
+                  selected: choiceChip.isSelected,
+                  selectedColor: kPrimaryColor,
+                  backgroundColor: kPrimaryDarkColor,
+                ))
+            .toList(),
+      );
 
   createForum(UserData userData) {
     return showDialog(
@@ -262,45 +289,47 @@ class _AnonForumFeedState extends State<AnonForumFeed> {
         builder: (context, snapshot) {
           UserData? userData = snapshot.data;
           return Scaffold(
-            appBar: AppBar(
-              shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(15),
-            )),
-              title: const Text("D I Ễ N   Đ À N",
-                  textAlign: TextAlign.right,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
-              centerTitle: true,
-              leading: IconButton(
-                  highlightColor: Colors.transparent,
-                  splashColor: Colors.transparent,
-                  icon: !isGrid ? const Icon(Icons.grid_on) : const Icon(Icons.table_rows_outlined),
-                  onPressed: () {
-                    setState(() {
-                      isGrid = !isGrid;
-                    });;
-                  }),
-              actions: <Widget>[
-
-                IconButton(
+              backgroundColor: kPrimaryDarkColor,
+              appBar: AppBar(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(15),
+                )),
+                title: const Text("D I Ễ N   Đ À N",
+                    textAlign: TextAlign.right,
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
+                centerTitle: true,
+                leading: IconButton(
                     highlightColor: Colors.transparent,
                     splashColor: Colors.transparent,
-                    icon: const Icon(Icons.image),
+                    icon: !isGrid
+                        ? const Icon(Icons.grid_on)
+                        : const Icon(Icons.table_rows_outlined),
                     onPressed: () {
-                      createForum(userData!);
+                      setState(() {
+                        isGrid = !isGrid;
+                      });
+                      ;
                     }),
-              ],
-            ),
-            body: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Container(child: Center(child: buildChoiceChips())),
-                forumList(user)
-              ],
-            )
-
-          );
+                actions: <Widget>[
+                  IconButton(
+                      highlightColor: Colors.transparent,
+                      splashColor: Colors.transparent,
+                      icon: const Icon(Icons.image),
+                      onPressed: () {
+                        createForum(userData!);
+                      }),
+                ],
+              ),
+              body: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(child: Center(child: buildChoiceChips())),
+                  forumList(user)
+                ],
+              ));
           // RefreshIndicator(
           //     child: createTimeLine(), onRefresh: () => retrieveTimeline()));
         });
@@ -311,5 +340,3 @@ class _AnonForumFeedState extends State<AnonForumFeed> {
     super.dispose();
   }
 }
-
-

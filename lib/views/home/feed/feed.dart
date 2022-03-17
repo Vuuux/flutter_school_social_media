@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,6 +14,7 @@ import 'package:luanvanflutter/views/components/search_bar.dart';
 import 'package:luanvanflutter/views/home/feed/post_screen.dart';
 import 'package:luanvanflutter/views/home/feed/upload_image_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 //Class feed chứa các bài post
 class Feed extends StatefulWidget {
@@ -29,7 +31,23 @@ class _FeedState extends State<Feed> {
   TextEditingController searchController = TextEditingController();
   Ctuer currentCtuer = Ctuer();
   final picker = ImagePicker(); //API chọn hình ảnh
+  List<PostModel> listPosts = [];
+  RefreshController _controller = RefreshController(initialRefresh: false);
   //lấy time từ post
+
+  Future<void> _onRefresh() async {
+    await Future.delayed(Duration(seconds: 1));
+    _controller.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use loadFailed(),if no data return,use LoadNodata()
+    //listPosts.add((listPosts.length+1).toString());
+    if (mounted) setState(() {});
+    _controller.loadComplete();
+  }
 
   Widget postList(CurrentUser currentUser) {
     return StreamBuilder<QuerySnapshot>(
@@ -41,29 +59,13 @@ class _FeedState extends State<Feed> {
                 controller: scrollController,
                 itemCount: snapshot.data!.docs.length,
                 itemBuilder: (context, index) {
-                  String postId = snapshot.data!.docs[index].get('postId');
-                  String ownerId = snapshot.data!.docs[index].get('ownerId');
-                  String username = snapshot.data!.docs[index].get('username');
-                  String location = snapshot.data!.docs[index].get('location');
-                  String description =
-                      snapshot.data!.docs[index].get('description');
-                  Timestamp timestamp =
-                      snapshot.data!.docs[index].get('timestamp');
-                  String url = snapshot.data!.docs[index].get('url');
-                  Map<String, dynamic> likes =
-                      snapshot.data!.docs[index].get('likes');
-
-                  final post = PostModel(
-                      postId: postId,
-                      ownerId: ownerId,
-                      username: username,
-                      location: location,
-                      description: description,
-                      url: url,
-                      likes: likes,
-                      timestamp: timestamp);
-
+                  final PostModel post =
+                      PostModel.fromDocument(snapshot.data!.docs[index]);
                   return Column(children: <Widget>[
+                    if (index == 0)
+                      const SizedBox(
+                        height: 80,
+                      ),
                     PostItem(post: post),
                     const Divider(
                       height: 20,
@@ -209,8 +211,9 @@ class _FeedState extends State<Feed> {
                     }),
               ],
             ),
-            body: Column(
+            body: Stack(
               children: [
+                SmartRefresher(controller: _controller, child: postList(user)),
                 CustomSearchBar(
                   onSearchSubmit: (String query) {
                     Future<QuerySnapshot> post = DatabaseServices(uid: '')
@@ -225,7 +228,6 @@ class _FeedState extends State<Feed> {
                   searchController: searchController,
                   hintText: 'Tìm kiếm bài viết...',
                 ),
-                //postList(user),
               ],
             ),
           );

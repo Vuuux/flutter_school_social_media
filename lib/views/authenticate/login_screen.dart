@@ -117,6 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
         GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Scaffold(
+            resizeToAvoidBottomInset: false,
             body: Stack(
               alignment: Alignment.center,
               children: <Widget>[
@@ -136,112 +137,106 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: size.width * 0.4,
                   ),
                 ),
-                SizedBox(
-                  height: h,
-                  width: w,
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
                   child: Column(
-                    children: [
-                      SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            SizedBox(height: size.height * 0.1),
-                            const Text(
-                              "ĐĂNG NHẬP",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 30),
-                            ),
-                            Form(
-                                key: _formKey,
-                                child: Column(
-                                  children: <Widget>[
-                                    FloatingImage(
-                                        image: SvgPicture.asset(
-                                      "assets/icons/login.svg",
-                                      height: size.height * 0.35,
-                                    )),
-                                    SizedBox(height: size.height * 0.03),
-                                    RoundedInputField(
-                                        title: email,
-                                        initialValue: email,
-                                        hintText: "Email của bạn",
-                                        icon: Icons.person,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            email = value;
-                                          });
-                                        },
-                                        validator: (val) {
-                                          return RegExp(
-                                                      r"(\w{1,}[b]\d{1,7})@(\w+\.||)+(ctu.edu.vn)")
-                                                  .hasMatch(val!)
-                                              ? null
-                                              : "Xin nhập đúng định dạng email trường cấp!";
-                                        }),
-                                    RoundedPasswordField(
-                                      title: "",
-                                      validator: (val) => val.length < 6
-                                          ? 'Điền mật khẩu dưới 6 ký tự'
-                                          : null,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          password = value;
-                                        });
-                                      },
-                                      hintText: 'Mật khẩu',
-                                    ),
-                                    ForgotPasswordCheck(
-                                      key: UniqueKey(),
-                                      press: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) {
-                                              return const ForgotPassword();
-                                            },
-                                          ),
-                                        );
-                                      },
-                                    )
-                                  ],
-                                )),
-                            RoundedButton(
-                              text: "ĐĂNG NHẬP",
-                              press: () async {
-                                signIn(context);
-                              },
-                            ),
-                            SizedBox(height: size.height * 0.03),
-                            AlreadyHaveAnAccountCheck(
-                              press: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) {
-                                      return const Register();
-                                    },
-                                  ),
-                                );
-                              },
-                              key: UniqueKey(),
-                            ),
-                            const SizedBox(height: 10),
-                            const Center(
-                              child: Text(
-                                "Lưu ý ứng dụng này không phải ứng dụng được "
-                                "phát hành chính thức bởi nhà trường",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    letterSpacing: 1.0,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.w100,
-                                    color: Colors.black),
-                              ),
-                            )
-                          ],
-                        ),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      SizedBox(height: size.height * 0.1),
+                      const Text(
+                        "ĐĂNG NHẬP",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 30),
                       ),
+                      Form(
+                          key: _formKey,
+                          child: Column(
+                            children: <Widget>[
+                              FloatingImage(
+                                  image: SvgPicture.asset(
+                                "assets/icons/login.svg",
+                                height: size.height * 0.3,
+                              )),
+                              SizedBox(height: size.height * 0.03),
+                              RoundedInputField(
+                                  isTitleCenter: true,
+                                  title: "Email",
+                                  initialValue: email,
+                                  hintText: "Email của bạn",
+                                  icon: Icons.person,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      email = value;
+                                    });
+                                  },
+                                  validator: (val) {
+                                    return RegExp(
+                                                r"(\w{1,}[b]\d{1,7})@(\w+\.||)+(ctu.edu.vn)")
+                                            .hasMatch(val!)
+                                        ? null
+                                        : "Xin nhập đúng định dạng email trường cấp!";
+                                  }),
+                              RoundedPasswordField(
+                                isTitleCenter: true,
+                                title: "Mật khẩu",
+                                validator: (val) => val.length < 6
+                                    ? 'Điền mật khẩu dưới 6 ký tự'
+                                    : null,
+                                onChanged: (value) {
+                                  setState(() {
+                                    password = value;
+                                  });
+                                },
+                                hintText: 'Mật khẩu',
+                              ),
+                              ForgotPasswordCheck(
+                                key: UniqueKey(),
+                                press: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) {
+                                        return const ForgotPassword();
+                                      },
+                                    ),
+                                  );
+                                },
+                              )
+                            ],
+                          )),
+                      RoundedButton(
+                        text: "ĐĂNG NHẬP",
+                        press: () async {
+                          signIn(context);
+                        },
+                      ),
+                      AlreadyHaveAnAccountCheck(
+                        press: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return const Register();
+                              },
+                            ),
+                          );
+                        },
+                        key: UniqueKey(),
+                      ),
+                      const SizedBox(height: 10),
+                      const Center(
+                        child: Text(
+                          "Lưu ý ứng dụng này không phải ứng dụng được "
+                          "phát hành chính thức bởi nhà trường",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 14,
+                              letterSpacing: 1.0,
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.w100,
+                              color: Colors.black),
+                        ),
+                      )
                     ],
                   ),
                 ),

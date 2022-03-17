@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/views/components/text_field_container.dart';
@@ -9,6 +10,8 @@ class RoundedInputField extends StatelessWidget {
   final IconData icon;
   final ValueChanged<String> onChanged;
   final FormFieldValidator validator;
+  final bool isTitleCenter;
+
   const RoundedInputField({
     Key? key,
     required this.initialValue,
@@ -17,13 +20,15 @@ class RoundedInputField extends StatelessWidget {
     required this.onChanged,
     required this.validator,
     required this.title,
+    this.isTitleCenter = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          isTitleCenter ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: [
         title.isNotEmpty
             ? Padding(

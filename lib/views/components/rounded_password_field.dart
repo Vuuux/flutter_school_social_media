@@ -8,14 +8,17 @@ class RoundedPasswordField extends StatefulWidget {
   final FormFieldValidator validator;
   final String hintText;
   final FocusNode? focusNode;
-  const RoundedPasswordField({
-    Key? key,
-    required this.onChanged,
-    required this.validator,
-    required this.hintText,
-    this.focusNode,
-    required this.title,
-  }) : super(key: key);
+  final bool isTitleCenter;
+
+  const RoundedPasswordField(
+      {Key? key,
+      required this.onChanged,
+      required this.validator,
+      required this.hintText,
+      this.focusNode,
+      required this.title,
+      this.isTitleCenter = false})
+      : super(key: key);
 
   @override
   State<RoundedPasswordField> createState() => _RoundedPasswordFieldState();
@@ -28,7 +31,9 @@ class _RoundedPasswordFieldState extends State<RoundedPasswordField> {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: widget.isTitleCenter
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
       children: [
         widget.title.isNotEmpty
             ? Padding(

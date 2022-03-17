@@ -22,7 +22,7 @@ class _BottomBarButtonState extends State<BottomBarButton> {
     return MaterialButton(
       highlightColor: Colors.transparent,
       splashColor: Colors.transparent,
-      minWidth: 20,
+      minWidth: 15,
       onPressed: () {
         widget.currentIndex.value = widget.index;
         widget.currentIndex.notifyChange();
@@ -31,7 +31,7 @@ class _BottomBarButtonState extends State<BottomBarButton> {
         widget.icon,
         color: widget.currentIndex.value == widget.index
             ? kPrimaryColor
-            : Colors.white,
+            : Colors.black,
       ),
     );
   }
