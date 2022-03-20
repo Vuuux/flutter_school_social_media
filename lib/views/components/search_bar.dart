@@ -72,6 +72,7 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
   }
 
   void clearSearch() {
+    widget.onTapCancel.call();
     widget.searchController.clear();
     FocusScope.of(context).unfocus();
   }

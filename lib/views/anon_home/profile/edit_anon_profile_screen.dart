@@ -10,7 +10,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:luanvanflutter/controller/controller.dart';
-import 'package:luanvanflutter/views/authenticate/helper.dart';
+import 'package:luanvanflutter/utils/helper.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/loading.dart';
 import 'package:provider/provider.dart';

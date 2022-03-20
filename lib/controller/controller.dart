@@ -488,11 +488,14 @@ class DatabaseServices {
 
   Future<QuerySnapshot<Map<String, dynamic>>> getTimelinePosts(
       String ownerId) async {
-    return timelineReference
-        .doc(ownerId)
-        .collection('timelinePosts')
-        .orderBy("timestamp", descending: true)
-        .get();
+    //NEW WAY
+    // return timelineReference
+    //     .doc(ownerId)
+    //     .collection('timelinePosts')
+    //     .orderBy("timestamp", descending: true)
+    //     .get();
+
+    return timelineReference.get();
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getPostById(
@@ -512,17 +515,25 @@ class DatabaseServices {
         .get();
   }
 
-  deletePost(String userId, String postId) async {
-    return await postReference
-        .doc(userId)
-        .collection('userPosts')
-        .doc(postId)
-        .get()
-        .then((value) {
-      if (value.exists) {
-        value.reference.delete();
-      }
-    });
+  Future<Either<bool, FirebaseException>> deletePost(
+      String userId, String postId) async {
+    try {
+      await postReference
+          .doc(userId)
+          .collection('userPosts')
+          .doc(postId)
+          .get()
+          .then((value) {
+        if (value.exists) {
+          value.reference.delete();
+        }
+      });
+
+      await deleteTimelinePost(postId);
+      return const Left(true);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
   }
 
   Future<Either<bool, FirebaseException>> createPost(PostModel post) async {
@@ -551,11 +562,22 @@ class DatabaseServices {
   }
 
   Future addPostToTimeline(PostModel post) async {
-    await timelineReference
-        .doc(post.ownerId)
-        .collection('timelinePosts')
-        .doc(post.postId)
-        .set({
+    // await timelineReference
+    //     //     .doc(post.ownerId)
+    //     //     .collection('timelinePosts')
+    //     //     .doc(post.postId)
+    //     //     .set({
+    //     //   "postId": post.postId,
+    //     //   "username": post.username,
+    //     //   "timestamp": Timestamp.now(),
+    //     //   "ownerId": post.ownerId,
+    //     //   "description": post.description,
+    //     //   "location": post.location,
+    //     //   "likes": post.likes,
+    //     //   "url": post.url
+    //     // });
+
+    await timelineReference.doc(post.postId).set({
       "postId": post.postId,
       "username": post.username,
       "timestamp": Timestamp.now(),
@@ -564,6 +586,14 @@ class DatabaseServices {
       "location": post.location,
       "likes": post.likes,
       "url": post.url
+    });
+  }
+
+  Future deleteTimelinePost(String postId) async {
+    await timelineReference.doc(postId).get().then((value) {
+      if (value.exists) {
+        value.reference.delete();
+      }
     });
   }
 

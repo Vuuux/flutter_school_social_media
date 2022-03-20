@@ -8,7 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:luanvanflutter/controller/auth_controller.dart';
 import 'package:luanvanflutter/utils/image_utils.dart';
-import 'package:luanvanflutter/views/authenticate/helper.dart';
+import 'package:luanvanflutter/utils/helper.dart';
 import 'package:luanvanflutter/views/authenticate/intro/on_boarding.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/style/constants.dart';

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,6 +11,7 @@ import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
+import 'package:luanvanflutter/utils/helper.dart';
 import 'package:luanvanflutter/views/components/search_bar.dart';
 import 'package:luanvanflutter/views/home/feed/post_screen.dart';
 import 'package:luanvanflutter/views/home/feed/upload_image_screen.dart';
@@ -29,14 +31,18 @@ class _FeedState extends State<Feed> {
   final timelineReference = FirebaseFirestore.instance.collection('posts');
   ScrollController scrollController = ScrollController();
   TextEditingController searchController = TextEditingController();
-  Ctuer currentCtuer = Ctuer();
+  late CurrentUser currentUser;
   final picker = ImagePicker(); //API chọn hình ảnh
-  List<PostModel> listPosts = [];
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  Future<QuerySnapshot>? postFuture;
   RefreshController _controller = RefreshController(initialRefresh: false);
   //lấy time từ post
 
   Future<void> _onRefresh() async {
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(Duration(seconds: 1), () {
+      searchController.clear();
+      loadData();
+    });
     _controller.refreshCompleted();
   }
 
@@ -49,10 +55,33 @@ class _FeedState extends State<Feed> {
     _controller.loadComplete();
   }
 
+  handleSearch(String query) {
+    Future<QuerySnapshot> posts = DatabaseServices(uid: '')
+        .timelineReference
+        .doc(currentUser.uid)
+        .collection('timelinePosts')
+        .where("description", isGreaterThanOrEqualTo: query)
+        .get();
+    setState(() {
+      postFuture = posts;
+    });
+  }
+
+  clearSearch() {
+    searchController.clear();
+  }
+
+  loadData() {
+    Future<QuerySnapshot> posts = DatabaseServices(uid: currentUser.uid)
+        .getTimelinePosts(currentUser.uid);
+    setState(() {
+      postFuture = posts;
+    });
+  }
+
   Widget postList(CurrentUser currentUser) {
     return StreamBuilder<QuerySnapshot>(
-      stream: Stream.fromFuture(DatabaseServices(uid: currentUser.uid)
-          .getTimelinePosts(currentUser.uid)),
+      stream: Stream.fromFuture(postFuture!),
       builder: (context, snapshot) {
         return snapshot.hasData
             ? ListView.builder(
@@ -67,11 +96,12 @@ class _FeedState extends State<Feed> {
                         height: 80,
                       ),
                     PostItem(post: post),
-                    const Divider(
-                      height: 20,
-                      thickness: 5,
-                      color: kPrimaryLightColor,
-                    ),
+                    if (index != snapshot.data!.docs.length - 1)
+                      const Divider(
+                        height: 20,
+                        thickness: 5,
+                        color: kPrimaryColor,
+                      ),
                   ]);
                 })
             : const Center(
@@ -87,6 +117,9 @@ class _FeedState extends State<Feed> {
   @override
   void initState() {
     super.initState();
+    String userId = auth.currentUser!.uid;
+    currentUser = CurrentUser(uid: userId);
+    loadData();
   }
 
   circularProgress() {
@@ -185,10 +218,10 @@ class _FeedState extends State<Feed> {
         ),
         designSize: const Size(360, 690),
         orientation: Orientation.portrait);
-    final user = context.watch<CurrentUser?>();
-
+    CurrentUser? user = context.watch<CurrentUser?>();
+    currentUser = user!;
     return StreamBuilder<UserData>(
-        stream: DatabaseServices(uid: user!.uid).userData,
+        stream: DatabaseServices(uid: user.uid).userData,
         builder: (context, snapshot) {
           UserData? userData = snapshot.data;
           return Scaffold(
@@ -213,18 +246,14 @@ class _FeedState extends State<Feed> {
             ),
             body: Stack(
               children: [
-                SmartRefresher(controller: _controller, child: postList(user)),
+                SmartRefresher(
+                    controller: _controller,
+                    onRefresh: _onRefresh,
+                    onLoading: _onLoading,
+                    child: postList(user)),
                 CustomSearchBar(
-                  onSearchSubmit: (String query) {
-                    Future<QuerySnapshot> post = DatabaseServices(uid: '')
-                        .postReference
-                        .where("username", isGreaterThanOrEqualTo: query)
-                        .get();
-                    setState(() {
-                      //searchResultsFuture = users;
-                    });
-                  },
-                  onTapCancel: () {},
+                  onSearchSubmit: handleSearch,
+                  onTapCancel: loadData,
                   searchController: searchController,
                   hintText: 'Tìm kiếm bài viết...',
                 ),

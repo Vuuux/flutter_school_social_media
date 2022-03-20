@@ -18,7 +18,7 @@ import 'package:luanvanflutter/home.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';
 import 'package:provider/src/provider.dart';
 
-import 'helper.dart';
+import '../../utils/helper.dart';
 import 'intro/on_boarding.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -43,7 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
       //lưu email vào sharedPreferences
       Helper.saveUserEmailSharedPreference(email.toString());
       //Lưu username vào database
-      //TODO: ADD UID
       DatabaseServices(uid: '')
           .getUserByEmail(email.toString())
           .then((value) async {
@@ -51,9 +50,9 @@ class _LoginScreenState extends State<LoginScreen> {
         await Helper.saveUserIdSharedPreference(
             snapshotUserinfo.docs[0].get('id'));
 
-        Helper.getUserIdSharedPreference()
+        Helper.getUserId()
             .then((value) => print("USERNAME:" + value.toString()));
-        Helper.getUserEmailSharedPreference()
+        Helper.getUserEmail()
             .then((value) => print("EMAIL:" + value.toString()));
       });
 

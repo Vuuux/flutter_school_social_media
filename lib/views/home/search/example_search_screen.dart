@@ -21,7 +21,8 @@ class _SimpleSearchState extends State<SimpleSearch> {
   Future<QuerySnapshot>? searchResultsFuture;
 
   handleSearch(String query) {
-    Future<QuerySnapshot> users = DatabaseServices(uid: '').userReference
+    Future<QuerySnapshot> users = DatabaseServices(uid: '')
+        .userReference
         .where("username", isGreaterThanOrEqualTo: query)
         .get();
     setState(() {
@@ -66,14 +67,16 @@ class _SimpleSearchState extends State<SimpleSearch> {
               'assets/images/search.svg',
               height: orientation == Orientation.portrait ? 300.0 : 200.0,
             ),
-            const Text(
-              "Tìm Ctuer",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.w600,
-                fontSize: 60.0,
+            const Center(
+              child: Text(
+                "Tìm Ctuer",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 60.0,
+                ),
               ),
             ),
           ],
@@ -92,7 +95,7 @@ class _SimpleSearchState extends State<SimpleSearch> {
         List<UserResult> searchResults = [];
         snapshot.data!.docs.forEach((doc) {
           UserData user = UserData.fromDocumentSnapshot(doc);
-          if(user.id != widget.currentUserData!.uid){
+          if (user.id != widget.currentUserData!.uid) {
             searchResults.add(UserResult(user: user));
           }
         });
@@ -110,7 +113,7 @@ class _SimpleSearchState extends State<SimpleSearch> {
       backgroundColor: Theme.of(context).primaryColor.withOpacity(0.8),
       appBar: buildSearchField(),
       body:
-      searchResultsFuture == null ? buildNoContent() : buildSearchResults(),
+          searchResultsFuture == null ? buildNoContent() : buildSearchResults(),
     );
   }
 }
@@ -124,8 +127,7 @@ class UserResult extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).primaryColor.withOpacity(0.7),
-      child:
-      Column(
+      child: Column(
         children: <Widget>[
           GestureDetector(
             child: ListTile(
@@ -133,19 +135,23 @@ class UserResult extends StatelessWidget {
                 backgroundImage: CachedNetworkImageProvider(user.avatar),
                 backgroundColor: kPrimaryColor,
               ),
-              title: Text(user.username,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold
-              ),),
-              subtitle: Text(user.username, style: const TextStyle(
-                color: kPrimaryColor,
-              ),),
+              title: Text(
+                user.username,
+                style: const TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                user.username,
+                style: const TextStyle(
+                  color: kPrimaryColor,
+                ),
+              ),
             ),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)
-            => OthersProfile(ctuerId: user.id))),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => OthersProfile(ctuerId: user.id))),
           ),
-          const Divider(height: 2.0,
+          const Divider(
+            height: 2.0,
           )
         ],
       ),

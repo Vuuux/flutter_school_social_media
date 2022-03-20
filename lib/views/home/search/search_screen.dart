@@ -3,7 +3,7 @@ import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
-import 'package:luanvanflutter/views/authenticate/helper.dart';
+import 'package:luanvanflutter/utils/helper.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:luanvanflutter/views/home/search/components/search_tile.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';

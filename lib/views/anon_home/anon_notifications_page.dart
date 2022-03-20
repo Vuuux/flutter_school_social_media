@@ -7,7 +7,7 @@ import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
 import 'package:luanvanflutter/views/anon_home/profile/others_anon_profile.dart';
-import 'package:luanvanflutter/views/authenticate/helper.dart';
+import 'package:luanvanflutter/utils/helper.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as tAgo;
@@ -53,29 +53,30 @@ class _AnonNotificationPageState extends State<AnonNotificationPage> {
     return StreamBuilder<UserData>(
         stream: databaseService.userData,
         builder: (context, snapshot) {
-          if(snapshot.connectionState == ConnectionState.waiting){
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return Loading();
           }
-          if(snapshot.hasData){
+          if (snapshot.hasData) {
             UserData? userData = snapshot.data;
             if (userData != null) {
               return Scaffold(
                 appBar: AppBar(
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.vertical(
-                        bottom: Radius.circular(15),
-                      )),
+                    bottom: Radius.circular(15),
+                  )),
                   centerTitle: true,
                   elevation: 0,
                   title: const Text("T H Ô N G    B Á O",
                       style:
-                      TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
                 ),
                 body: FutureBuilder<QuerySnapshot>(
                     future: notificationFuture,
                     builder: (context, dataSnapshot) {
                       List<NotificationModel> notificationsItems = [];
-                      if (dataSnapshot.connectionState != ConnectionState.done) {
+                      if (dataSnapshot.connectionState !=
+                          ConnectionState.done) {
                         return Loading();
                       }
                       if (dataSnapshot.hasData) {
@@ -92,7 +93,8 @@ class _AnonNotificationPageState extends State<AnonNotificationPage> {
                                   noti: notificationsItems[index]);
                             },
                             itemCount: notificationsItems.length,
-                            separatorBuilder: (BuildContext context, int index) {
+                            separatorBuilder:
+                                (BuildContext context, int index) {
                               return const Divider(
                                 height: 1,
                                 thickness: 1,
@@ -108,7 +110,9 @@ class _AnonNotificationPageState extends State<AnonNotificationPage> {
               );
             }
           }
-            return Center(child: const Text("Bạn không có thông báo nào!"),);
+          return Center(
+            child: const Text("Bạn không có thông báo nào!"),
+          );
         });
   }
 }
@@ -124,9 +128,11 @@ class AnonNotificationsItem extends StatefulWidget {
   DatabaseServices databaseService = DatabaseServices(uid: '');
 
   configureMediaPreview(context) {
-    mediaPreview = noti.mediaUrl!.isNotEmpty ? SizedBox(
-      child: CachedNetworkImage(imageUrl: noti.mediaUrl!),
-    ) : SizedBox.shrink();
+    mediaPreview = noti.mediaUrl!.isNotEmpty
+        ? SizedBox(
+            child: CachedNetworkImage(imageUrl: noti.mediaUrl!),
+          )
+        : SizedBox.shrink();
     if (noti.type == 'following') {
       notificationItemText = 'đang theo dõi bạn';
     } else if (noti.type == 'like') {
@@ -299,8 +305,8 @@ class _AnonNotificationsItemState extends State<AnonNotificationsItem> {
                   child: RichText(
                     overflow: TextOverflow.ellipsis,
                     text: TextSpan(
-                      style: const TextStyle(
-                          fontSize: 10.0, color: Colors.black),
+                      style:
+                          const TextStyle(fontSize: 10.0, color: Colors.black),
                       children: [
                         TextSpan(
                             text: widget.noti.username,
@@ -319,23 +325,25 @@ class _AnonNotificationsItemState extends State<AnonNotificationsItem> {
                   ),
                 ),
                 Flexible(
-                  flex: widget.noti.type == 'request' || widget.noti.type == 'accept-request'? 3 : 0,
+                  flex: widget.noti.type == 'request' ||
+                          widget.noti.type == 'accept-request'
+                      ? 3
+                      : 0,
                   child: widget.noti.type == 'request'
                       ? accepted || declined
                           ? accepted
                               ? InkWell(
                                   child: const Text('ĐÃ ĐỒNG Ý!',
-                                      style: TextStyle(fontSize: 12.0,
-                                      fontWeight: FontWeight.bold
-                                      )),
+                                      style: TextStyle(
+                                          fontSize: 12.0,
+                                          fontWeight: FontWeight.bold)),
                                   onTap: () {})
                               : InkWell(
                                   child: const Text('ĐÃ TỪ CHỐI',
                                       style: TextStyle(fontSize: 12.0)),
                                   onTap: () {})
                           : Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
                                 InkWell(
                                     child: const Text('OK!',
