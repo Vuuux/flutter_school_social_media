@@ -9,6 +9,7 @@ import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/forum.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
+import 'package:luanvanflutter/utils/theme_service.dart';
 import 'package:luanvanflutter/views/anon_home/feed/create_forum_screen.dart';
 import 'package:luanvanflutter/views/anon_home/feed/forum_item.dart';
 import 'package:luanvanflutter/views/components/chips/data/choice_chip_data.dart';
@@ -191,8 +192,9 @@ class _AnonForumFeedState extends State<AnonForumFeed> {
         children: choiceChips
             .map((choiceChip) => ChoiceChip(
                   label: Text(choiceChip.label!),
-                  labelStyle: const TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+                  labelStyle: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: ThemeService().isDarkTheme ? white : black),
                   onSelected: (isSelected) => setState(() {
                     choiceChips = choiceChips.map((otherChip) {
                       final newChip = otherChip.copy(isSelected: false);
@@ -235,8 +237,10 @@ class _AnonForumFeedState extends State<AnonForumFeed> {
                     }
                   }),
                   selected: choiceChip.isSelected,
-                  selectedColor: kPrimaryColor,
-                  backgroundColor: kPrimaryDarkColor,
+                  selectedColor: ThemeService().isDarkTheme
+                      ? kPrimaryDarkColor
+                      : kPrimaryColor,
+                  backgroundColor: kSelectedBackgroudColor,
                 ))
             .toList(),
       );
@@ -289,7 +293,6 @@ class _AnonForumFeedState extends State<AnonForumFeed> {
         builder: (context, snapshot) {
           UserData? userData = snapshot.data;
           return Scaffold(
-              backgroundColor: kPrimaryDarkColor,
               appBar: AppBar(
                 shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.vertical(

@@ -62,13 +62,13 @@ class _NotificationPageState extends State<NotificationPage> {
                 appBar: AppBar(
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(15),
+                    bottom: Radius.circular(20),
                   )),
                   centerTitle: true,
                   elevation: 0,
-                  title: const Text("T H Ô N G    B Á O",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
+                  title: const Text(
+                    "T H Ô N G    B Á O",
+                  ),
                 ),
                 body: FutureBuilder<QuerySnapshot>(
                     future: notificationFuture,

@@ -8,6 +8,7 @@ import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/loading.dart';
+import 'package:luanvanflutter/utils/dimen.dart';
 import 'package:luanvanflutter/views/home/feed/post_detail.dart';
 import 'package:provider/src/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -25,11 +26,12 @@ class PostItem extends StatefulWidget {
 }
 
 class _PostItemState extends State<PostItem> {
-  
   buildPostHeader(String uid, BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
-      future:
-          DatabaseServices(uid: uid).userReference.doc(widget.post.ownerId).get(),
+      future: DatabaseServices(uid: uid)
+          .userReference
+          .doc(widget.post.ownerId)
+          .get(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           UserData user = UserData.fromDocumentSnapshot(snapshot.data!);
@@ -48,16 +50,19 @@ class _PostItemState extends State<PostItem> {
               backgroundColor: Colors.grey,
             ),
             title: GestureDetector(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => PostDetail(postId: widget.post.postId, ownerId: user.id))),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => PostDetail(
+                      postId: widget.post.postId, ownerId: user.id))),
               child: Text(
                 user.username,
                 style: const TextStyle(
-                  color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            subtitle: Text(widget.post.location +' - ' + timeago.format(widget.post.timestamp.toDate(), locale: "vi")),
+            subtitle: Text(widget.post.location +
+                ' - ' +
+                timeago.format(widget.post.timestamp.toDate(), locale: "vi")),
             trailing: IconButton(
               onPressed: () => onOpenPostOption(context),
               icon: const Icon(Icons.more_vert),
@@ -70,26 +75,29 @@ class _PostItemState extends State<PostItem> {
   }
 
   onOpenPostOption(BuildContext nContext) {
-    return widget.currentUser!.id == widget.post.ownerId ? showDialog(
-        context: nContext,
-        builder: (context) {
-          return SimpleDialog(
-            children: <Widget>[
-              SimpleDialogOption(
-                child: const Text(
-                  "Xóa bài viết",
-                ),
-                onPressed: () => DatabaseServices(uid: '').deletePost(widget.post.ownerId, widget.post.postId),
-              ),
-              SimpleDialogOption(
-                child: const Text(
-                  "Đóng",
-                ),
-                onPressed: () {},
-              )
-            ],
-          );
-        }) : null;
+    return widget.currentUser!.id == widget.post.ownerId
+        ? showDialog(
+            context: nContext,
+            builder: (context) {
+              return SimpleDialog(
+                children: <Widget>[
+                  SimpleDialogOption(
+                    child: const Text(
+                      "Xóa bài viết",
+                    ),
+                    onPressed: () => DatabaseServices(uid: '')
+                        .deletePost(widget.post.ownerId, widget.post.postId),
+                  ),
+                  SimpleDialogOption(
+                    child: const Text(
+                      "Đóng",
+                    ),
+                    onPressed: () {},
+                  )
+                ],
+              );
+            })
+        : null;
   }
 
   buildPostImage() {
@@ -135,7 +143,6 @@ class _PostItemState extends State<PostItem> {
               child: Text(
                 widget.post.username + "  ",
                 style: const TextStyle(
-                  color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -187,7 +194,6 @@ class _PostItemState extends State<PostItem> {
               child: Text(
                 "$likeCount lượt thích",
                 style: const TextStyle(
-                  color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -233,6 +239,9 @@ class _PostItemState extends State<PostItem> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           buildPostHeader(user!.uid, context),
+          SizedBox(
+            height: Dimen.paddingCommon4,
+          ),
           buildPostImage(),
           buildPostFooter()
         ],

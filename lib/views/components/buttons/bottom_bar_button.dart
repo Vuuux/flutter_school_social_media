@@ -2,6 +2,7 @@ import 'package:eventual/eventual-notifier.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:luanvanflutter/style/constants.dart';
+import 'package:luanvanflutter/utils/theme_service.dart';
 
 class BottomBarButton extends StatefulWidget {
   final index;
@@ -25,12 +26,13 @@ class _BottomBarButtonState extends State<BottomBarButton> {
       minWidth: 15,
       onPressed: () {
         widget.currentIndex.value = widget.index;
-        widget.currentIndex.notifyChange();
       },
       child: Icon(
         widget.icon,
         color: widget.currentIndex.value == widget.index
-            ? kPrimaryColor
+            ? ThemeService().isDarkTheme
+                ? kPrimaryDarkColor
+                : kPrimaryColor
             : Colors.black,
       ),
     );

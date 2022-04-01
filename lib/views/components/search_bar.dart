@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:luanvanflutter/utils/theme_service.dart';
 
 class CustomSearchBar extends StatefulWidget {
   final TextEditingController searchController;
@@ -50,8 +52,10 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
   Widget buildSearchField() {
     return Expanded(
       child: TextFormField(
+        style: const TextStyle(color: Colors.black),
         controller: widget.searchController,
         decoration: InputDecoration(
+          hintStyle: const TextStyle(color: Colors.black),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(60),
           ),
@@ -60,6 +64,7 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
           prefixIcon: const Icon(
             Icons.search,
             size: 28.0,
+            //color: Get,
           ),
           suffixIcon: IconButton(
             icon: const Icon(Icons.clear),

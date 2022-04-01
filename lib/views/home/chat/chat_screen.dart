@@ -20,7 +20,6 @@ class ChatScreen extends StatefulWidget {
 
 var f = DateFormat('h:mm a');
 
-
 class _ChatScreenState extends State<ChatScreen> {
   Stream<QuerySnapshot>? chatsScreenStream;
   late UserData currentCtuer;
@@ -44,40 +43,45 @@ class _ChatScreenState extends State<ChatScreen> {
         builder: (context, snapshot) {
           return snapshot.hasData
               ? ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              ctuerId = '';
+                  itemCount: snapshot.data!.docs.length,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    ctuerId = '';
 
-              List<dynamic> userIdList = snapshot.data!.docs[index].get('users');
-              userIdList.forEach((userId) {
-                if(userId.toString() != user.uid) {
-                  ctuerId = userId;
-                }
-              });
-              return FutureBuilder<DocumentSnapshot>(
-                future: DatabaseServices(uid: ctuerId).getUserByUserId(),
-                builder: (context, childSnapshot) {
-                  var roomId = snapshot.data!.docs[index].get("chatRoomId");
-                  if(childSnapshot.connectionState == ConnectionState.waiting){
-                    return Loading();
-                  }
-                  if(childSnapshot.hasData){
-                    return ChatScreenTile(
-                      chatRoomId: roomId,
-                      userId: user.uid,
-                      ctuer: UserData.fromDocumentSnapshot(childSnapshot.data!),
-                    );
-                  }
-                  return const Center(
-                      child: Text(
-                      'Nói chuyện với bạn bằng cách bấm + icon',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
-                  ));
-                }
-              );
-            },
-          )
+                    List<dynamic> userIdList =
+                        snapshot.data!.docs[index].get('users');
+                    userIdList.forEach((userId) {
+                      if (userId.toString() != user.uid) {
+                        ctuerId = userId;
+                      }
+                    });
+                    return FutureBuilder<DocumentSnapshot>(
+                        future:
+                            DatabaseServices(uid: ctuerId).getUserByUserId(),
+                        builder: (context, childSnapshot) {
+                          var roomId =
+                              snapshot.data!.docs[index].get("chatRoomId");
+                          if (childSnapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Loading();
+                          }
+                          if (childSnapshot.hasData) {
+                            return ChatScreenTile(
+                              chatRoomId: roomId,
+                              userId: user.uid,
+                              ctuer: UserData.fromDocumentSnapshot(
+                                  childSnapshot.data!),
+                            );
+                          }
+                          return const Center(
+                              child: Text(
+                            'Nói chuyện với bạn bằng cách bấm + icon',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w300),
+                          ));
+                        });
+                  },
+                )
               : const Center(child: Text("NOTHING HERE!"));
         });
   }
@@ -89,25 +93,27 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(15),
-            )),
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
         centerTitle: true,
         elevation: 0,
-        title: const Text("T R Ò   C H U Y Ệ N",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
+        title: const Text(
+          "T R Ò   C H U Y Ệ N",
+        ),
         actions: <Widget>[
           IconButton(
             highlightColor: Colors.transparent,
             splashColor: Colors.transparent,
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add_comment_outlined),
             onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => SearchScreen(userId: user.uid)));
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => SearchScreen(userId: user.uid)));
             },
           ),
         ],
       ),
-      body: chatsScreenStream != null ? chatRoomList(user) : Center(child: Loading()),
+      body: chatsScreenStream != null
+          ? chatRoomList(user)
+          : Center(child: Loading()),
     );
   }
 }

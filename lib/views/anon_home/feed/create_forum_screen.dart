@@ -30,12 +30,11 @@ class _CreateForumState extends State<CreateForum>
     with AutomaticKeepAliveClientMixin<CreateForum> {
   File? file;
   TextEditingController descriptionTextEditingController =
-  TextEditingController();
-  TextEditingController titleTextEditingController =
-  TextEditingController();
+      TextEditingController();
+  TextEditingController titleTextEditingController = TextEditingController();
   bool uploading = false;
   final Reference storageReference =
-  FirebaseStorage.instance.ref().child("Đăng ảnh");
+      FirebaseStorage.instance.ref().child("Đăng ảnh");
   final postReference = FirebaseFirestore.instance.collection("posts");
   String forumId = const Uuid().v4();
   final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -54,7 +53,7 @@ class _CreateForumState extends State<CreateForum>
 
   Future<String> uploadPhoto(mImageFile) async {
     UploadTask mStorageUploadTask =
-    storageReference.child("forum_$forumId.jpg").putFile(mImageFile);
+        storageReference.child("forum_$forumId.jpg").putFile(mImageFile);
     TaskSnapshot storageTaskSnapshot = await mStorageUploadTask;
     String downloadUrl = await storageTaskSnapshot.ref.getDownloadURL();
     return downloadUrl;
@@ -116,109 +115,104 @@ class _CreateForumState extends State<CreateForum>
       ),
       body: uploading
           ? Container(
-        alignment: Alignment.center,
-        child: const CircularProgressIndicator(),
-      )
+              alignment: Alignment.center,
+              child: const CircularProgressIndicator(),
+            )
           : ListView(
-        children: <Widget>[
-          SizedBox(
-            height: 230,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width * 0.8,
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: FileImage(file!), fit: BoxFit.cover),
+              children: <Widget>[
+                SizedBox(
+                  height: 230,
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: Center(
+                    child: AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: FileImage(file!), fit: BoxFit.cover),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                const Padding(
+                  padding: EdgeInsets.only(top: 12),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.title),
+                  title: TextFormField(
+                    style: const TextStyle(color: Colors.black),
+                    controller: titleTextEditingController,
+                    decoration: textFieldInputDecoration('Tựa đề diễn đàn'),
+                    // decoration: InputDecoration(
+                    //   hintText: 'Say something about your image',
+                    //   hintStyle: TextStyle(color: Colors.grey),
+                    //   border: InputBorder.none,
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.question_answer),
+                  title: TextFormField(
+                    style: const TextStyle(color: Colors.black),
+                    controller: descriptionTextEditingController,
+                    decoration: textFieldInputDecoration(
+                        'Đặt câu hỏi cho diễn đàn của bạn'),
+                    // decoration: InputDecoration(
+                    //   hintText: 'Say something about your image',
+                    //   hintStyle: TextStyle(color: Colors.grey),
+                    //   border: InputBorder.none,
+                  ),
+                ),
+                buildChoiceChips()
+              ],
             ),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(top: 12),
-          ),
-          ListTile(
-            leading: const Icon(Icons.title),
-            title: TextFormField(
-              style: const TextStyle(color: Colors.black),
-              controller: titleTextEditingController,
-              decoration: textFieldInputDecoration(
-                  'Tựa đề diễn đàn'),
-              // decoration: InputDecoration(
-              //   hintText: 'Say something about your image',
-              //   hintStyle: TextStyle(color: Colors.grey),
-              //   border: InputBorder.none,
-            ),
-          ),
-          ListTile(
-            leading: Icon(Icons.question_answer),
-            title: TextFormField(
-              style: const TextStyle(color: Colors.black),
-              controller: descriptionTextEditingController,
-              decoration: textFieldInputDecoration(
-                  'Đặt câu hỏi cho diễn đàn của bạn'),
-              // decoration: InputDecoration(
-              //   hintText: 'Say something about your image',
-              //   hintStyle: TextStyle(color: Colors.grey),
-              //   border: InputBorder.none,
-            ),
-          ),
-          buildChoiceChips()
-        ],
-      ),
     );
   }
+
   List<ChoiceChipData> choiceChips = ChoiceChips.all;
 
   Widget buildChoiceChips() => Wrap(
-    runSpacing: 5.0,
-    spacing: 5.0,
-    alignment: WrapAlignment.center,
-    children: choiceChips
-        .map((choiceChip) => ChoiceChip(
-      label:  Text(choiceChip.label!),
-      labelStyle: const TextStyle(
-          fontWeight: FontWeight.bold, color: Colors.white),
-      onSelected: (isSelected) => setState(() {
+        runSpacing: 5.0,
+        spacing: 5.0,
+        alignment: WrapAlignment.center,
+        children: choiceChips
+            .map((choiceChip) => ChoiceChip(
+                  label: Text(choiceChip.label!),
+                  labelStyle: const TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.white),
+                  onSelected: (isSelected) => setState(() {
+                    choiceChips = choiceChips.map((otherChip) {
+                      final newChip = otherChip.copy(isSelected: false);
 
-        choiceChips = choiceChips.map((otherChip) {
-          final newChip = otherChip.copy(isSelected: false);
+                      return choiceChip == newChip
+                          ? newChip.copy(isSelected: isSelected)
+                          : newChip;
+                    }).toList();
 
-          return choiceChip == newChip
-              ? newChip.copy(isSelected: isSelected)
-              : newChip;
-        }).toList();
-
-        switch(choiceChip.label){
-          case 'Hỏi đáp':
-            category = 'questions';
-            break;
-          case 'Học tập':
-            category = 'studying';
-            break;
-          case 'Tư vấn':
-            category = 'advise';
-            break;
-          case 'Thầm kín':
-            category = 'secret';
-            break;
-          case 'Hỗ trợ':
-            category = 'support';
-            break;
-        }
-
-      }),
-      selected: choiceChip.isSelected,
-      selectedColor: kPrimaryColor,
-      backgroundColor: kPrimaryDarkColor,
-    ))
-        .toList(),
-  );
+                    switch (choiceChip.label) {
+                      case 'Hỏi đáp':
+                        category = 'questions';
+                        break;
+                      case 'Học tập':
+                        category = 'studying';
+                        break;
+                      case 'Tư vấn':
+                        category = 'advise';
+                        break;
+                      case 'Thầm kín':
+                        category = 'secret';
+                        break;
+                      case 'Hỗ trợ':
+                        category = 'support';
+                        break;
+                    }
+                  }),
+                  selected: choiceChip.isSelected,
+                  selectedColor: kPrimaryColor,
+                  backgroundColor: Colors.white,
+                ))
+            .toList(),
+      );
 
   @override
   void initState() {

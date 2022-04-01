@@ -12,6 +12,7 @@ import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/utils/helper.dart';
+import 'package:luanvanflutter/views/components/app_bar/custom_sliver_app_bar.dart';
 import 'package:luanvanflutter/views/components/search_bar.dart';
 import 'package:luanvanflutter/views/home/feed/post_screen.dart';
 import 'package:luanvanflutter/views/home/feed/upload_image_screen.dart';
@@ -36,6 +37,7 @@ class _FeedState extends State<Feed> {
   final FirebaseAuth auth = FirebaseAuth.instance;
   Future<QuerySnapshot>? postFuture;
   RefreshController _controller = RefreshController(initialRefresh: false);
+
   //lấy time từ post
 
   Future<void> _onRefresh() async {
@@ -58,8 +60,6 @@ class _FeedState extends State<Feed> {
   handleSearch(String query) {
     Future<QuerySnapshot> posts = DatabaseServices(uid: '')
         .timelineReference
-        .doc(currentUser.uid)
-        .collection('timelinePosts')
         .where("description", isGreaterThanOrEqualTo: query)
         .get();
     setState(() {
@@ -85,6 +85,7 @@ class _FeedState extends State<Feed> {
       builder: (context, snapshot) {
         return snapshot.hasData
             ? ListView.builder(
+                shrinkWrap: true,
                 controller: scrollController,
                 itemCount: snapshot.data!.docs.length,
                 itemBuilder: (context, index) {
@@ -93,7 +94,7 @@ class _FeedState extends State<Feed> {
                   return Column(children: <Widget>[
                     if (index == 0)
                       const SizedBox(
-                        height: 80,
+                        height: 60,
                       ),
                     PostItem(post: post),
                     if (index != snapshot.data!.docs.length - 1)
@@ -225,41 +226,28 @@ class _FeedState extends State<Feed> {
         builder: (context, snapshot) {
           UserData? userData = snapshot.data;
           return Scaffold(
-            appBar: AppBar(
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(15),
-              )),
-              title: const Text("F E E D",
-                  textAlign: TextAlign.right,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
-              centerTitle: true,
-              actions: <Widget>[
-                IconButton(
-                    highlightColor: Colors.transparent,
-                    splashColor: Colors.transparent,
-                    icon: const Icon(Icons.image),
-                    onPressed: () {
-                      takeImage(userData!);
-                    }),
-              ],
-            ),
-            body: Stack(
-              children: [
-                SmartRefresher(
-                    controller: _controller,
-                    onRefresh: _onRefresh,
-                    onLoading: _onLoading,
-                    child: postList(user)),
-                CustomSearchBar(
-                  onSearchSubmit: handleSearch,
-                  onTapCancel: loadData,
-                  searchController: searchController,
-                  hintText: 'Tìm kiếm bài viết...',
-                ),
-              ],
-            ),
-          );
+              body: NestedScrollView(
+                  headerSliverBuilder:
+                      (BuildContext context, bool innerBoxIsScrolled) => [
+                            CustomAppBar(
+                                title: 'F E E D',
+                                trailingIcon: Icons.image,
+                                onLeadingClick: () => null,
+                                onTrailingClick: () {
+                                  takeImage(userData!);
+                                }),
+                          ],
+                  body: Stack(
+                    children: [
+                      postList(user),
+                      CustomSearchBar(
+                        onSearchSubmit: handleSearch,
+                        onTapCancel: loadData,
+                        searchController: searchController,
+                        hintText: 'Tìm kiếm bài viết...',
+                      ),
+                    ],
+                  )));
           // RefreshIndicator(
           //     child: createTimeLine(), onRefresh: () => retrieveTimeline()));
         });

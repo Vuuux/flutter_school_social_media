@@ -466,22 +466,17 @@ class DatabaseServices {
 
   //--------------- POST ------------------//
   Future likePost(String likerId, String ownerId, String postId) async {
-    await postReference
-        .doc(ownerId)
-        .collection('userPosts')
-        .doc(postId)
-        .update({'likes.$likerId': true});
-    await feedReference
-        .doc(ownerId)
-        .collection('timelinePosts')
+    await timelineReference
+        // .doc(ownerId)
+        // .collection('userPosts')
         .doc(postId)
         .update({'likes.$likerId': true});
   }
 
   Future unlikePost(String unlikerId, String ownerId, String postId) async {
-    await postReference
-        .doc(ownerId)
-        .collection('userPosts')
+    await timelineReference
+        // .doc(ownerId)
+        // .collection('userPosts')
         .doc(postId)
         .update({'likes.$unlikerId': false});
   }
@@ -519,8 +514,8 @@ class DatabaseServices {
       String userId, String postId) async {
     try {
       await postReference
-          .doc(userId)
-          .collection('userPosts')
+          // .doc(userId)
+          // .collection('userPosts')
           .doc(postId)
           .get()
           .then((value) {

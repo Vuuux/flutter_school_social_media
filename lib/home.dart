@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
+import 'package:luanvanflutter/utils/theme_service.dart';
 import 'package:luanvanflutter/views/anon_home/anon_notifications_page.dart';
 import 'package:luanvanflutter/views/anon_home/feed/forum_feed.dart';
 import 'package:luanvanflutter/views/anon_home/profile/anon_profile.dart';
@@ -13,6 +14,7 @@ import 'package:luanvanflutter/views/anon_home/search/anon_example_search_screen
 import 'package:luanvanflutter/views/components/bottom_bar/bottom_bar.dart';
 import 'package:luanvanflutter/views/components/buttons/bottom_bar_button.dart';
 import 'package:luanvanflutter/views/home/profile/profile.dart';
+import 'package:luanvanflutter/views/home/schedule/task_manager.dart';
 import 'package:luanvanflutter/views/home/search/example_search_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,7 +32,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  static bool anonymous = false;
+  EventualNotifier<bool> anonymous = EventualNotifier(false);
   EventualNotifier<int> _currentAnonymousIndex = EventualNotifier(0);
   EventualNotifier<int> _currentIndex = EventualNotifier(0);
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -140,7 +142,7 @@ class _HomeState extends State<Home> {
     _saveDeviceToken(user!.uid);
     final tabs = [
       const Feed(),
-      Container(),
+      const TaskManagerPage(),
       const ChatScreen(),
       NotificationPage(
         uid: user!.uid,
@@ -160,28 +162,34 @@ class _HomeState extends State<Home> {
     ];
     //ScreenUtil.setScreenOrientation('portrait');
     //this StreamProvider provides the list of user for WiggleList();
-    return anonymous
-        ? EventualSingleBuilder(
-            notifier: _currentAnonymousIndex,
-            builder: (context, notifier, _) => Scaffold(
-              extendBody: true,
-              key: _scaffoldKey,
-              body: anonymousTabs[notifier.value],
-              bottomNavigationBar: _buildAnonymousBottomBar(size),
-            ),
-          )
-        : EventualSingleBuilder(
-            notifier: _currentIndex,
-            builder: (context, notifier, _) => Scaffold(
-              extendBody: true,
-              key: _scaffoldKey,
-              body: tabs[notifier.value],
-              bottomNavigationBar: _buildBottomBar(size),
-            ),
-          );
+    return EventualBuilder(
+        notifiers: [anonymous, ThemeService.themeNotifier],
+        builder: (context, anonNotifier, _) {
+          ThemeMode themeMode = anonNotifier[1].value;
+          return anonNotifier[0].value
+              ? EventualSingleBuilder(
+                  notifier: _currentAnonymousIndex,
+                  builder: (context, notifier, _) => Scaffold(
+                    extendBody: true,
+                    key: _scaffoldKey,
+                    body: anonymousTabs[notifier.value],
+                    bottomNavigationBar:
+                        _buildAnonymousBottomBar(size, themeMode),
+                  ),
+                )
+              : EventualSingleBuilder(
+                  notifier: _currentIndex,
+                  builder: (context, notifier, _) => Scaffold(
+                    extendBody: true,
+                    key: _scaffoldKey,
+                    body: tabs[notifier.value],
+                    bottomNavigationBar: _buildBottomBar(size, themeMode),
+                  ),
+                );
+        });
   }
 
-  Widget _buildBottomBar(Size size) => BottomAppBar(
+  Widget _buildBottomBar(Size size, ThemeMode themeMode) => BottomAppBar(
         elevation: 10,
         color: Colors.white.withOpacity(0),
         shape: const CircularNotchedRectangle(),
@@ -251,17 +259,20 @@ class _HomeState extends State<Home> {
             Center(
               heightFactor: 0.6,
               child: FloatingActionButton(
-                backgroundColor: kPrimaryLightColor,
+                backgroundColor: themeMode == ThemeMode.dark
+                    ? kPrimaryDarkColor
+                    : kPrimaryColor,
                 splashColor: Colors.transparent,
                 child: ClipOval(
                   child: Image.asset('assets/images/ghosty2.png',
-                      fit: BoxFit.fill, color: kPrimaryColor),
+                      fit: BoxFit.fill,
+                      color: themeMode == ThemeMode.dark
+                          ? Colors.black
+                          : Colors.white),
                 ),
                 onPressed: () {
                   DatabaseServices(uid: user!.uid).changeAnonymousMode(true);
-                  setState(() {
-                    anonymous = true;
-                  });
+                  anonymous.value = true;
                 },
               ),
             ),
@@ -269,7 +280,8 @@ class _HomeState extends State<Home> {
         ),
       );
 
-  Widget _buildAnonymousBottomBar(Size size) => BottomAppBar(
+  Widget _buildAnonymousBottomBar(Size size, ThemeMode themeValue) =>
+      BottomAppBar(
         elevation: 10,
         color: Colors.white.withOpacity(0),
         shape: const CircularNotchedRectangle(),
@@ -312,12 +324,18 @@ class _HomeState extends State<Home> {
             Center(
               heightFactor: 0.6,
               child: FloatingActionButton(
+                backgroundColor: themeValue == ThemeMode.dark
+                    ? kPrimaryDarkColor
+                    : kPrimaryColor,
                 splashColor: Colors.transparent,
-                child: const Icon(Icons.portrait),
+                child: Icon(Icons.portrait,
+                    color: themeValue == ThemeMode.dark
+                        ? Colors.black
+                        : Colors.white),
                 onPressed: () {
                   DatabaseServices(uid: user!.uid).updateAnon(false);
                   setState(() {
-                    anonymous = false;
+                    anonymous.value = false;
                   });
                 },
               ),
