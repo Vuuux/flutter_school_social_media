@@ -7,7 +7,7 @@ class RoundedInputField extends StatelessWidget {
   final String title;
   final String initialValue;
   final String hintText;
-  final IconData icon;
+  final IconData? icon;
   final ValueChanged<String> onChanged;
   final FormFieldValidator validator;
   final bool isTitleCenter;
@@ -16,7 +16,7 @@ class RoundedInputField extends StatelessWidget {
     Key? key,
     required this.initialValue,
     required this.hintText,
-    required this.icon,
+    this.icon,
     required this.onChanged,
     required this.validator,
     required this.title,
@@ -48,10 +48,12 @@ class RoundedInputField extends StatelessWidget {
             cursorColor: kPrimaryColor,
             decoration: InputDecoration(
               hintStyle: const TextStyle(color: Colors.black45),
-              icon: Icon(
-                icon,
-                color: kPrimaryColor,
-              ),
+              icon: icon != null
+                  ? Icon(
+                      icon,
+                      color: kPrimaryColor,
+                    )
+                  : null,
               hintText: hintText,
               border: InputBorder.none,
             ),

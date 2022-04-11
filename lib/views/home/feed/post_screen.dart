@@ -69,7 +69,7 @@ class _PostItemState extends State<PostItem> {
             ),
           );
         }
-        return const SizedBox.shrink();
+        return Loading();
       },
     );
   }

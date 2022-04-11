@@ -11,6 +11,7 @@ import 'package:http/http.dart';
 import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/notification.dart';
 import 'package:luanvanflutter/models/post.dart';
+import 'package:luanvanflutter/models/task.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/views/home/notifications_page.dart';
 
@@ -63,6 +64,7 @@ class DatabaseServices {
   final femaleReference = FirebaseFirestore.instance.collection('female');
   final qaGameReference = FirebaseFirestore.instance.collection('qaGames');
   final bondReference = FirebaseFirestore.instance.collection('bonds');
+  final taskReference = FirebaseFirestore.instance.collection('tasks');
 
   Future uploadWhoData(
       {required String email,
@@ -1243,7 +1245,7 @@ class DatabaseServices {
     required String gameRoomId,
     required List<String> myAnswers,
   }) async {
-    return qaGameReference
+    return await qaGameReference
         .doc(gameRoomId)
         .collection('userAnswers')
         .doc(ctuerId)
@@ -1302,5 +1304,30 @@ class DatabaseServices {
   Future<QuerySnapshot<Map<String, dynamic>>> getQAGameRoomId(
       String ctuerId, String uid) async {
     return await qaGameReference.where('players', arrayContains: uid).get();
+  }
+
+  //TASK
+
+  Future<Either<bool, FirebaseException>> createTask(TaskSchedule task) async {
+    Map<String, dynamic> json = task.toJson();
+    try {
+      await taskReference
+          .doc(uid)
+          .collection("userTasks")
+          .doc(task.taskId)
+          .set(json);
+      return const Left(true);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
+  }
+
+  Future<Either<QuerySnapshot, FirebaseException>> getTasks() async {
+    try {
+      var snapshot = await taskReference.doc(uid).collection("userTasks").get();
+      return Left(snapshot);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
   }
 }

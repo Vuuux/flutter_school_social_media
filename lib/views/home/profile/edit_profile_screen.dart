@@ -121,11 +121,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   toastLength: Toast.LENGTH_SHORT,
                   gravity: ToastGravity.CENTER,
                   timeInSecForIosWeb: 1);
-
-              Helper.saveUserEmailSharedPreference(email);
-              Helper.saveUserIdSharedPreference(name);
-              Helper.saveUserLoggedInSharedPreference(true);
-
               Navigator.of(context).pushAndRemoveUntil(
                   FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
             } else {

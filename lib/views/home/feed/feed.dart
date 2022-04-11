@@ -12,6 +12,7 @@ import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/utils/helper.dart';
+import 'package:luanvanflutter/utils/theme_service.dart';
 import 'package:luanvanflutter/views/components/app_bar/custom_sliver_app_bar.dart';
 import 'package:luanvanflutter/views/components/search_bar.dart';
 import 'package:luanvanflutter/views/home/feed/post_screen.dart';
@@ -98,10 +99,12 @@ class _FeedState extends State<Feed> {
                       ),
                     PostItem(post: post),
                     if (index != snapshot.data!.docs.length - 1)
-                      const Divider(
+                      Divider(
                         height: 20,
                         thickness: 5,
-                        color: kPrimaryColor,
+                        color: ThemeService().isDarkTheme
+                            ? kPrimaryDarkColor
+                            : kPrimaryColor,
                       ),
                   ]);
                 })

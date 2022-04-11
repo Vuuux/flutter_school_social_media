@@ -34,7 +34,14 @@ class StandardAppBar extends StatelessWidget with PreferredSizeWidget {
       title: Text(title),
       centerTitle: true,
       leading: GestureDetector(
-        onTap: onLeadingClick,
+        onTap: () {
+          if (enableBack) {
+            Navigator.pop(context);
+          }
+          if (onLeadingClick != null) {
+            onLeadingClick!.call();
+          }
+        },
         child: enableBack
             ? const Icon(Icons.arrow_back)
             : leadingIcon != null

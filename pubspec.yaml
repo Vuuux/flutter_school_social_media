@@ -60,7 +60,8 @@ dependencies:
   auto_size_text: ^2.1.0
   http: ^0.13.3
   flip_card: ^0.4.4
-  flutter_local_notifications: ^6.0.0
+  flutter_local_notifications:
+  flutter_native_timezone:
   flutter_speed_dial: ^1.2.5
   line_awesome_flutter: ^2.0.0
   flutter_screenutil: ^5.0.0+2
@@ -94,10 +95,16 @@ dependencies:
   get:
   day_night_switcher: ^0.2.0+1
   date_picker_timeline: ^1.2.3
+  json_annotation: ^4.4.0
+  flutter_localizations:
+    sdk: flutter
+  localization: ^2.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  build_runner: ^2.1.8
+  json_serializable: ^6.1.5
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -120,6 +127,7 @@ flutter:
     - assets/
     - assets/icons/
     - assets/images/
+    - lib/i18n/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

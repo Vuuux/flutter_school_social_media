@@ -3,9 +3,11 @@ import 'package:eventual/eventual-notifier.dart';
 import 'package:eventual/eventual-single-builder.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
+import 'package:luanvanflutter/utils/notify_service.dart';
 import 'package:luanvanflutter/utils/theme_service.dart';
 import 'package:luanvanflutter/views/anon_home/anon_notifications_page.dart';
 import 'package:luanvanflutter/views/anon_home/feed/forum_feed.dart';
@@ -91,11 +93,13 @@ class _HomeState extends State<Home> {
     DatabaseServices(uid: uid).uploadToken(fcmToken!);
   }
 
+  late NotifyHelper notifyHelper;
   @override
   void initState() {
     super.initState();
-    //TODO: Add Day Night Switch
-
+    notifyHelper = NotifyHelper();
+    notifyHelper.initializeNotification();
+    notifyHelper.requestIOSPermissions();
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       var messageData = message.data;
       final String recipientId = messageData["recipient"];
@@ -105,6 +109,14 @@ class _HomeState extends State<Home> {
       }
 
       print('onMessage: $message');
+    });
+
+    ThemeService.themeNotifier.addListener(() {
+      notifyHelper.displayNotification(
+          title: "Đã thay đổi chủ đề",
+          body: Get.isDarkMode
+              ? "Đã kích hoạt chủ đề sáng"
+              : "Đã kích hoạt chủ đề tối");
     });
 
     // _fcm.configure(

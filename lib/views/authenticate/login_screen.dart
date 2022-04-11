@@ -40,20 +40,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   signIn(BuildContext context) {
     if (_formKey.currentState!.validate()) {
-      //lưu email vào sharedPreferences
-      Helper.saveUserEmailSharedPreference(email.toString());
       //Lưu username vào database
       DatabaseServices(uid: '')
           .getUserByEmail(email.toString())
           .then((value) async {
         snapshotUserinfo = value;
-        await Helper.saveUserIdSharedPreference(
-            snapshotUserinfo.docs[0].get('id'));
-
-        Helper.getUserId()
-            .then((value) => print("USERNAME:" + value.toString()));
-        Helper.getUserEmail()
-            .then((value) => print("EMAIL:" + value.toString()));
       });
 
       //setStateLoading
@@ -64,7 +55,6 @@ class _LoginScreenState extends State<LoginScreen> {
       context.read<AuthService>().signIn(email, password).then((value) {
         String err = "";
         if (value == "OK") {
-          Helper.saveUserLoggedInSharedPreference(true);
           Fluttertoast.showToast(
               msg: "Đăng nhập thành công",
               toastLength: Toast.LENGTH_SHORT,

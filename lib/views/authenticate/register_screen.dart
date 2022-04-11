@@ -67,8 +67,7 @@ class _RegisterState extends State<Register> {
   }
 
   setFileToImage() async {
-    _image =
-        await ImageUtils.imageToFile(imageName: "student_avatar", ext: "png");
+    _image = await ImageUtils.imageToFile(imageName: "appicon", ext: "png");
   }
 
   final List<String> _homeAreaType = <String>[
@@ -298,7 +297,7 @@ class _RegisterState extends State<Register> {
                                                 fit: BoxFit.cover,
                                               )
                                             : Image.asset(
-                                                'assets/student_avatar.png',
+                                                'assets/appicon.png',
                                                 fit: BoxFit.cover,
                                               ),
                                       )),
