@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:luanvanflutter/controller/auth_controller.dart';
 import 'package:luanvanflutter/controller/controller.dart';
@@ -63,20 +64,22 @@ class _MyProfileState extends State<MyProfile> {
     }
   }
 
-  Column createColumns(String title, int count) {
+  Column createColumns(String title, int count, Color color) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Text(
           count.toString(),
-          style: const TextStyle(fontSize: 15.0, fontWeight: FontWeight.w600),
+          style: TextStyle(
+              fontSize: 15.0, fontWeight: FontWeight.w600, color: color),
         ),
         Container(
           margin: const EdgeInsets.only(top: 5.0),
           child: Text(
             title,
-            style: const TextStyle(fontSize: 12.0, fontWeight: FontWeight.w200),
+            style: TextStyle(
+                fontSize: 12.0, fontWeight: FontWeight.w200, color: color),
           ),
         )
       ],
@@ -106,11 +109,14 @@ class _MyProfileState extends State<MyProfile> {
           width: MediaQuery.of(context).size.width / 2.5,
           height: 26.0,
           child: Text(title,
-              style:
-                  const TextStyle(fontWeight: FontWeight.w300, fontSize: 12)),
+              style: TextStyle(
+                fontWeight: FontWeight.w300,
+                fontSize: 12,
+                color: Get.isDarkMode ? Colors.black : Colors.white,
+              )),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: kPrimaryLightColor,
+            color: Get.isDarkMode ? kPrimaryDarkColor : kPrimaryColor,
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
@@ -227,9 +233,9 @@ class _MyProfileState extends State<MyProfile> {
                                         const SizedBox(height: 15),
                                         Text(userData.username,
                                             style: const TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w500,
-                                                color: kPrimaryColor)),
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w500,
+                                            )),
                                       ],
                                     ),
                                   ),
@@ -240,9 +246,11 @@ class _MyProfileState extends State<MyProfile> {
                                 width: MediaQuery.of(context).size.width / 1.17,
                                 padding:
                                     const EdgeInsets.only(top: 3, bottom: 3),
-                                decoration: const BoxDecoration(
-                                    color: kPrimaryLightColor,
-                                    borderRadius: BorderRadius.all(
+                                decoration: BoxDecoration(
+                                    color: Get.isDarkMode
+                                        ? kPrimaryDarkColor
+                                        : kPrimaryColor,
+                                    borderRadius: const BorderRadius.all(
                                       Radius.circular(15),
                                     )),
                                 child: Row(
@@ -256,8 +264,12 @@ class _MyProfileState extends State<MyProfile> {
                                         splashColor: Colors.transparent,
                                         padding: const EdgeInsets.only(
                                             left: 21, right: 21),
-                                        child: createColumns('Người theo dõi',
-                                            countTotalFollowers),
+                                        child: createColumns(
+                                            'Người theo dõi',
+                                            countTotalFollowers,
+                                            Get.isDarkMode
+                                                ? Colors.black
+                                                : Colors.white),
                                         onPressed: () {}
                                         //TODO: ADD FOLLOWER LIST
                                         // =>
@@ -275,8 +287,12 @@ class _MyProfileState extends State<MyProfile> {
                                         splashColor: Colors.transparent,
                                         padding: const EdgeInsets.only(
                                             left: 21, right: 21),
-                                        child: createColumns('Đang theo dõi',
-                                            countTotalFollowings),
+                                        child: createColumns(
+                                            'Đang theo dõi',
+                                            countTotalFollowings,
+                                            Get.isDarkMode
+                                                ? Colors.black
+                                                : Colors.white),
                                         onPressed: () {}
                                         // TODO: ADD FOLLOWING LIST
                                         // => Navigator.of(context)
@@ -293,8 +309,12 @@ class _MyProfileState extends State<MyProfile> {
                                       splashColor: Colors.transparent,
                                       padding: const EdgeInsets.only(
                                           left: 21, right: 21),
-                                      child:
-                                          createColumns('Fame', userData.fame),
+                                      child: createColumns(
+                                          'Fame',
+                                          userData.fame,
+                                          Get.isDarkMode
+                                              ? Colors.black
+                                              : Colors.white),
                                       onPressed: () {},
                                     ),
                                   ],

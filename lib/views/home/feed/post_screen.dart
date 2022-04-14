@@ -4,6 +4,7 @@ import 'package:animator/animator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
@@ -109,7 +110,12 @@ class _PostItemState extends State<PostItem> {
         children: <Widget>[
           ClipRRect(
               borderRadius: BorderRadius.circular(15.0),
-              child: Image.network(widget.post.url)),
+              child: Container(
+                child: Image.network(
+                  widget.post.url,
+                  width: Get.width,
+                ),
+              )),
           //TODO: ANIMATOR HERE
           showHeart
               ? Animator(

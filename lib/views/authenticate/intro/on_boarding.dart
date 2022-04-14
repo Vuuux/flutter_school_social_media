@@ -133,7 +133,7 @@ class _OnBoardingState extends State<OnBoarding> {
 
     NotificationDetails notificationDetails = NotificationDetails(
         android: androidNotificationDetails, iOS: iosNotificationDetails);
-    // await flutterLocalNotificationsPlugin.schedule(1, 'Hello there',
+    // await flutterLocalNotificationsPlugin.task(1, 'Hello there',
     //     'please subscribe my channel', timeDelayed, notificationDetails);
     await flutterLocalNotificationsPlugin.showDailyAtTime(
         1, "CTUER", "Kết bạn ngay!", time, notificationDetails);

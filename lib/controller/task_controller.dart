@@ -7,7 +7,8 @@ import 'package:luanvanflutter/models/task.dart';
 import 'package:luanvanflutter/utils/helper.dart';
 
 class TaskController extends GetxController {
-  String uid = Helper().getUserId();
+  final DatabaseServices _database =
+      DatabaseServices(uid: Helper().getUserId());
   @override
   void onReady() {
     super.onReady();
@@ -15,8 +16,8 @@ class TaskController extends GetxController {
 
   var taskList = <TaskSchedule>[].obs;
 
-  void getTasks() async {
-    var response = await DatabaseServices(uid: uid).getTasks();
+  Future getTasks() async {
+    var response = await _database.getTasks();
     response.fold((left) {
       taskList.assignAll(left.docs
           .map((task) => TaskSchedule.fromDocumentSnapshot(task))
@@ -32,6 +33,16 @@ class TaskController extends GetxController {
 
   Future<Either<bool, FirebaseException>> addTask(
       {required TaskSchedule task}) async {
-    return await DatabaseServices(uid: uid).createTask(task);
+    return await _database.createTask(task);
+  }
+
+  Future<Either<bool, FirebaseException>> deleteTask(
+      {required String taskId}) async {
+    return await _database.deleteTask(taskId);
+  }
+
+  Future<Either<bool, FirebaseException>> updateTask(
+      {required String taskId, bool isCompleted = true}) async {
+    return await _database.updateCompleteStatusTask(taskId, isCompleted);
   }
 }

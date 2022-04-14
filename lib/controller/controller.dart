@@ -1330,4 +1330,36 @@ class DatabaseServices {
       return Right(error);
     }
   }
+
+  Future<Either<bool, FirebaseException>> deleteTask(String taskId) async {
+    try {
+      await taskReference
+          .doc(uid)
+          .collection("userTasks")
+          .doc(taskId)
+          .get()
+          .then((doc) {
+        if (doc.exists) {
+          doc.reference.delete();
+        }
+      });
+      return const Left(true);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
+  }
+
+  Future<Either<bool, FirebaseException>> updateCompleteStatusTask(
+      String taskId, bool isCompleted) async {
+    try {
+      await taskReference
+          .doc(uid)
+          .collection("userTasks")
+          .doc(taskId)
+          .update({'isCompleted': isCompleted});
+      return const Left(true);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
+  }
 }

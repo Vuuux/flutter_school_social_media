@@ -16,8 +16,8 @@ import 'package:luanvanflutter/views/anon_home/search/anon_example_search_screen
 import 'package:luanvanflutter/views/components/bottom_bar/bottom_bar.dart';
 import 'package:luanvanflutter/views/components/buttons/bottom_bar_button.dart';
 import 'package:luanvanflutter/views/home/profile/profile.dart';
-import 'package:luanvanflutter/views/home/schedule/task_manager.dart';
 import 'package:luanvanflutter/views/home/search/example_search_screen.dart';
+import 'package:luanvanflutter/views/home/task/task_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 

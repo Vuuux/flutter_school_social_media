@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:luanvanflutter/controller/controller.dart';
@@ -11,6 +13,7 @@ import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
+import 'package:luanvanflutter/style/loading.dart';
 import 'package:luanvanflutter/utils/helper.dart';
 import 'package:luanvanflutter/utils/theme_service.dart';
 import 'package:luanvanflutter/views/components/app_bar/custom_sliver_app_bar.dart';
@@ -84,36 +87,42 @@ class _FeedState extends State<Feed> {
     return StreamBuilder<QuerySnapshot>(
       stream: Stream.fromFuture(postFuture!),
       builder: (context, snapshot) {
-        return snapshot.hasData
-            ? ListView.builder(
-                shrinkWrap: true,
-                controller: scrollController,
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (context, index) {
-                  final PostModel post =
-                      PostModel.fromDocument(snapshot.data!.docs[index]);
-                  return Column(children: <Widget>[
-                    if (index == 0)
-                      const SizedBox(
-                        height: 60,
-                      ),
-                    PostItem(post: post),
-                    if (index != snapshot.data!.docs.length - 1)
-                      Divider(
-                        height: 20,
-                        thickness: 5,
-                        color: ThemeService().isDarkTheme
-                            ? kPrimaryDarkColor
-                            : kPrimaryColor,
-                      ),
-                  ]);
-                })
-            : const Center(
-                child: Text(
-                  "Chưa có bài viết nào.",
-                  style: TextStyle(color: Colors.black),
-                ),
+        if (snapshot.hasData) {
+          List<PostModel> listPost = snapshot.data!.docs
+              .map((doc) => PostModel.fromDocument(doc))
+              .toList();
+          if (listPost.isEmpty) {
+            return const Center(
+              child: Text(
+                "Chưa có bài viết nào.",
+                style: TextStyle(color: Colors.black),
+              ),
+            );
+          }
+          return ListView.separated(
+            shrinkWrap: true,
+            controller: scrollController,
+            itemCount: listPost.length,
+            itemBuilder: (context, index) {
+              final PostModel post = listPost[index];
+              return AnimationConfiguration.staggeredList(
+                  position: index,
+                  child: SlideAnimation(
+                      child: FadeInAnimation(child: PostItem(post: post))));
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return Container(
+                height: 6,
+                width: 120,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color:
+                        Get.isDarkMode ? Colors.grey[600] : Colors.grey[300]),
               );
+            },
+          );
+        }
+        return Loading();
       },
     );
   }
@@ -233,7 +242,13 @@ class _FeedState extends State<Feed> {
                   headerSliverBuilder:
                       (BuildContext context, bool innerBoxIsScrolled) => [
                             CustomAppBar(
-                                title: 'F E E D',
+                                title: 'T Ư Ờ N G   N H À',
+                                background: Image.asset(
+                                  "assets/images/ctu.jpg",
+                                  fit: BoxFit.cover,
+                                  color: Colors.white.withOpacity(0.95),
+                                  colorBlendMode: BlendMode.modulate,
+                                ),
                                 trailingIcon: Icons.image,
                                 onLeadingClick: () => null,
                                 onTrailingClick: () {
@@ -242,7 +257,7 @@ class _FeedState extends State<Feed> {
                           ],
                   body: Stack(
                     children: [
-                      postList(user),
+                      postList(user).paddingOnly(top: 55),
                       CustomSearchBar(
                         onSearchSubmit: handleSearch,
                         onTapCancel: loadData,

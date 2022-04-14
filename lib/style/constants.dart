@@ -38,7 +38,7 @@ const kSecondaryColor = Color(0xFF717171);
 const kPrimaryLightColor = Color(0xFFFFD154);
 const kContentColorLightTheme = Color(0xFF1D1D35);
 const kContentColorDarkTheme = Color(0xFFF5FCF9);
-
+const kGreenColor = Color(0xFF02EC88);
 const kWarninngColor = Color(0xFFF3BB1C);
 const kErrorColor = Color(0xFFF03738);
 

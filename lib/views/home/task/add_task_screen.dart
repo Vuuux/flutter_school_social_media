@@ -51,10 +51,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         note: "",
         remindTime: remindList[0],
         date: DateFormat("EEEE dd/MM/yyyy", "vi_VN").format(DateTime.now()),
-        startTime:
-            DateFormat("hh:mm a").format(DateTime.now().toUtc()).toString(),
-        endTime: "9:30 PM",
+        startTime: DateFormat("hh:mm a").format(DateTime.now()).toString(),
+        endTime: DateFormat("hh:mm a")
+            .format(DateTime.now().add(const Duration(hours: 4)))
+            .toString(),
         scheduleMode: ScheduleMode.NONE);
+    print(DateTime.now().timeZoneName);
     task.notifyChange();
   }
 
