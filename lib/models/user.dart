@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/profile_notifier.dart';
 
@@ -9,7 +10,7 @@ class CurrentUser {
 }
 
 //dữ liệu User chi tiết
-class UserData {
+class UserData extends Equatable {
   late final String id;
   late final String email;
   late final String username;
@@ -67,7 +68,6 @@ class UserData {
     address = data['address'];
   }
 
-
   factory UserData.fromDocumentSnapshot(DocumentSnapshot data) {
     return UserData(
         email: data['email'],
@@ -90,8 +90,30 @@ class UserData {
   }
 
   getUserData(ProfileNotifier profileNotifier, String uid) async {
-    DocumentSnapshot snapshot = await DatabaseServices(uid: uid).getUserByUserId();
+    DocumentSnapshot snapshot =
+        await DatabaseServices(uid: uid).getUserByUserId();
     UserData data = UserData.fromDocumentSnapshot(snapshot);
     profileNotifier.currentProfile = data;
   }
+
+  @override
+  List<Object?> get props => [
+        id,
+        email,
+        username,
+        nickname,
+        gender,
+        major,
+        bio,
+        avatar,
+        isAnon,
+        anonBio,
+        anonInterest,
+        anonAvatar,
+        fame,
+        media,
+        course,
+        playlist,
+        address
+      ];
 }

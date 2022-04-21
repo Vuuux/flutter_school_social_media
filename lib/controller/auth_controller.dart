@@ -48,19 +48,18 @@ class AuthService {
 
   //đăng ký với Email và Password
   Future<Either<bool, FirebaseAuthException>> signUp(
-      String email,
-      String password,
-      String name,
-      String nickname,
-      String gender,
-      String major,
-      String bio,
-      String avatar,
-      bool isAnon,
-      File media,
-      String playlist,
-      String course,
-      String address) async {
+      {required String email,
+      required String password,
+      required String name,
+      required String nickname,
+      required String gender,
+      required String major,
+      required String bio,
+      required bool isAnon,
+      required File pickedAvatar,
+      required String playlist,
+      required String course,
+      required String address}) async {
     try {
       UserCredential credentialResult =
           await _auth.createUserWithEmailAndPassword(
@@ -72,23 +71,23 @@ class AuthService {
       if (user != null) {
         await _auth.signInWithEmailAndPassword(
             email: email.trim(), password: password.trim());
-        UploadTask uploadTask = storageReference.putFile(media);
+        UploadTask uploadTask = storageReference.putFile(pickedAvatar);
         TaskSnapshot taskSnapshot = await uploadTask;
         var imgURL = (await taskSnapshot.ref.getDownloadURL()).toString();
 
         uploadResult = await DatabaseServices(uid: user.uid).uploadUserData(
-            email.trim(),
-            name,
-            nickname,
-            gender,
-            major,
-            bio,
-            avatar,
-            isAnon,
-            imgURL,
-            playlist,
-            course,
-            address);
+            email: email.trim(),
+            username: name,
+            nickname: nickname,
+            gender: gender,
+            major: major,
+            bio: bio,
+            avatar: imgURL,
+            isAnon: isAnon,
+            media: '',
+            playlist: playlist,
+            course: course,
+            address: address);
       }
       return Left(uploadResult);
     } on FirebaseAuthException catch (e) {

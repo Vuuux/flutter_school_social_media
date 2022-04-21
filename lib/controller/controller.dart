@@ -93,20 +93,20 @@ class DatabaseServices {
           });
   }
 
-  Future<bool> uploadUserData(
-    String email,
-    String username,
-    String nickname,
-    String gender,
-    String major,
-    String bio,
-    String avatar,
-    bool isAnon,
-    String media,
-    String playlist,
-    String course,
-    String address,
-  ) async {
+  Future<bool> uploadUserData({
+    required String email,
+    required String username,
+    required String nickname,
+    required String gender,
+    required String major,
+    required String bio,
+    required String avatar,
+    required bool isAnon,
+    required String media,
+    required String playlist,
+    required String course,
+    required String address,
+  }) async {
     try {
       await userReference.doc(uid).set({
         'id': uid,
@@ -121,11 +121,12 @@ class DatabaseServices {
         "isAnon": isAnon,
         'anonBio': '',
         'anonInterest': '',
-        'anonAvatar': avatar,
+        'anonAvatar':
+            "https://firebasestorage.googleapis.com/v0/b/god-project-ctu.appspot.com/o/Profile%20Pictures?alt=media&token=128aa6d4-42ec-40f5-b3db-3371e85ca126",
         'followers': {},
         'followings': {},
         'fame': 0,
-        "media": media,
+        "media": '',
         "playlist": playlist,
         "course": course,
         "address": address,

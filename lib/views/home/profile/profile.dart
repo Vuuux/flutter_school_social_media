@@ -90,7 +90,8 @@ class _MyProfileState extends State<MyProfile> {
     return Row(
       children: <Widget>[
         createButtonTitleAndFunction(
-            title: 'Chỉnh sửa', performFunction: editUserProfile),
+            title: 'Chỉnh sửa',
+            performFunction: () => editUserProfile(userData)),
         createButtonTitleAndFunction(
             title: 'Đổi mật khẩu', performFunction: editUserPassword),
       ],
@@ -129,9 +130,9 @@ class _MyProfileState extends State<MyProfile> {
         .push(MaterialPageRoute(builder: (context) => const EditPassword()));
   }
 
-  editUserProfile() {
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => const EditProfileScreen()));
+  editUserProfile(UserData userData) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => EditProfileScreen(userData: userData)));
   }
 
   @override

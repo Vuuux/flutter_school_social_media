@@ -17,6 +17,8 @@ import 'package:luanvanflutter/style/loading.dart';
 import 'package:luanvanflutter/utils/helper.dart';
 import 'package:luanvanflutter/utils/theme_service.dart';
 import 'package:luanvanflutter/views/components/app_bar/custom_sliver_app_bar.dart';
+import 'package:luanvanflutter/views/components/buttons/ripple_animation.dart';
+import 'package:luanvanflutter/views/components/dialog/custom_dialog.dart';
 import 'package:luanvanflutter/views/components/search_bar.dart';
 import 'package:luanvanflutter/views/home/feed/post_screen.dart';
 import 'package:luanvanflutter/views/home/feed/upload_image_screen.dart';
@@ -264,6 +266,40 @@ class _FeedState extends State<Feed> {
                         searchController: searchController,
                         hintText: 'Tìm kiếm bài viết...',
                       ),
+                      Positioned(
+                        bottom: 80.0,
+                        right: 8.0,
+                        child: RipplesAnimation(
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return const CustomDialog(
+                                    title: 'Đi kết bạn nào!',
+                                    description:
+                                        'Hôm nay bạn sẽ kết bạn với Hmmie nào đây?',
+                                    buttonText: 'Tìm hiểu',
+                                  );
+                                });
+                          },
+                          size: 20.0,
+                          color: kPrimaryDarkColor,
+                          child: Icon(Icons.face),
+                          // style: ButtonStyle(
+                          //   shape: MaterialStateProperty.all(CircleBorder()),
+                          //   padding:
+                          //       MaterialStateProperty.all(EdgeInsets.all(20)),
+                          //   backgroundColor: MaterialStateProperty.all(
+                          //       Colors.blue), // <-- Button color
+                          //   overlayColor:
+                          //       MaterialStateProperty.resolveWith<Color?>(
+                          //           (states) {
+                          //     if (states.contains(MaterialState.pressed))
+                          //       return Colors.red; // <-- Splash color
+                          //   }),
+                          // ),
+                        ),
+                      )
                     ],
                   )));
           // RefreshIndicator(

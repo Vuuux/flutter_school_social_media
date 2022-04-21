@@ -97,6 +97,7 @@ dependencies:
   date_picker_timeline: ^1.2.3
   json_annotation: ^4.4.0
   flutter_staggered_animations: ^1.0.0
+  equatable: ^2.0.3
   flutter_localizations:
     sdk: flutter
   localization: ^2.1.0
@@ -128,6 +129,7 @@ flutter:
     - assets/
     - assets/icons/
     - assets/images/
+    - assets/sound/
     - lib/i18n/
 
   # An image asset can refer to one or more resolution-specific "variants", see

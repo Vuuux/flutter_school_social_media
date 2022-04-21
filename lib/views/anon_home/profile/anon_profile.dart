@@ -57,7 +57,8 @@ class _AnonProfileState extends State<AnonProfile> {
     return Row(
       children: <Widget>[
         createButtonTitleAndFunction(
-            title: 'Chỉnh sửa', performFunction: editUserProfile),
+            title: 'Chỉnh sửa',
+            performFunction: () => editUserProfile(userData)),
       ],
     );
   }
@@ -71,14 +72,11 @@ class _AnonProfileState extends State<AnonProfile> {
         splashColor: Colors.transparent,
         onPressed: performFunction,
         child: Container(
-          width: MediaQuery
-              .of(context)
-              .size
-              .width / 2.5,
+          width: MediaQuery.of(context).size.width / 2.5,
           height: 26.0,
           child: Text(title,
               style:
-              const TextStyle(fontWeight: FontWeight.w300, fontSize: 12)),
+                  const TextStyle(fontWeight: FontWeight.w300, fontSize: 12)),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: kPrimaryLightColor,
@@ -89,17 +87,17 @@ class _AnonProfileState extends State<AnonProfile> {
     );
   }
 
-
-  editUserProfile() {
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => const EditProfileScreen()));
+  editUserProfile(UserData userData) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => EditProfileScreen(
+              userData: userData,
+            )));
   }
 
   @override
   void initState() {
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -125,8 +123,8 @@ class _AnonProfileState extends State<AnonProfile> {
                 centerTitle: true,
                 shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(15),
-                    )),
+                  bottom: Radius.circular(15),
+                )),
                 elevation: 0,
               ),
               body: SingleChildScrollView(
@@ -136,17 +134,14 @@ class _AnonProfileState extends State<AnonProfile> {
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       constraints: BoxConstraints(
-                          minHeight: MediaQuery
-                              .of(context)
-                              .size
-                              .height),
+                          minHeight: MediaQuery.of(context).size.height),
                       child: Column(children: <Widget>[
                         Column(children: <Widget>[
                           Column(
                             children: <Widget>[
                               Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Expanded(
@@ -157,9 +152,9 @@ class _AnonProfileState extends State<AnonProfile> {
                                         ),
                                         CustomCircleAvatar(
                                             image: Image.network(
-                                              userData.avatar,
-                                              fit: BoxFit.fill,
-                                            )),
+                                          userData.avatar,
+                                          fit: BoxFit.fill,
+                                        )),
                                         const SizedBox(height: 15),
                                         Text(userData.nickname,
                                             style: const TextStyle(
@@ -177,7 +172,7 @@ class _AnonProfileState extends State<AnonProfile> {
                                   Expanded(
                                     child: Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+                                          MainAxisAlignment.spaceEvenly,
                                       children: <Widget>[
                                         createButton(userData),
                                       ],
@@ -189,10 +184,7 @@ class _AnonProfileState extends State<AnonProfile> {
                           ),
                           Container(
                             padding: const EdgeInsets.all(15),
-                            width: MediaQuery
-                                .of(context)
-                                .size
-                                .width,
+                            width: MediaQuery.of(context).size.width,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,10 +200,10 @@ class _AnonProfileState extends State<AnonProfile> {
                                         : userData.bio,
                                     style: userData.bio == ''
                                         ? const TextStyle(
-                                        fontSize: 12, color: Colors.grey)
+                                            fontSize: 12, color: Colors.grey)
                                         : const TextStyle(
-                                      fontSize: 18,
-                                    )),
+                                            fontSize: 18,
+                                          )),
                                 const SizedBox(
                                   height: 5,
                                 ),
@@ -229,10 +221,10 @@ class _AnonProfileState extends State<AnonProfile> {
                                         : userData.media,
                                     style: userData.media == ''
                                         ? const TextStyle(
-                                        fontSize: 12, color: Colors.grey)
+                                            fontSize: 12, color: Colors.grey)
                                         : const TextStyle(
-                                      fontSize: 18,
-                                    )),
+                                            fontSize: 18,
+                                          )),
                                 SizedBox(
                                   height: kSpacingUnit.w,
                                 ),
@@ -250,10 +242,10 @@ class _AnonProfileState extends State<AnonProfile> {
                                         : userData.course,
                                     style: userData.course == ''
                                         ? const TextStyle(
-                                        fontSize: 10, color: Colors.grey)
+                                            fontSize: 10, color: Colors.grey)
                                         : const TextStyle(
-                                      fontSize: 15,
-                                    )),
+                                            fontSize: 15,
+                                          )),
                                 SizedBox(
                                   height: kSpacingUnit.w,
                                 ),
@@ -271,10 +263,10 @@ class _AnonProfileState extends State<AnonProfile> {
                                         : userData.playlist,
                                     style: userData.playlist == ''
                                         ? const TextStyle(
-                                        fontSize: 10, color: Colors.grey)
+                                            fontSize: 10, color: Colors.grey)
                                         : const TextStyle(
-                                      fontSize: 15,
-                                    )),
+                                            fontSize: 15,
+                                          )),
                                 SizedBox(
                                   height: kSpacingUnit.w,
                                 ),
@@ -284,144 +276,142 @@ class _AnonProfileState extends State<AnonProfile> {
                           //GRID VIEW IMAGE
                           StreamBuilder<QuerySnapshot>(
                               stream: Stream.fromFuture(
-                                  DatabaseServices(uid: user.uid)
-                                      .getMyPosts()),
+                                  DatabaseServices(uid: user.uid).getMyPosts()),
                               builder: (context, snapshot) {
                                 return snapshot.hasData
                                     ? Padding(
-                                  padding:
-                                  const EdgeInsets.only(left: 5.0),
-                                  child: SizedBox(
-                                    height: MediaQuery
-                                        .of(context)
-                                        .size
-                                        .height *
-                                        0.30 -
-                                        50,
-                                    child: ListView.builder(
-                                        physics:
-                                        const ClampingScrollPhysics(),
-                                        shrinkWrap: true,
-                                        scrollDirection:
-                                        Axis.horizontal,
-                                        itemCount:
-                                        snapshot.data!.docs.length,
-                                        itemBuilder: (context, index) {
-                                          var post = PostItem(
-                                              post: PostModel(
-                                                  postId: snapshot
-                                                      .data!.docs[index]
-                                                      .get('postId'),
-                                                  ownerId: snapshot
-                                                      .data!.docs[index]
-                                                      .get('ownerId'),
-                                                  username: snapshot
-                                                      .data!.docs[index]
-                                                      .get('username'),
-                                                  location: snapshot
-                                                      .data!.docs[index]
-                                                      .get('location'),
-                                                  description: snapshot
-                                                      .data!.docs[index]
-                                                      .get('description'),
-                                                  url: snapshot
-                                                      .data!.docs[index]
-                                                      .get('url'),
-                                                  likes: snapshot.data!.docs[index]
-                                                      .get('likes'),
-                                                  timestamp: snapshot
-                                                      .data!.docs[index]
-                                                      .get('timestamp')
-                                              ),
-                                              );
-
-                                          Map<dynamic, dynamic> likes =
-                                          snapshot.data!.docs[index]
-                                              .get('likes');
-                                          if (index ==
-                                              snapshot
-                                                  .data!.docs.length) {
-                                            return Column(
-                                              children: <Widget>[
-                                                const Text(
-                                                    'Thêm ảnh vào profile của bạn'),
-                                                IconButton(
-                                                  icon: const Icon(
-                                                      LineAwesomeIcons
-                                                          .plus_circle),
-                                                  onPressed: () {
-                                                    ChooseImage(
-                                                        context: context,
-                                                        userData: userData);
-                                                  },
-                                                ),
-                                              ],
-                                            );
-                                          }
-                                          return FocusedMenuHolder(
-                                            menuWidth:
-                                            MediaQuery
-                                                .of(context)
-                                                .size
-                                                .width *
-                                                0.36,
-                                            onPressed: () {
-                                              Navigator.push(context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          PostDetail(postId: post.post.postId, ownerId: user.uid,)));
-                                            },
-                                            menuItems: <
-                                                FocusedMenuItem>[
-                                              FocusedMenuItem(
-                                                  title: const Text(
-                                                    "Xóa ảnh",
-                                                    style: TextStyle(
-                                                        color: Colors
-                                                            .black,
-                                                        fontSize: 12),
-                                                  ),
-                                                  trailingIcon:
-                                                  const Icon(
-                                                      Icons.delete),
-                                                  onPressed: () {
-                                                    DatabaseServices(
-                                                        uid: '')
-                                                        .deletePhotos(
-                                                        user.uid,
-                                                        index);
-                                                  },
-                                                  backgroundColor:
-                                                  Colors.redAccent)
-                                            ],
-                                            child: Container(
-                                              width: 150,
-                                              margin:
-                                              const EdgeInsets.only(
-                                                  right: 15),
-                                              height:
-                                              MediaQuery
-                                                  .of(context)
-                                                  .size
-                                                  .height *
+                                        padding:
+                                            const EdgeInsets.only(left: 5.0),
+                                        child: SizedBox(
+                                          height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
                                                   0.30 -
-                                                  50,
-                                              child: ClipRRect(
-                                                  borderRadius:
-                                                  const BorderRadius
-                                                      .all(
-                                                      Radius
-                                                          .circular(
-                                                          20.0)),
-                                                  child: Image.network(
-                                                    post.post.url,
-                                                    fit: BoxFit.fill,
-                                                  )),
-                                            ),
-                                          );
-                                        }),
-                                  ),
-                                )
+                                              50,
+                                          child: ListView.builder(
+                                              physics:
+                                                  const ClampingScrollPhysics(),
+                                              shrinkWrap: true,
+                                              scrollDirection: Axis.horizontal,
+                                              itemCount:
+                                                  snapshot.data!.docs.length,
+                                              itemBuilder: (context, index) {
+                                                var post = PostItem(
+                                                  post: PostModel(
+                                                      postId: snapshot
+                                                          .data!.docs[index]
+                                                          .get('postId'),
+                                                      ownerId: snapshot
+                                                          .data!.docs[index]
+                                                          .get('ownerId'),
+                                                      username: snapshot
+                                                          .data!.docs[index]
+                                                          .get('username'),
+                                                      location: snapshot
+                                                          .data!.docs[index]
+                                                          .get('location'),
+                                                      description: snapshot
+                                                          .data!.docs[index]
+                                                          .get('description'),
+                                                      url: snapshot
+                                                          .data!.docs[index]
+                                                          .get('url'),
+                                                      likes: snapshot.data!.docs[index].get('likes'),
+                                                      timestamp: snapshot.data!.docs[index].get('timestamp')),
+                                                );
+
+                                                Map<dynamic, dynamic> likes =
+                                                    snapshot.data!.docs[index]
+                                                        .get('likes');
+                                                if (index ==
+                                                    snapshot
+                                                        .data!.docs.length) {
+                                                  return Column(
+                                                    children: <Widget>[
+                                                      const Text(
+                                                          'Thêm ảnh vào profile của bạn'),
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                            LineAwesomeIcons
+                                                                .plus_circle),
+                                                        onPressed: () {
+                                                          ChooseImage(
+                                                              context: context,
+                                                              userData:
+                                                                  userData);
+                                                        },
+                                                      ),
+                                                    ],
+                                                  );
+                                                }
+                                                return FocusedMenuHolder(
+                                                  menuWidth:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.36,
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    PostDetail(
+                                                                      postId: post
+                                                                          .post
+                                                                          .postId,
+                                                                      ownerId:
+                                                                          user.uid,
+                                                                    )));
+                                                  },
+                                                  menuItems: <FocusedMenuItem>[
+                                                    FocusedMenuItem(
+                                                        title: const Text(
+                                                          "Xóa ảnh",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize: 12),
+                                                        ),
+                                                        trailingIcon:
+                                                            const Icon(
+                                                                Icons.delete),
+                                                        onPressed: () {
+                                                          DatabaseServices(
+                                                                  uid: '')
+                                                              .deletePhotos(
+                                                                  user.uid,
+                                                                  index);
+                                                        },
+                                                        backgroundColor:
+                                                            Colors.redAccent)
+                                                  ],
+                                                  child: Container(
+                                                    width: 150,
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                            right: 15),
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                    .size
+                                                                    .height *
+                                                                0.30 -
+                                                            50,
+                                                    child: ClipRRect(
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                    .all(
+                                                                Radius.circular(
+                                                                    20.0)),
+                                                        child: Image.network(
+                                                          post.post.url,
+                                                          fit: BoxFit.fill,
+                                                        )),
+                                                  ),
+                                                );
+                                              }),
+                                        ),
+                                      )
                                     : Loading();
                               }),
                         ])

@@ -21,7 +21,7 @@ class NotifyHelper {
             onDidReceiveLocalNotification: onDidReceiveLocalNotification);
 
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings("appicon.png");
+        AndroidInitializationSettings("appicon");
 
     final InitializationSettings initializationSettings =
         InitializationSettings(
@@ -35,8 +35,12 @@ class NotifyHelper {
   Future<void> displayNotification(
       {required String title, required String body}) async {
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-        'your channel id', 'your channel name', 'your channel description',
-        importance: Importance.max, priority: Priority.high);
+      'your channel id',
+      'your channel name',
+      'your channel description',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
@@ -61,7 +65,9 @@ class NotifyHelper {
         convertDate,
         const NotificationDetails(
             android: AndroidNotificationDetails('your channel id',
-                'your channel name', 'your channel description')),
+                'your channel name', 'your channel description',
+                playSound: true,
+                sound: RawResourceAndroidNotificationSound('ring_tone'))),
         androidAllowWhileIdle: true,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,

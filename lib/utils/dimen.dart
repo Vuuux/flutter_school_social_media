@@ -5,4 +5,6 @@ class Dimen {
   static double paddingCommon20 = 20;
   static double paddingCommon25 = 25;
   static double appBarHeightExpanded = 150;
+  static double buttonHeight = 60.0;
+  static double fontButtonSize16 = 16.0;
 }

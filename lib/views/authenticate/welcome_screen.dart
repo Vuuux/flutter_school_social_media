@@ -3,7 +3,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/floating_image.dart';
 import 'package:luanvanflutter/views/authenticate/register_screen.dart';
-import 'package:luanvanflutter/views/authenticate/signup_screen.dart';
 import 'package:luanvanflutter/views/components/rounded_button.dart';
 
 import 'login_screen.dart';

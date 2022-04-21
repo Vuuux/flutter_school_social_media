@@ -186,9 +186,8 @@ class _PostItemState extends State<PostItem> {
                           ownerId: widget.post.ownerId,
                           mediaUrl: widget.post.url))),
               child: Icon(
-                Icons.chat,
+                Icons.sms_outlined,
                 size: 28.0,
-                color: Colors.blue[900],
               ),
             ),
           ],

@@ -4,16 +4,14 @@ import 'package:luanvanflutter/views/components/text_field_container.dart';
 
 class RoundedPasswordField extends StatefulWidget {
   final String title;
-  final ValueChanged<String> onChanged;
-  final FormFieldValidator validator;
   final String hintText;
+  final TextEditingController? controller;
   final FocusNode? focusNode;
   final bool isTitleCenter;
 
   const RoundedPasswordField(
       {Key? key,
-      required this.onChanged,
-      required this.validator,
+      this.controller,
       required this.hintText,
       this.focusNode,
       required this.title,
@@ -47,9 +45,8 @@ class _RoundedPasswordFieldState extends State<RoundedPasswordField> {
         TextFieldContainer(
           child: TextFormField(
             focusNode: widget.focusNode,
-            validator: widget.validator,
+            controller: widget.controller,
             obscureText: !_passwordVisible,
-            onChanged: widget.onChanged,
             cursorColor: kPrimaryColor,
             decoration: InputDecoration(
               hintText: widget.hintText,

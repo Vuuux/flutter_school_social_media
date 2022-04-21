@@ -77,7 +77,7 @@ class CustomDialog extends StatelessWidget {
                                     onPressed: () {
                                       Navigator.of(context).pushReplacement(
                                         MaterialPageRoute(
-                                          builder: (context) => Filterpage(
+                                          builder: (context) => FilterPage(
                                               userData: userData as UserData,
                                               ctuerList: ctuerList),
                                         ),

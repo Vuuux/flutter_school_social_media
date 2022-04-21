@@ -1,5 +1,8 @@
 import 'dart:math';
+import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flip_card/flip_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:luanvanflutter/models/ctuer.dart';
@@ -24,8 +27,11 @@ class IntroPage2 extends StatefulWidget {
 }
 
 class _IntroPage2State extends State<IntroPage2> {
+  GlobalKey<FlipCardState> cardKey = GlobalKey<FlipCardState>();
   @override
   Widget build(BuildContext context) {
+    String gender =
+        widget.chosenCtuer.gender.toUpperCase() == 'MALE' ? "Nam" : "Nữ";
     return Scaffold(
       body: Stack(
         children: [
@@ -42,116 +48,202 @@ class _IntroPage2State extends State<IntroPage2> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Text(
-                    "Gặp bạn mới",
+                    "Bạn mới của bạn đây!",
                     style: TextStyle(
-                      fontWeight: FontWeight.w300,
+                      fontWeight: FontWeight.bold,
                       fontSize: 24,
-                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                    child: Container(
-                      height: MediaQuery.of(context).size.height * 0.7,
-                      width: MediaQuery.of(context).size.width * 0.92,
-                      decoration: widget.chosenCtuer.anonAvatar == ''
-                          ? const BoxDecoration(
-                              color: Colors.white,
-                              image: DecorationImage(
-                                image: AssetImage('assets/images/profile1.png'),
-                              ),
-                            )
-                          : BoxDecoration(
-                              image: DecorationImage(
-                                image:
-                                    NetworkImage(widget.chosenCtuer.anonAvatar),
-                              ),
+                  FlipCard(
+                      key: cardKey,
+                      flipOnTouch: true,
+                      direction: FlipDirection.HORIZONTAL,
+                      front: ClipRRect(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
+                        child: Container(
+                          height: MediaQuery.of(context).size.height * 0.7,
+                          width: MediaQuery.of(context).size.width * 0.92,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                  offset: const Offset(4, 4),
+                                  color: Colors.grey.shade500,
+                                  blurRadius: 15,
+                                  spreadRadius: 1),
+                              const BoxShadow(
+                                  offset: Offset(-4, -4),
+                                  color: Colors.white,
+                                  blurRadius: 15,
+                                  spreadRadius: 1)
+                            ],
+                            image: DecorationImage(
+                              image: CachedNetworkImageProvider(
+                                  widget.chosenCtuer.avatar),
                             ),
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            right: 0,
-                            bottom: MediaQuery.of(context).size.height * 0.1,
-                            child: ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(25),
-                              ),
-                              child: Container(
-                                width: MediaQuery.of(context).size.width * 0.8,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFFFFFF).withOpacity(0.8),
-                                ),
-                                child: Container(
-                                  margin: EdgeInsets.all(22),
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.7,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        children: <Widget>[
+                          ),
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                right: 0,
+                                bottom: 10,
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.only(
+                                    bottomLeft: Radius.circular(25),
+                                  ),
+                                  child: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.8,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      color: Color(0xFFFFFFF).withOpacity(0.8),
+                                    ),
+                                    child: Container(
+                                      margin: EdgeInsets.all(22),
+                                      width: MediaQuery.of(context).size.width *
+                                          0.7,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: <Widget>[
+                                              Text(
+                                                "Ctuer: " +
+                                                    widget.chosenCtuer.username,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 18,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                              Text(
+                                                'Lượt thích: ' +
+                                                    widget.chosenCtuer.fame
+                                                        .toString() +
+                                                    " ",
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 18,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                              const Icon(
+                                                FontAwesomeIcons.solidHeart,
+                                                color: Colors.red,
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
                                           Text(
-                                            "${widget.chosenCtuer.nickname}, ${widget.chosenCtuer.gender}",
+                                            "Giới tính: " + gender,
                                             style: const TextStyle(
                                               fontWeight: FontWeight.w500,
                                               fontSize: 18,
                                               color: Colors.black,
                                             ),
                                           ),
-                                          const Spacer(),
-                                          const Icon(
-                                            LineAwesomeIcons.star_1,
-                                            color: Colors.deepPurpleAccent,
+                                          const SizedBox(
+                                            height: 10,
                                           ),
                                           Text(
-                                            'Fame: ' +
-                                                widget.chosenCtuer.fame
-                                                    .toString(),
+                                            "Khóa: ${widget.chosenCtuer.course}",
                                             style: const TextStyle(
                                               fontWeight: FontWeight.w500,
                                               fontSize: 18,
                                               color: Colors.black,
                                             ),
-                                          )
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Text(
+                                            "Ngành: ${widget.chosenCtuer.major}",
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 18,
+                                              color: Colors.black,
+                                            ),
+                                          ),
                                         ],
                                       ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text(
-                                        "Khóa: ${widget.chosenCtuer.course}",
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 18,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text(
-                                        "Bio: ${widget.chosenCtuer.anonBio}",
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 18,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      back: ClipRRect(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
+                        child: Container(
+                          height: MediaQuery.of(context).size.height * 0.7,
+                          width: MediaQuery.of(context).size.width * 0.92,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                  offset: const Offset(4, 4),
+                                  color: Colors.grey.shade500,
+                                  blurRadius: 15,
+                                  spreadRadius: 1),
+                              const BoxShadow(
+                                  offset: Offset(-4, -4),
+                                  color: Colors.white,
+                                  blurRadius: 15,
+                                  spreadRadius: 1)
+                            ],
+                          ),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              CachedNetworkImage(
+                                  colorBlendMode: BlendMode.softLight,
+                                  imageUrl: widget.chosenCtuer.avatar),
+                              Center(
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                      sigmaX: 5.0, sigmaY: 5.0),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.5)),
+                                    child: Container(),
                                   ),
                                 ),
                               ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  )
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Giới thiệu về bản thân:",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Text(
+                                    widget.chosenCtuer.bio,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ))
                 ],
               ),
             ),

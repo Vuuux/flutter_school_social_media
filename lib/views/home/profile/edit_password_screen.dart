@@ -75,15 +75,6 @@ class _EditPasswordState extends State<EditPassword> {
                                             Expanded(
                                               child: RoundedPasswordField(
                                                 title: "Mật khẩu hiện tại",
-                                                validator: (val) {
-                                                  return checkCurrentPasswordValid
-                                                      ? null
-                                                      : 'Mật khẩu hiện tại không đúng!';
-                                                },
-                                                onChanged: (val) {
-                                                  setState(
-                                                      () => oldPassword = val);
-                                                },
                                                 hintText: 'Mật khẩu hiện tại',
                                               ),
                                             ),
@@ -95,16 +86,6 @@ class _EditPasswordState extends State<EditPassword> {
                                             Expanded(
                                               child: RoundedPasswordField(
                                                 title: "Mật khẩu mới",
-                                                validator: (val) {
-                                                  return val.isEmpty ||
-                                                          val.length <= 6
-                                                      ? 'Hãy cung cấp mật khẩu hợp lệ!'
-                                                      : null;
-                                                },
-                                                onChanged: (val) {
-                                                  setState(
-                                                      () => newPassword = val);
-                                                },
                                                 hintText: 'Mật khẩu mới',
                                               ),
                                             ),
@@ -115,15 +96,6 @@ class _EditPasswordState extends State<EditPassword> {
                                             Expanded(
                                               child: RoundedPasswordField(
                                                 title: "Nhập lại mật khẩu mới",
-                                                validator: (val) {
-                                                  return newPassword == val
-                                                      ? null
-                                                      : 'Mật khẩu không trùng khớp!';
-                                                },
-                                                onChanged: (val) {
-                                                  setState(() =>
-                                                      confirmPassword = val);
-                                                },
                                                 hintText:
                                                     'Xác nhận mật khẩu mới',
                                               ),

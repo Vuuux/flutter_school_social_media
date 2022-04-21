@@ -34,7 +34,7 @@ class _TaskManagerPageState extends State<TaskManagerPage> {
   final _taskController = Get.put(TaskController());
   late NotifyHelper notifyHelper;
   final DateFormat _dateFormat = MyDateUtils.getFormatter;
-  EventualNotifier<DateTime> _selectedDate =
+  final EventualNotifier<DateTime> _selectedDate =
       EventualNotifier<DateTime>(DateTime.now());
   // late Stream<Either<QuerySnapshot, FirebaseException>> taskStream;
   @override
@@ -84,7 +84,7 @@ class _TaskManagerPageState extends State<TaskManagerPage> {
               _dateFormat.format(DateTime.now()),
               style: subHeadingStyle,
             ),
-            Text("Hôm nay")
+            const Text("Hôm nay")
           ],
         ),
       );
@@ -119,7 +119,13 @@ class _TaskManagerPageState extends State<TaskManagerPage> {
               shrinkWrap: true,
               itemBuilder: (context, index) {
                 TaskSchedule task = _taskController.taskList[index];
-                if (task.scheduleMode == ScheduleMode.DAILY) {
+                DateTime dateOfTask = _dateFormat.parse(task.date);
+                if (task.scheduleMode == ScheduleMode.DAILY ||
+                    (task.scheduleMode == ScheduleMode.MONTHLY &&
+                        dateOfTask.month == DateTime.now().month &&
+                        dateOfTask.day == _selectedDate.value.day) ||
+                    (task.scheduleMode == ScheduleMode.WEEKLY &&
+                        dateOfTask.weekday == _selectedDate.value.weekday)) {
                   return AnimationConfiguration.staggeredList(
                     position: index,
                     child: SlideAnimation(

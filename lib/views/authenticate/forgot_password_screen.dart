@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/auth_controller.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/style/decoration.dart';
@@ -22,6 +23,7 @@ class ForgotPassword extends StatefulWidget {
 class _ForgotPasswordState extends State<ForgotPassword> {
   final _formKey = GlobalKey<FormState>();
   String email = '';
+  TextEditingController _emailController = TextEditingController();
   bool loading = false;
 
   bool checkCurrentPasswordValid = true;
@@ -91,18 +93,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                           Expanded(
                                             child: RoundedInputField(
                                               title: 'Email',
-                                              initialValue: email,
+                                              controller: _emailController,
                                               hintText:
                                                   "Email tài khoản đã đăng ký của bạn",
                                               icon: Icons.person,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  email = value;
-                                                });
-                                              },
-                                              validator: (val) => val.isEmpty
-                                                  ? 'Nhập email'
-                                                  : null,
                                             ),
                                           ),
                                         ],
@@ -110,6 +104,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                       const SizedBox(height: 18),
                                       GestureDetector(
                                         onTap: () async {
+                                          email = _emailController.text;
+                                          Get.snackbar("Đã gửi",
+                                              "Email khôi phục đã được gửi, vui lòng kiểm tra",
+                                              snackPosition:
+                                                  SnackPosition.BOTTOM);
                                           context
                                               .read<AuthService>()
                                               .sendEmailResetPassword(email);

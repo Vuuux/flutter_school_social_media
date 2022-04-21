@@ -5,20 +5,16 @@ import 'package:luanvanflutter/views/components/text_field_container.dart';
 
 class RoundedInputField extends StatelessWidget {
   final String title;
-  final String initialValue;
   final String hintText;
   final IconData? icon;
-  final ValueChanged<String> onChanged;
-  final FormFieldValidator validator;
   final bool isTitleCenter;
+  final TextEditingController? controller;
 
   const RoundedInputField({
     Key? key,
-    required this.initialValue,
     required this.hintText,
     this.icon,
-    required this.onChanged,
-    required this.validator,
+    this.controller,
     required this.title,
     this.isTitleCenter = false,
   }) : super(key: key);
@@ -41,11 +37,8 @@ class RoundedInputField extends StatelessWidget {
             : const SizedBox.shrink(),
         TextFieldContainer(
           child: TextFormField(
-            initialValue: initialValue,
+            controller: controller,
             autofocus: false,
-            validator: validator,
-            onChanged: onChanged,
-            cursorColor: kPrimaryColor,
             decoration: InputDecoration(
               hintStyle: const TextStyle(color: Colors.black45),
               icon: icon != null
