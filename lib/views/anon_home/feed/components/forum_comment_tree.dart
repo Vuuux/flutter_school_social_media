@@ -35,22 +35,23 @@ class ForumCommentTree extends StatefulWidget {
 }
 
 class _ForumCommentTreeState extends State<ForumCommentTree> {
-
   Future<bool> handleLikeComment(
       String forumId, String uid, CommentModel data) async {
     if (data.likes[uid] == false || data.likes.isEmpty) {
-      await DatabaseServices(uid: uid).likeForumComment(forumId, data.commentId);
+      await DatabaseServices(uid: uid)
+          .likeForumComment(forumId, data.commentId);
       data.likes[uid] = true;
       return true;
     } else {
-      await DatabaseServices(uid: uid).unlikeForumComment(forumId, data.commentId);
+      await DatabaseServices(uid: uid)
+          .unlikeForumComment(forumId, data.commentId);
       data.likes[uid] = false;
       return false;
     }
   }
 
   Widget _buildLikeReply(String rootCommentId, String forumId, String uid,
-      CommentModel data, bool isLiked) =>
+          CommentModel data, bool isLiked) =>
       Row(
         children: [
           const SizedBox(
@@ -58,11 +59,10 @@ class _ForumCommentTreeState extends State<ForumCommentTree> {
           ),
           GestureDetector(
               onTap: () async {
-                await handleLikeComment(forumId, uid, data)
-                    .then((value) {
-                      setState(() {
-                        isLiked = value;
-                      });
+                await handleLikeComment(forumId, uid, data).then((value) {
+                  setState(() {
+                    isLiked = value;
+                  });
                 });
               },
               child: Text(
@@ -75,7 +75,8 @@ class _ForumCommentTreeState extends State<ForumCommentTree> {
             width: 24,
           ),
           GestureDetector(
-              onTap:() => widget.onClickReply(data, rootCommentId, data.userId),
+              onTap: () =>
+                  widget.onClickReply(data, rootCommentId, data.userId),
               child: Text('Reply')),
           const SizedBox(
             width: 12,
@@ -89,21 +90,21 @@ class _ForumCommentTreeState extends State<ForumCommentTree> {
   buildLikeCount(CommentModel data) {
     return data.getLikeCount() > 0
         ? Card(
-        elevation: 2.0,
-        child: Padding(
-          padding: const EdgeInsets.only(right: 2.0),
-          child: Row(
-            children: <Widget>[
-              Icon(
-                Icons.favorite,
-                size: 14,
-                color: Colors.red[900],
+            elevation: 2.0,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 2.0),
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.favorite,
+                    size: 14,
+                    color: Colors.red[900],
+                  ),
+                  Text('${data.getLikeCount()}',
+                      style: const TextStyle(fontSize: 14)),
+                ],
               ),
-              Text('${data.getLikeCount()}',
-                  style: const TextStyle(fontSize: 14)),
-            ],
-          ),
-        ))
+            ))
         : const SizedBox.shrink();
   }
 
@@ -135,13 +136,14 @@ class _ForumCommentTreeState extends State<ForumCommentTree> {
 
   @override
   Widget build(BuildContext context) {
-    CurrentUser user = context.watch<CurrentUser>();
+    CurrentUserId user = context.watch<CurrentUserId>();
     String uid = user.uid;
     return CommentTreeWidget<CommentModel, CommentModel>(
       widget.comment,
       widget.cmtList,
       treeThemeData: TreeThemeData(
-          lineColor: widget.cmtList.isEmpty ? Colors.transparent : kPrimaryColor,
+          lineColor:
+              widget.cmtList.isEmpty ? Colors.transparent : kPrimaryColor,
           lineWidth: 2),
       avatarRoot: (context, data) => PreferredSize(
         child: CircleAvatar(
@@ -174,7 +176,7 @@ class _ForumCommentTreeState extends State<ForumCommentTree> {
                 children: [
                   Container(
                     padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                     decoration: BoxDecoration(
                         color: Colors.grey[100],
                         borderRadius: BorderRadius.circular(12)),
@@ -197,8 +199,8 @@ class _ForumCommentTreeState extends State<ForumCommentTree> {
                   ),
                   Padding(
                       padding: const EdgeInsets.only(top: 4),
-                      child: _buildLikeReply(
-                          widget.comment.commentId, widget.forumId, uid, data, isLiked))
+                      child: _buildLikeReply(widget.comment.commentId,
+                          widget.forumId, uid, data, isLiked))
                 ],
               );
             });
@@ -218,7 +220,7 @@ class _ForumCommentTreeState extends State<ForumCommentTree> {
                 children: [
                   Container(
                     padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                     decoration: BoxDecoration(
                         color: Colors.grey[100],
                         borderRadius: BorderRadius.circular(12)),
@@ -241,8 +243,8 @@ class _ForumCommentTreeState extends State<ForumCommentTree> {
                   ),
                   Padding(
                       padding: const EdgeInsets.only(top: 4),
-                      child: _buildLikeReply(
-                          widget.comment.commentId, widget.forumId, uid, data, isRootLiked))
+                      child: _buildLikeReply(widget.comment.commentId,
+                          widget.forumId, uid, data, isRootLiked))
                 ],
               );
             });
@@ -250,4 +252,3 @@ class _ForumCommentTreeState extends State<ForumCommentTree> {
     );
   }
 }
-

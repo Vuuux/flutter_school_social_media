@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
-import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/user.dart';
 
 class FollowerList extends StatefulWidget {
-  final List<Ctuer> ctuerList;
+  final List<UserData> ctuerList;
   final UserData user;
-  const FollowerList({Key? key, required this.ctuerList, required this.user}) : super(key: key);
+  const FollowerList({Key? key, required this.ctuerList, required this.user})
+      : super(key: key);
 
   @override
   _FollowerListState createState() => _FollowerListState();

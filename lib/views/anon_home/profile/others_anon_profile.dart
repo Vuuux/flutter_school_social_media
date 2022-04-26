@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:luanvanflutter/controller/controller.dart';
-import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
@@ -21,7 +20,7 @@ import 'anon_following_list.dart';
 class OthersAnonProfile extends StatefulWidget {
   final ctuerId;
   UserData? ctuer;
-  CurrentUser? currentUser;
+  CurrentUserId? currentUser;
   Stream<DocumentSnapshot>? userDataStream;
   OthersAnonProfile({Key? key, required this.ctuerId}) : super(key: key);
 
@@ -57,7 +56,6 @@ class _OthersAnonProfileState extends State<OthersAnonProfile> {
     }
   }
 
-
   checkIfAlreadyFollowing() async {
     await dbServer.followerReference
         .doc(widget.ctuer!.id)
@@ -65,17 +63,17 @@ class _OthersAnonProfileState extends State<OthersAnonProfile> {
         .doc(widget.currentUser!.uid)
         .get()
         .then((value) => {
-      if (mounted)
-        {
-          setState(() {
-            if (value.exists) {
-              following = value.exists;
-              sentreRequest = value.exists;
-              acceptedRequest = value.exists;
-            }
-          })
-        }
-    });
+              if (mounted)
+                {
+                  setState(() {
+                    if (value.exists) {
+                      following = value.exists;
+                      sentreRequest = value.exists;
+                      acceptedRequest = value.exists;
+                    }
+                  })
+                }
+            });
   }
 
   //TODO: CHECK IF FOLLOW REQUEST ACCEPTED
@@ -110,7 +108,6 @@ class _OthersAnonProfileState extends State<OthersAnonProfile> {
                 }
             });
   }
-
 
   getAllFollowers() async {
     QuerySnapshot querySnapshot = await dbServer.followerReference
@@ -330,10 +327,8 @@ class _OthersAnonProfileState extends State<OthersAnonProfile> {
 
   @override
   Widget build(BuildContext context) {
-    widget.currentUser = context.watch<CurrentUser?>();
-    if (mounted) {
-
-    }
+    widget.currentUser = context.watch<CurrentUserId?>();
+    if (mounted) {}
 
     ScreenUtil.init(
         const BoxConstraints(
@@ -347,16 +342,15 @@ class _OthersAnonProfileState extends State<OthersAnonProfile> {
         builder: (context, snapshot) {
           UserData? userData = snapshot.data;
           if (userData != null) {
-
             return StreamBuilder<DocumentSnapshot>(
                 stream: widget.userDataStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Loading();
-                  }
-                  else{
-                    if(snapshot.hasData){
-                      widget.ctuer = UserData.fromDocumentSnapshot(snapshot.data!);
+                  } else {
+                    if (snapshot.hasData) {
+                      widget.ctuer =
+                          UserData.fromDocumentSnapshot(snapshot.data!);
                       getAllFollowers();
                       getAllFollowings();
                       checkIfAlreadyFollowing();
@@ -396,329 +390,329 @@ class _OthersAnonProfileState extends State<OthersAnonProfile> {
                               child: Column(children: <Widget>[
                                 Column(children: <Widget>[
                                   Column(
-                                children: <Widget>[
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      Expanded(
-                                        child: Column(
-                                          children: <Widget>[
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
-                                            CustomCircleAvatar(
-                                                image: Image.network(
-                                              widget.ctuer!.avatar,
-                                              fit: BoxFit.fill,
-                                            )),
-                                            const SizedBox(height: 15),
-                                            Text(
-                                              widget.ctuer!.username,
-                                              style: const TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight:
-                                                      FontWeight.w500,
-                                                  color: kPrimaryColor),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width /
-                                            1.17,
-                                    padding: const EdgeInsets.only(
-                                      top: 3,
-                                      bottom: 3,
-                                    ),
-                                    decoration: const BoxDecoration(
-                                        color: kPrimaryColor,
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(15),
-                                        )),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      //crossAxisAlignment: CrossAxisAlignment.baseline,
-                                      children: <Widget>[
-                                        FlatButton(
-                                            highlightColor:
-                                                Colors.transparent,
-                                            splashColor: Colors.transparent,
-                                            padding: const EdgeInsets.only(
-                                                left: 21, right: 21),
-                                            child: createColumns(
-                                                'Followers',
-                                                countTotalFollowers),
-                                            onPressed: (widget.currentUser!
-                                                            .uid ==
-                                                        widget.ctuer!.id ||
-                                                    following)
-                                                ?
-                                                //TODO: ADD FOLLOWER LIST VIEW
-                                                //       () => Navigator.of(context)
-                                                //     .pushAndRemoveUntil(
-                                                //   FadeRoute(
-                                                //       page: FollowerList(
-                                                //           ctuerList: hmmies,
-                                                //           user: userData)
-                                                //   ),
-                                                //   ModalRoute.withName('FollowersList'),
-                                                // )
-                                                //:
-                                                () =>
-                                                    print('tried pressing')
-                                                : () {}),
-                                        FlatButton(
-                                            highlightColor:
-                                                Colors.transparent,
-                                            splashColor: Colors.transparent,
-                                            padding: const EdgeInsets.only(
-                                                left: 21, right: 21),
-                                            child: createColumns(
-                                                'Following',
-                                                countTotalFollowings),
-                                            onPressed: (widget.currentUser!
-                                                            .uid ==
-                                                        widget.ctuer!.id ||
-                                                    following)
-                                                ?
-                                                //TODO: ADD FOLLOWING LIST VIEW
-                                                //       () => Navigator.of(context)
-                                                //     .pushAndRemoveUntil(
-                                                //   FadeRoute(
-                                                //       page: FollowingList(
-                                                //           ctuerList: hmmies,
-                                                //           user: userData)),
-                                                //   ModalRoute.withName('FollowingList'),
-                                                // )
-                                                //      :
-                                                () =>
-                                                    print('tried pressing')
-                                                : () {}),
-                                        FlatButton(
-                                          highlightColor:
-                                              Colors.transparent,
-                                          splashColor: Colors.transparent,
-                                          padding: const EdgeInsets.only(
-                                              left: 21, right: 21),
-                                          child: createColumns(
-                                              'Fame', widget.ctuer!.fame),
-                                          onPressed: () {},
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: <Widget>[
-                                            createFollowButton(userData),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                                  ),
-                                  (widget.currentUser!.uid ==
-                                          widget.ctuer!.id ||
-                                      following)
-                                  ? Container(
-                                      padding: EdgeInsets.all(15),
-                                      width:
-                                          MediaQuery.of(context).size.width,
-                                      child: Column(
+                                      Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.start,
+                                            MainAxisAlignment.spaceBetween,
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: <Widget>[
-                                          const Text('V Ề  T Ô I',
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight:
-                                                      FontWeight.w300,
-                                                  color: kPrimaryColor)),
-                                          const SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(widget.ctuer!.bio,
-                                              //' hiiiiiiGreyscale, also known as, is a dreaded and usually fatal dis',
-                                              //"Greyscale, also known as, is a dreaded and usually fatal disease that can leave flesh stiff and dead, and the skin cracked and flaking, and stone-like to the touch. Those that manage to survive a bout with the illness will be immune from ever contracting it again, but the flesh damaged by the ravages of the disease will never heal, and they will be scarred for life. Princess Shireen Baratheon caught greyscale as an infant and survived, but the ordeal left half of her face disfigured by the disease.[2]",
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                              )),
-                                          SizedBox(
-                                            height: kSpacingUnit.w,
-                                          ),
-                                          const Text('C Ộ N G   Đ Ồ N G',
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight:
-                                                      FontWeight.w300,
-                                                  color: kPrimaryColor)),
-                                          const SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(
-                                              "Đại học Cần Thơ, " +
-                                                  "ngành " +
-                                                  widget.ctuer!.major,
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                              )),
-                                          SizedBox(
-                                            height: kSpacingUnit.w,
-                                          ),
-                                          const Text(
-                                              'S O C I A L   M E D I A ',
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight:
-                                                      FontWeight.w300,
-                                                  color: kPrimaryColor)),
-                                          const SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(widget.ctuer!.media,
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                              )),
-                                          SizedBox(
-                                            height: kSpacingUnit.w,
-                                          ),
-                                          const Text('K H O Á',
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight:
-                                                      FontWeight.w300,
-                                                  color: kPrimaryColor)),
-                                          const SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(widget.ctuer!.course,
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                              )),
-                                          SizedBox(
-                                            height: kSpacingUnit.w,
-                                          ),
-                                          const Text('P L A Y L I S T',
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight:
-                                                      FontWeight.w300,
-                                                  color: kPrimaryColor)),
-                                          const SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(widget.ctuer!.playlist,
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                              )),
-                                          SizedBox(
-                                            height: kSpacingUnit.w,
-                                          ),
-                                          const Text('S Ố N G  Ở',
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight:
-                                                      FontWeight.w300,
-                                                  color: kPrimaryColor)),
-                                          const SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text(widget.ctuer!.address,
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                              )),
-                                          SizedBox(
-                                            height: kSpacingUnit.w,
+                                          Expanded(
+                                            child: Column(
+                                              children: <Widget>[
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                CustomCircleAvatar(
+                                                    image: Image.network(
+                                                  widget.ctuer!.avatar,
+                                                  fit: BoxFit.fill,
+                                                )),
+                                                const SizedBox(height: 15),
+                                                Text(
+                                                  widget.ctuer!.username,
+                                                  style: const TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: kPrimaryColor),
+                                                )
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
-                                    )
-                                  : Container(
-                                      padding: const EdgeInsets.all(20),
-                                      child: Text(
-                                          'THEO DÕI ' +
-                                              widget.ctuer!.username +
-                                              ' ĐỂ HIỂN THỊ PROFILE',
-                                          style: const TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w300,
-                                              color: kPrimaryColor)),
-                                    ),
+                                      const SizedBox(height: 10),
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                1.17,
+                                        padding: const EdgeInsets.only(
+                                          top: 3,
+                                          bottom: 3,
+                                        ),
+                                        decoration: const BoxDecoration(
+                                            color: kPrimaryColor,
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(15),
+                                            )),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          //crossAxisAlignment: CrossAxisAlignment.baseline,
+                                          children: <Widget>[
+                                            FlatButton(
+                                                highlightColor:
+                                                    Colors.transparent,
+                                                splashColor: Colors.transparent,
+                                                padding: const EdgeInsets.only(
+                                                    left: 21, right: 21),
+                                                child: createColumns(
+                                                    'Followers',
+                                                    countTotalFollowers),
+                                                onPressed: (widget.currentUser!
+                                                                .uid ==
+                                                            widget.ctuer!.id ||
+                                                        following)
+                                                    ?
+                                                    //TODO: ADD FOLLOWER LIST VIEW
+                                                    //       () => Navigator.of(context)
+                                                    //     .pushAndRemoveUntil(
+                                                    //   FadeRoute(
+                                                    //       page: FollowerList(
+                                                    //           ctuerList: hmmies,
+                                                    //           user: userData)
+                                                    //   ),
+                                                    //   ModalRoute.withName('FollowersList'),
+                                                    // )
+                                                    //:
+                                                    () =>
+                                                        print('tried pressing')
+                                                    : () {}),
+                                            FlatButton(
+                                                highlightColor:
+                                                    Colors.transparent,
+                                                splashColor: Colors.transparent,
+                                                padding: const EdgeInsets.only(
+                                                    left: 21, right: 21),
+                                                child: createColumns(
+                                                    'Following',
+                                                    countTotalFollowings),
+                                                onPressed: (widget.currentUser!
+                                                                .uid ==
+                                                            widget.ctuer!.id ||
+                                                        following)
+                                                    ?
+                                                    //TODO: ADD FOLLOWING LIST VIEW
+                                                    //       () => Navigator.of(context)
+                                                    //     .pushAndRemoveUntil(
+                                                    //   FadeRoute(
+                                                    //       page: FollowingList(
+                                                    //           ctuerList: hmmies,
+                                                    //           user: userData)),
+                                                    //   ModalRoute.withName('FollowingList'),
+                                                    // )
+                                                    //      :
+                                                    () =>
+                                                        print('tried pressing')
+                                                    : () {}),
+                                            FlatButton(
+                                              highlightColor:
+                                                  Colors.transparent,
+                                              splashColor: Colors.transparent,
+                                              padding: const EdgeInsets.only(
+                                                  left: 21, right: 21),
+                                              child: createColumns(
+                                                  'Fame', widget.ctuer!.fame),
+                                              onPressed: () {},
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: <Widget>[
+                                                createFollowButton(userData),
+                                              ],
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                   (widget.currentUser!.uid ==
-                                          widget.ctuer!.id ||
-                                      following)
-                                  ? StreamBuilder<QuerySnapshot>(
-                                      stream: DatabaseServices(
-                                              uid: widget.ctuer!.id)
-                                          .getPhotos(),
-                                      builder: (context, snapshot) {
-                                        return snapshot.hasData
-                                            ? SizedBox(
-                                                height: MediaQuery.of(
-                                                                context)
-                                                            .size
-                                                            .height *
-                                                        0.30 -
-                                                    50,
-                                                child: ListView.builder(
-                                                    physics:
-                                                        const ClampingScrollPhysics(),
-                                                    shrinkWrap: true,
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    itemCount: snapshot
-                                                        .data!.docs.length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      return Container(
-                                                          width: 150,
-                                                          margin: const EdgeInsets
-                                                                  .only(
-                                                              right: 20),
-                                                          height: MediaQuery.of(
-                                                                          context)
-                                                                      .size
-                                                                      .height *
-                                                                  0.30 -
-                                                              50,
-                                                          child: ClipRRect(
-                                                            borderRadius:
-                                                                const BorderRadius
-                                                                        .all(
-                                                                    Radius.circular(
-                                                                        20.0)),
-                                                            child: Image
-                                                                .network(
-                                                              snapshot
-                                                                  .data!
-                                                                  .docs[
-                                                                      index]
-                                                                  .get(
-                                                                      'photo'),
-                                                              fit: BoxFit
-                                                                  .fill,
-                                                            ),
-                                                          ));
-                                                    }))
-                                            : Loading();
-                                      })
-                                  : Container()
+                                              widget.ctuer!.id ||
+                                          following)
+                                      ? Container(
+                                          padding: EdgeInsets.all(15),
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              const Text('V Ề  T Ô I',
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w300,
+                                                      color: kPrimaryColor)),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(widget.ctuer!.bio,
+                                                  //' hiiiiiiGreyscale, also known as, is a dreaded and usually fatal dis',
+                                                  //"Greyscale, also known as, is a dreaded and usually fatal disease that can leave flesh stiff and dead, and the skin cracked and flaking, and stone-like to the touch. Those that manage to survive a bout with the illness will be immune from ever contracting it again, but the flesh damaged by the ravages of the disease will never heal, and they will be scarred for life. Princess Shireen Baratheon caught greyscale as an infant and survived, but the ordeal left half of her face disfigured by the disease.[2]",
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                  )),
+                                              SizedBox(
+                                                height: kSpacingUnit.w,
+                                              ),
+                                              const Text('C Ộ N G   Đ Ồ N G',
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w300,
+                                                      color: kPrimaryColor)),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(
+                                                  "Đại học Cần Thơ, " +
+                                                      "ngành " +
+                                                      widget.ctuer!.major,
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                  )),
+                                              SizedBox(
+                                                height: kSpacingUnit.w,
+                                              ),
+                                              const Text(
+                                                  'S O C I A L   M E D I A ',
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w300,
+                                                      color: kPrimaryColor)),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(widget.ctuer!.media,
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                  )),
+                                              SizedBox(
+                                                height: kSpacingUnit.w,
+                                              ),
+                                              const Text('K H O Á',
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w300,
+                                                      color: kPrimaryColor)),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(widget.ctuer!.course,
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                  )),
+                                              SizedBox(
+                                                height: kSpacingUnit.w,
+                                              ),
+                                              const Text('P L A Y L I S T',
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w300,
+                                                      color: kPrimaryColor)),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(widget.ctuer!.playlist,
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                  )),
+                                              SizedBox(
+                                                height: kSpacingUnit.w,
+                                              ),
+                                              const Text('S Ố N G  Ở',
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w300,
+                                                      color: kPrimaryColor)),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(widget.ctuer!.address,
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                  )),
+                                              SizedBox(
+                                                height: kSpacingUnit.w,
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : Container(
+                                          padding: const EdgeInsets.all(20),
+                                          child: Text(
+                                              'THEO DÕI ' +
+                                                  widget.ctuer!.username +
+                                                  ' ĐỂ HIỂN THỊ PROFILE',
+                                              style: const TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w300,
+                                                  color: kPrimaryColor)),
+                                        ),
+                                  (widget.currentUser!.uid ==
+                                              widget.ctuer!.id ||
+                                          following)
+                                      ? StreamBuilder<QuerySnapshot>(
+                                          stream: DatabaseServices(
+                                                  uid: widget.ctuer!.id)
+                                              .getPhotos(),
+                                          builder: (context, snapshot) {
+                                            return snapshot.hasData
+                                                ? SizedBox(
+                                                    height: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .height *
+                                                            0.30 -
+                                                        50,
+                                                    child: ListView.builder(
+                                                        physics:
+                                                            const ClampingScrollPhysics(),
+                                                        shrinkWrap: true,
+                                                        scrollDirection:
+                                                            Axis.horizontal,
+                                                        itemCount: snapshot
+                                                            .data!.docs.length,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          return Container(
+                                                              width: 150,
+                                                              margin: const EdgeInsets
+                                                                      .only(
+                                                                  right: 20),
+                                                              height: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .height *
+                                                                      0.30 -
+                                                                  50,
+                                                              child: ClipRRect(
+                                                                borderRadius:
+                                                                    const BorderRadius
+                                                                            .all(
+                                                                        Radius.circular(
+                                                                            20.0)),
+                                                                child: Image
+                                                                    .network(
+                                                                  snapshot
+                                                                      .data!
+                                                                      .docs[
+                                                                          index]
+                                                                      .get(
+                                                                          'photo'),
+                                                                  fit: BoxFit
+                                                                      .fill,
+                                                                ),
+                                                              ));
+                                                        }))
+                                                : Loading();
+                                          })
+                                      : Container()
                                 ])
                               ])))
                     ]),

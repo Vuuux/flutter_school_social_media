@@ -21,10 +21,11 @@ class ConversationScreen extends StatefulWidget {
   final UserData ctuer;
   final String userId;
 
-  const ConversationScreen({Key? key,
-    required this.chatRoomId,
-    required this.ctuer,
-    required this.userId})
+  const ConversationScreen(
+      {Key? key,
+      required this.chatRoomId,
+      required this.ctuer,
+      required this.userId})
       : super(key: key);
 
   @override
@@ -47,21 +48,21 @@ class _ConversationScreenState extends State<ConversationScreen> {
       builder: (context, snapshot) {
         return snapshot.hasData
             ? ListView.builder(
-            controller: scrollController,
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              return MessageTile(
-                  chatRoomId: widget.chatRoomId,
-                  type: snapshot.data!.docs[index].get("type"),
-                  message: snapshot.data!.docs[index].get("message"),
-                  isSendByMe:
-                  snapshot.data!.docs[index].get("senderId") == widget.userId,
-                  time: f
-                      .format(snapshot.data!.docs[index]
-                      .get("timestamp")
-                      .toDate())
-                      .toString());
-            })
+                controller: scrollController,
+                itemCount: snapshot.data!.docs.length,
+                itemBuilder: (context, index) {
+                  return MessageTile(
+                      chatRoomId: widget.chatRoomId,
+                      type: snapshot.data!.docs[index].get("type"),
+                      message: snapshot.data!.docs[index].get("message"),
+                      isSendByMe: snapshot.data!.docs[index].get("senderId") ==
+                          widget.userId,
+                      time: f
+                          .format(snapshot.data!.docs[index]
+                              .get("timestamp")
+                              .toDate())
+                          .toString());
+                })
             : Container();
       },
     );
@@ -103,7 +104,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser>();
+    final user = context.watch<CurrentUserId>();
     ScreenUtil.init(
         const BoxConstraints(
           maxWidth: 414,
@@ -111,8 +112,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
         designSize: const Size(360, 690),
         orientation: Orientation.portrait);
-    chatMessagesStream = DatabaseServices(uid: '')
-        .getConversationMessages(widget.chatRoomId);
+    chatMessagesStream =
+        DatabaseServices(uid: '').getConversationMessages(widget.chatRoomId);
 
     return StreamBuilder<UserData>(
       stream: DatabaseServices(uid: user.uid).userData,
@@ -150,11 +151,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
                               height: 180,
                               child: widget.ctuer.avatar.isNotEmpty
                                   ? Image.network(
-                                widget.ctuer.avatar,
-                                fit: BoxFit.fill,
-                              )
+                                      widget.ctuer.avatar,
+                                      fit: BoxFit.fill,
+                                    )
                                   : Image.asset('assets/images/profile1.png',
-                                  fit: BoxFit.fill),
+                                      fit: BoxFit.fill),
                             ),
                           ),
                         ),
@@ -186,13 +187,15 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     splashColor: Colors.transparent,
                     icon: const Icon(Icons.gamepad),
                     onPressed: () async {
-                      await DatabaseServices(uid: '').getQAGameRoomId(widget.ctuer.id, userData.id).then((QuerySnapshot<Map<String, dynamic>> value){
-                        Navigator.of(context).push(MaterialPageRoute(builder: (
-                            context) => CompatibilityStart(
-                          ctuer: widget.ctuer,
-                          userData: userData,
-                          gameRoomId: value.docs[0].id,
-                        )));
+                      await DatabaseServices(uid: '')
+                          .getQAGameRoomId(widget.ctuer.id, userData.id)
+                          .then((QuerySnapshot<Map<String, dynamic>> value) {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => CompatibilityStart(
+                                  ctuer: widget.ctuer,
+                                  userData: userData,
+                                  gameRoomId: value.docs[0].id,
+                                )));
                       });
 
                       // Navigator.of(context).pushAndRemoveUntil(
@@ -204,7 +207,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       //           ctuerList: widget.ctuerList),
                       //     ),
                       //     ModalRoute.withName('CompatibilityStart'));
-
                     },
                   ),
                 ],
@@ -218,18 +220,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         borderRadius: BorderRadius.circular(13),
                         border: Border.all(color: Colors.grey)),
                     alignment: Alignment.bottomCenter,
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width,
+                    width: MediaQuery.of(context).size.width,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 16),
                     child: Container(
                       padding: const EdgeInsets.only(left: 20),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.grey)
-                      ),
+                          border: Border.all(color: Colors.grey)),
                       child: Row(
                         children: <Widget>[
                           Expanded(
@@ -238,15 +236,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
                               onChanged: (val) {
                                 setState(() => message = val);
                                 Future.delayed(
-                                    const Duration(milliseconds: 100),
-                                        () {
-                                      scrollController.animateTo(
-                                          scrollController.position
-                                              .maxScrollExtent,
-                                          duration: const Duration(
-                                              milliseconds: 500),
-                                          curve: Curves.ease);
-                                    });
+                                    const Duration(milliseconds: 100), () {
+                                  scrollController.animateTo(
+                                      scrollController.position.maxScrollExtent,
+                                      duration:
+                                          const Duration(milliseconds: 500),
+                                      curve: Curves.ease);
+                                });
                               },
                               style: const TextStyle(color: Colors.black),
                               decoration: const InputDecoration.collapsed(
@@ -294,11 +290,12 @@ class MessageTile extends StatelessWidget {
   final String type;
   final String chatRoomId;
 
-  const MessageTile({required this.message,
-    required this.isSendByMe,
-    required this.time,
-    required this.type,
-    required this.chatRoomId});
+  const MessageTile(
+      {required this.message,
+      required this.isSendByMe,
+      required this.time,
+      required this.type,
+      required this.chatRoomId});
 
   //delete msg
   //edit msg
@@ -312,23 +309,17 @@ class MessageTile extends StatelessWidget {
           left: isSendByMe ? 0 : 24,
           right: isSendByMe ? 24 : 0),
       alignment: isSendByMe ? Alignment.centerRight : Alignment.centerLeft,
-      width: MediaQuery
-          .of(context)
-          .size
-          .width,
+      width: MediaQuery.of(context).size.width,
       child: FocusedMenuHolder(
-        menuWidth: MediaQuery
-            .of(context)
-            .size
-            .width * 0.35,
+        menuWidth: MediaQuery.of(context).size.width * 0.35,
         onPressed: () => FocusScope.of(context).unfocus(),
         menuBoxDecoration: const BoxDecoration(
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(23),
-              topRight: Radius.circular(23),
-              bottomLeft: Radius.circular(23),
-              bottomRight: Radius.circular(23),
-            )),
+          topLeft: Radius.circular(23),
+          topRight: Radius.circular(23),
+          bottomLeft: Radius.circular(23),
+          bottomRight: Radius.circular(23),
+        )),
         menuItems: <FocusedMenuItem>[
           FocusedMenuItem(
               title: const Text(
@@ -362,19 +353,19 @@ class MessageTile extends StatelessWidget {
                 : Colors.red,
             borderRadius: isSendByMe
                 ? const BorderRadius.only(
-              topLeft: Radius.circular(23),
-              topRight: Radius.circular(23),
-              bottomLeft: Radius.circular(23),
-            )
+                    topLeft: Radius.circular(23),
+                    topRight: Radius.circular(23),
+                    bottomLeft: Radius.circular(23),
+                  )
                 : const BorderRadius.only(
-              topLeft: Radius.circular(23),
-              topRight: Radius.circular(23),
-              bottomRight: Radius.circular(23),
-            ),
+                    topLeft: Radius.circular(23),
+                    topRight: Radius.circular(23),
+                    bottomRight: Radius.circular(23),
+                  ),
           ),
           child: Column(
             crossAxisAlignment:
-            isSendByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                isSendByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: <Widget>[
               Text(
                 time,

@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_format/date_format.dart';
 import "package:flutter/material.dart";
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:luanvanflutter/models/notification.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
@@ -12,6 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as tAgo;
 
 import '../../controller/controller.dart';
+import '../components/app_bar/standard_app_bar.dart';
 import 'feed/post_detail.dart';
 
 //Class quản lý thông báo
@@ -45,6 +48,10 @@ class _NotificationPageState extends State<NotificationPage> {
     });
   }
 
+  _deleteAllNotification() {
+    DatabaseServices(uid: widget.uid).deleteAllNotifications();
+  }
+
   @override
   Widget build(BuildContext context) {
     DatabaseServices databaseService = DatabaseServices(uid: widget.uid);
@@ -59,16 +66,12 @@ class _NotificationPageState extends State<NotificationPage> {
             UserData? userData = snapshot.data;
             if (userData != null) {
               return Scaffold(
-                appBar: AppBar(
-                  shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(20),
-                  )),
-                  centerTitle: true,
-                  elevation: 0,
-                  title: const Text(
-                    "T H Ô N G    B Á O",
-                  ),
+                appBar: StandardAppBar(
+                  title: 'C Ô N G   V I Ệ C',
+                  trailingIcon: FontAwesomeIcons.trash,
+                  onTrailingClick: () async {
+                    _deleteAllNotification();
+                  },
                 ),
                 body: FutureBuilder<QuerySnapshot>(
                     future: notificationFuture,
@@ -135,22 +138,20 @@ class NotificationsItem extends StatefulWidget {
         : SizedBox.shrink();
     if (noti.type == 'following') {
       notificationItemText = 'đang theo dõi bạn';
-    } else if (noti.type == 'like') {
+    } else if (noti.type == KEY_NOTIFICATION_LIKE) {
       notificationItemText = 'đã thích bài viết của bạn';
-    } else if (noti.type == 'comment') {
+    } else if (noti.type == KEY_NOTIFICATION_COMMENT) {
       notificationItemText = 'đã bình luận bài viết';
-    } else if (noti.type == 'message') {
+    } else if (noti.type == KEY_NOTIFICATION_MESSAGE) {
       notificationItemText = 'đã gửi bạn 1 tin nhắn';
-    } else if (noti.type == 'request') {
+    } else if (noti.type == KEY_NOTIFICATION_REQUEST) {
       notificationItemText = 'yêu cầu theo dõi bạn';
-    } else if (noti.type == 'accept-request') {
+    } else if (noti.type == KEY_NOTIFICATION_ACCEPT_REQUEST) {
       notificationItemText = 'đã chấp nhận yêu cầu theo dõi của bạn';
-    } else if (noti.type == 'compatibility') {
+    } else if (noti.type == KEY_NOTIFICATION_COMP) {
       notificationItemText = 'muốn chơi trò QnA với bạn';
-    } else if (noti.type == 'anonmessage') {
-      notificationItemText = 'đã gởi 1 tin nhắn (Vô danh)';
-    } else if (noti.type == 'question') {
-      notificationItemText = 'muốn chơi đố vui cùng bạn';
+    } else if (noti.type == KEY_NOTIFICATION_QUESTION) {
+      notificationItemText = 'muốn kết nối với bạn';
     } else {
       notificationItemText = 'Lỗi, Unknown type = ' + noti.type;
     }
@@ -237,7 +238,7 @@ class _NotificationsItemState extends State<NotificationsItem> {
     return await DatabaseServices(uid: uid).getUserByUserId();
   }
 
-  handleAcceptRequest(CurrentUser user) async {
+  handleAcceptRequest(CurrentUserId user) async {
     await getCurrentUserData(user.uid).then((value) {
       setState(() {
         widget.userData = UserData.fromDocumentSnapshot(value);
@@ -270,7 +271,7 @@ class _NotificationsItemState extends State<NotificationsItem> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<CurrentUser?>(context);
+    final user = Provider.of<CurrentUserId?>(context);
     checkFollowRequestStatus(user!.uid);
     checkAcceptedOrDeclinedfortictactoe(user.uid);
     widget.configureMediaPreview(context);

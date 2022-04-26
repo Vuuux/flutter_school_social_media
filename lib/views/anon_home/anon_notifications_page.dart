@@ -241,7 +241,7 @@ class _AnonNotificationsItemState extends State<AnonNotificationsItem> {
     return await DatabaseServices(uid: uid).getUserByUserId();
   }
 
-  handleAcceptRequest(CurrentUser user) async {
+  handleAcceptRequest(CurrentUserId user) async {
     await getCurrentUserData(user.uid).then((value) {
       setState(() {
         widget.userData = UserData.fromDocumentSnapshot(value);
@@ -273,7 +273,7 @@ class _AnonNotificationsItemState extends State<AnonNotificationsItem> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<CurrentUser?>(context);
+    final user = Provider.of<CurrentUserId?>(context);
     checkFollowRequestStatus(user!.uid);
     checkAcceptedOrDeclinedfortictactoe(user.uid);
     widget.configureMediaPreview(context);

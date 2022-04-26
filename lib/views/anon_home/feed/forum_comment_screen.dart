@@ -40,7 +40,6 @@ class ShowForumComments extends StatefulWidget {
 }
 
 class _ShowForumCommentsState extends State<ShowForumComments> {
-
   int upVoteCount = 0;
   int downVoteCount = 0;
   @override
@@ -70,22 +69,20 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
   }
 
   handleUpvote(String uid, String ownerId, String forumId) {
-    if (widget.isVoted &&  widget.isDownVoted) {
+    if (widget.isVoted && widget.isDownVoted) {
       DatabaseServices(uid: uid)
           .updateVoteForum(uid, forumId, true, false)
           .then((value) {
         setState(() {
           upVoteCount += 1;
-          downVoteCount -=1;
+          downVoteCount -= 1;
           widget.forum.upVotes[uid] = true;
           widget.forum.downVotes[uid] = false;
           widget.isDownVoted = false;
           widget.isUpVoted = true;
         });
       });
-
-    }
-    else if (widget.isVoted &&  widget.isUpVoted) {
+    } else if (widget.isVoted && widget.isUpVoted) {
       DatabaseServices(uid: uid)
           .updateVoteForum(uid, forumId, false, false)
           .then((value) {
@@ -98,12 +95,8 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
           widget.isUpVoted = false;
         });
       });
-
-    }
-    else if (!widget.isVoted && !widget.isDownVoted && !widget.isUpVoted) {
-      DatabaseServices(uid: uid)
-          .upVoteForum(uid, forumId)
-          .then((value) {
+    } else if (!widget.isVoted && !widget.isDownVoted && !widget.isUpVoted) {
+      DatabaseServices(uid: uid).upVoteForum(uid, forumId).then((value) {
         setState(() {
           upVoteCount += 1;
           widget.isVoted = true;
@@ -122,23 +115,22 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
           Timestamp.now());
     }
   }
+
   handleDownVote(String uid, String ownerId, String forumId) {
-    if (widget.isVoted &&  widget.isDownVoted) {
+    if (widget.isVoted && widget.isDownVoted) {
       DatabaseServices(uid: uid)
           .updateVoteForum(uid, forumId, false, false)
           .then((value) {
         setState(() {
           widget.isVoted = false;
-          downVoteCount -=1;
+          downVoteCount -= 1;
           widget.forum.upVotes[uid] = false;
           widget.forum.downVotes[uid] = false;
           widget.isDownVoted = false;
           widget.isUpVoted = false;
         });
       });
-
-    }
-    else if (widget.isVoted && widget.isUpVoted) {
+    } else if (widget.isVoted && widget.isUpVoted) {
       DatabaseServices(uid: uid)
           .updateVoteForum(uid, forumId, false, true)
           .then((value) {
@@ -151,12 +143,8 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
           widget.isUpVoted = false;
         });
       });
-
-    }
-    else if (!widget.isVoted && !widget.isDownVoted && !widget.isUpVoted) {
-      DatabaseServices(uid: uid)
-          .downVoteForum(uid, forumId)
-          .then((value) {
+    } else if (!widget.isVoted && !widget.isDownVoted && !widget.isUpVoted) {
+      DatabaseServices(uid: uid).downVoteForum(uid, forumId).then((value) {
         setState(() {
           downVoteCount += 1;
           widget.isVoted = true;
@@ -166,6 +154,7 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
       });
     }
   }
+
   buildForumFooter(String uid) {
     return Column(
       children: <Widget>[
@@ -174,18 +163,18 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
           children: <Widget>[
             GestureDetector(
               onTap: () =>
-                  handleUpvote(uid ,widget.forum.ownerId, widget.forum.forumId),
+                  handleUpvote(uid, widget.forum.ownerId, widget.forum.forumId),
               child: widget.isUpVoted
                   ? const Icon(
-                Icons.thumb_up,
-                size: 20.0,
-                color: Colors.blue,
-              )
+                      Icons.thumb_up,
+                      size: 20.0,
+                      color: Colors.blue,
+                    )
                   : const Icon(
-                Icons.thumb_up_outlined,
-                size: 20.0,
-                color: Colors.blue,
-              ),
+                      Icons.thumb_up_outlined,
+                      size: 20.0,
+                      color: Colors.blue,
+                    ),
             ),
             Container(
               margin: const EdgeInsets.only(left: 10.0),
@@ -198,19 +187,19 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
               ),
             ),
             GestureDetector(
-              onTap: () =>
-                  handleDownVote(uid, widget.forum.ownerId, widget.forum.forumId),
+              onTap: () => handleDownVote(
+                  uid, widget.forum.ownerId, widget.forum.forumId),
               child: widget.isDownVoted
                   ? const Icon(
-                Icons.thumb_down,
-                size: 20.0,
-                color: Colors.red,
-              )
+                      Icons.thumb_down,
+                      size: 20.0,
+                      color: Colors.red,
+                    )
                   : const Icon(
-                Icons.thumb_down_outlined,
-                size: 20.0,
-                color: Colors.red,
-              ),
+                      Icons.thumb_down_outlined,
+                      size: 20.0,
+                      color: Colors.red,
+                    ),
             ),
             Container(
               margin: const EdgeInsets.only(left: 10.0),
@@ -222,18 +211,20 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
                 ),
               ),
             ),
-            const SizedBox(width: 10,)
+            const SizedBox(
+              width: 10,
+            )
           ],
         ),
-
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser?>();
-    widget.isVoted = (widget.forum.upVotes[user!.uid] == true || widget.forum.downVotes[user.uid] == true);
+    final user = context.watch<CurrentUserId?>();
+    widget.isVoted = (widget.forum.upVotes[user!.uid] == true ||
+        widget.forum.downVotes[user.uid] == true);
     widget.isUpVoted = widget.forum.upVotes[user.uid] == true;
     widget.isDownVoted = widget.forum.downVotes[user.uid] == true;
 
@@ -277,14 +268,16 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text(timeago.format(widget.forum.timestamp.toDate(), locale: 'vi'),
-                  style: const TextStyle(
+              Text(
+                timeago.format(widget.forum.timestamp.toDate(), locale: 'vi'),
+                style: const TextStyle(
                     fontSize: 12,
                     color: Colors.black,
-                    fontStyle: FontStyle.italic
-                  ),
+                    fontStyle: FontStyle.italic),
               ),
-              const SizedBox(width: 10.0,),
+              const SizedBox(
+                width: 10.0,
+              ),
             ],
           ),
           buildForumFooter(user.uid),

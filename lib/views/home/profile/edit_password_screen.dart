@@ -29,7 +29,7 @@ class _EditPasswordState extends State<EditPassword> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser?>();
+    final user = context.watch<CurrentUserId?>();
     return loading
         ? Loading()
         : GestureDetector(

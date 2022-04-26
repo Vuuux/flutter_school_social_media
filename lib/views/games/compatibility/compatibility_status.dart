@@ -4,7 +4,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:luanvanflutter/controller/controller.dart';
-import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/loading.dart';
 
@@ -14,8 +13,11 @@ class CompatibilityStatus extends StatefulWidget {
   final UserData userData;
 
   const CompatibilityStatus(
-      { Key? key,
-        required this.ctuer, required this.userData, required this.gameRoomId}) : super(key: key);
+      {Key? key,
+      required this.ctuer,
+      required this.userData,
+      required this.gameRoomId})
+      : super(key: key);
 
   @override
   _CompatibilityStatusState createState() => _CompatibilityStatusState();
@@ -41,65 +43,64 @@ class _CompatibilityStatusState extends State<CompatibilityStatus> {
                     stream: myCompatibilityResults,
                     builder: (context, snapshot1) {
                       if (snapshot1.data != null) {
-                        return snapshot1.data!.exists && snapshot1.data!
-                                    .get('answers')
-                                    .isNotEmpty
+                        return snapshot1.data!.exists &&
+                                snapshot1.data!.get('answers').isNotEmpty
                             ? StreamBuilder<DocumentSnapshot>(
                                 stream: friendCompatibilityResults,
                                 builder: (context, snapshot2) {
                                   if (snapshot2.data != null) {
-                                    return snapshot2.data!.exists && snapshot2.data!.get('answers')
+                                    return snapshot2.data!.exists &&
+                                            snapshot2.data!
+                                                .get('answers')
                                                 .isNotEmpty
                                         ? ListView.builder(
                                             itemCount: 5,
                                             itemBuilder: (context, index) {
                                               return CompatibilityTile(
-                                                friendAnswer: snapshot2
-                                                                .data!.get('answers')
-                                                        [index] ??
+                                                friendAnswer: snapshot2.data!
+                                                        .get(
+                                                            'answers')[index] ??
                                                     'not filled',
-                                                myAnswer: snapshot1
-                                                                .data!.get('answers')
-                                                        [index] ??
+                                                myAnswer: snapshot1.data!.get(
+                                                        'answers')[index] ??
                                                     'not filled',
-                                                question: snapshot
-                                                    .data!.docs[0]
+                                                question: snapshot.data!.docs[0]
                                                     .get('questions')[index],
                                               );
                                             })
                                         : Center(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(30),
-                                            child: AutoSizeText(
-                                              "${widget.ctuer.nickname} chưa hoàn thành Quiz",
-                                              style: const TextStyle(
-                                                  fontSize: 40,
-                                                  fontWeight:
-                                                      FontWeight.w100),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(30),
+                                              child: AutoSizeText(
+                                                "${widget.ctuer.nickname} chưa hoàn thành Quiz",
+                                                style: const TextStyle(
+                                                    fontSize: 40,
+                                                    fontWeight:
+                                                        FontWeight.w100),
+                                              ),
                                             ),
-                                          ),
-                                        );
+                                          );
                                   } else {
                                     return Loading();
                                   }
                                 })
                             : const Center(
-                              child: Text(
-                                "Bạn chưa hoàn thành Quiz",
-                                style: TextStyle(
-                                    fontSize: 40, color: Colors.white),
-                              ),
-                            );
+                                child: Text(
+                                  "Bạn chưa hoàn thành Quiz",
+                                  style: TextStyle(
+                                      fontSize: 40, color: Colors.white),
+                                ),
+                              );
                       } else {
                         return Loading();
                       }
                     })
                 : const Center(
-                  child: Text(
-                    "Không có quiz nào",
-                    style: TextStyle(fontSize: 40, color: Colors.white),
-                  ),
-                );
+                    child: Text(
+                      "Không có quiz nào",
+                      style: TextStyle(fontSize: 40, color: Colors.white),
+                    ),
+                  );
           } else {
             return Loading();
           }
@@ -114,23 +115,19 @@ class _CompatibilityStatusState extends State<CompatibilityStatus> {
   }
 
   initialize() {
-    myCompatibilityResults = DatabaseServices(uid: '')
-        .getMyQAGameResults(
+    myCompatibilityResults = DatabaseServices(uid: '').getMyQAGameResults(
       widget.userData.id,
       widget.gameRoomId,
     );
 
-    friendCompatibilityResults = DatabaseServices(uid: '')
-        .getFriendCompResults(
+    friendCompatibilityResults = DatabaseServices(uid: '').getFriendCompResults(
       widget.ctuer.id,
       widget.gameRoomId,
     );
 
-    compatibilityQuestions = DatabaseServices(uid: '')
-        .getCompQuestions(
+    compatibilityQuestions = DatabaseServices(uid: '').getCompQuestions(
       widget.gameRoomId,
     );
-
   }
 
   Future<int> documentThings() async {
@@ -141,7 +138,7 @@ class _CompatibilityStatusState extends State<CompatibilityStatus> {
     DocumentSnapshot docFriendAnswers = await DatabaseServices(uid: '')
         .getDocFriendCompatibilityAnswers(widget.ctuer.id, widget.gameRoomId);
 
-    if(docFriendAnswers.exists && docMyAnswers.exists) {
+    if (docFriendAnswers.exists && docMyAnswers.exists) {
       for (int i = 0; i < 5; i++) {
         if (answer1.length < 5) {
           answer1.add(docMyAnswers.get('answers')[i].toString());
@@ -186,7 +183,8 @@ class _CompatibilityStatusState extends State<CompatibilityStatus> {
               child: Text(
                 'Score: $score',
                 textAlign: TextAlign.end,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w100),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w100),
               ),
             ),
           ),
@@ -237,7 +235,10 @@ class CompatibilityTile extends StatelessWidget {
   final String myAnswer;
   final String friendAnswer;
 
-  const CompatibilityTile({required this.question, required this.myAnswer, required this.friendAnswer});
+  const CompatibilityTile(
+      {required this.question,
+      required this.myAnswer,
+      required this.friendAnswer});
 
   @override
   Widget build(BuildContext context) {

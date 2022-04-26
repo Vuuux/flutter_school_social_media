@@ -209,7 +209,7 @@ class _PostItemState extends State<PostItem> {
     );
   }
 
-  CurrentUser? user;
+  CurrentUserId? user;
   int likeCount = 0;
   bool showHeart = false;
 
@@ -235,7 +235,7 @@ class _PostItemState extends State<PostItem> {
 
   @override
   Widget build(BuildContext context) {
-    user = context.watch<CurrentUser?>();
+    user = context.watch<CurrentUserId?>();
     widget.isLiked = (widget.post.likes[user!.uid] == true);
     getCurrentUserData(user!.uid);
     return Padding(

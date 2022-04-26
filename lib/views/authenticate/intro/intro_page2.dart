@@ -5,12 +5,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:luanvanflutter/views/games/trivia/trivia.dart';
 import 'package:luanvanflutter/home.dart';
+import 'package:uuid/uuid.dart';
 
 class IntroPage2 extends StatefulWidget {
   UserData userData;
@@ -18,9 +18,11 @@ class IntroPage2 extends StatefulWidget {
   UserData chosenCtuer;
 
   IntroPage2(
-      {required this.chosenCtuer,
+      {Key? key,
+      required this.chosenCtuer,
       required this.userData,
-      required this.ctuerList});
+      required this.ctuerList})
+      : super(key: key);
 
   @override
   _IntroPage2State createState() => _IntroPage2State();
@@ -28,6 +30,7 @@ class IntroPage2 extends StatefulWidget {
 
 class _IntroPage2State extends State<IntroPage2> {
   GlobalKey<FlipCardState> cardKey = GlobalKey<FlipCardState>();
+  late String triviaRoomId = Uuid().v4();
   @override
   Widget build(BuildContext context) {
     String gender =
@@ -112,30 +115,40 @@ class _IntroPage2State extends State<IntroPage2> {
                                           Row(
                                             //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                             children: <Widget>[
-                                              Text(
-                                                "Ctuer: " +
-                                                    widget.chosenCtuer.username,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 18,
-                                                  color: Colors.black,
+                                              Expanded(
+                                                child: Text(
+                                                  widget.chosenCtuer.username
+                                                      .toUpperCase(),
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18,
+                                                    color: Colors.black,
+                                                  ),
                                                 ),
+                                                flex: 2,
                                               ),
-                                              const Spacer(),
-                                              Text(
-                                                'Lượt thích: ' +
-                                                    widget.chosenCtuer.fame
-                                                        .toString() +
-                                                    " ",
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 18,
-                                                  color: Colors.black,
+                                              Expanded(
+                                                child: Row(
+                                                  children: [
+                                                    Text(
+                                                      widget.chosenCtuer.fame
+                                                              .toString() +
+                                                          " ",
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 18,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                    const Icon(
+                                                      FontAwesomeIcons
+                                                          .solidHeart,
+                                                      color: Colors.red,
+                                                    ),
+                                                  ],
                                                 ),
-                                              ),
-                                              const Icon(
-                                                FontAwesomeIcons.solidHeart,
-                                                color: Colors.red,
+                                                flex: 1,
                                               ),
                                             ],
                                           ),
@@ -222,9 +235,9 @@ class _IntroPage2State extends State<IntroPage2> {
                               Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "Giới thiệu về bản thân:",
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
                                       color: Colors.black,
@@ -276,9 +289,10 @@ class _IntroPage2State extends State<IntroPage2> {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (context) => Trivia(
-                      widget.chosenCtuer,
-                      widget.userData,
-                      widget.ctuerList,
+                      ctuerData: widget.chosenCtuer,
+                      currentUserData: widget.userData,
+                      ctuerList: widget.ctuerList,
+                      triviaRoomId: triviaRoomId,
                     ),
                   ),
                 );

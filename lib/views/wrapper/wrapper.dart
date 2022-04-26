@@ -5,16 +5,13 @@ import 'package:luanvanflutter/views/authenticate/welcome_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/controller/controller.dart';
-import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/home.dart';
 
 class Wrapper extends StatelessWidget {
-  //TODO: ADD UID
-  DatabaseServices databaseService = DatabaseServices(uid: '');
   bool firstlog = true;
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser?>();
+    final user = context.watch<CurrentUserId?>();
     print('Current user:' + user.toString());
     if (user == null) {
       return const WelcomeScreen();

@@ -1,5 +1,4 @@
 import 'package:luanvanflutter/controller/controller.dart';
-import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';

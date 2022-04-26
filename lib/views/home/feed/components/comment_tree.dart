@@ -47,7 +47,7 @@ class _CommentTreeState extends State<CommentTree> {
   }
 
   Widget _buildLikeReply(String rootCommentId, String postId, String uid,
-      CommentModel data, bool isLiked) =>
+          CommentModel data, bool isLiked) =>
       Row(
         children: [
           const SizedBox(
@@ -55,11 +55,10 @@ class _CommentTreeState extends State<CommentTree> {
           ),
           GestureDetector(
               onTap: () async {
-                await handleLikeComment(postId, uid, data)
-                    .then((value) {
-                      setState(() {
-                        isLiked = value;
-                      });
+                await handleLikeComment(postId, uid, data).then((value) {
+                  setState(() {
+                    isLiked = value;
+                  });
                 });
               },
               child: Text(
@@ -72,7 +71,8 @@ class _CommentTreeState extends State<CommentTree> {
             width: 24,
           ),
           GestureDetector(
-              onTap:() => widget.onClickReply(data, rootCommentId, data.userId),
+              onTap: () =>
+                  widget.onClickReply(data, rootCommentId, data.userId),
               child: Text('Reply')),
           const SizedBox(
             width: 12,
@@ -86,21 +86,21 @@ class _CommentTreeState extends State<CommentTree> {
   buildLikeCount(CommentModel data) {
     return data.getLikeCount() > 0
         ? Card(
-        elevation: 2.0,
-        child: Padding(
-          padding: const EdgeInsets.only(right: 2.0),
-          child: Row(
-            children: <Widget>[
-              Icon(
-                Icons.favorite,
-                size: 14,
-                color: Colors.red[900],
+            elevation: 2.0,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 2.0),
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.favorite,
+                    size: 14,
+                    color: Colors.red[900],
+                  ),
+                  Text('${data.getLikeCount()}',
+                      style: const TextStyle(fontSize: 14)),
+                ],
               ),
-              Text('${data.getLikeCount()}',
-                  style: const TextStyle(fontSize: 14)),
-            ],
-          ),
-        ))
+            ))
         : SizedBox.shrink();
   }
 
@@ -132,13 +132,14 @@ class _CommentTreeState extends State<CommentTree> {
 
   @override
   Widget build(BuildContext context) {
-    CurrentUser user = context.watch<CurrentUser>();
+    CurrentUserId user = context.watch<CurrentUserId>();
     String uid = user.uid;
     return CommentTreeWidget<CommentModel, CommentModel>(
       widget.comment,
       widget.cmtList,
       treeThemeData: TreeThemeData(
-          lineColor: widget.cmtList.isEmpty ? Colors.transparent : kPrimaryColor,
+          lineColor:
+              widget.cmtList.isEmpty ? Colors.transparent : kPrimaryColor,
           lineWidth: 2),
       avatarRoot: (context, data) => PreferredSize(
         child: CircleAvatar(
@@ -171,7 +172,7 @@ class _CommentTreeState extends State<CommentTree> {
                 children: [
                   Container(
                     padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                     decoration: BoxDecoration(
                         color: Colors.grey[100],
                         borderRadius: BorderRadius.circular(12)),
@@ -194,8 +195,8 @@ class _CommentTreeState extends State<CommentTree> {
                   ),
                   Padding(
                       padding: const EdgeInsets.only(top: 4),
-                      child: _buildLikeReply(
-                          widget.comment.commentId, widget.postId, uid, data, isLiked))
+                      child: _buildLikeReply(widget.comment.commentId,
+                          widget.postId, uid, data, isLiked))
                 ],
               );
             });
@@ -215,7 +216,7 @@ class _CommentTreeState extends State<CommentTree> {
                 children: [
                   Container(
                     padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                     decoration: BoxDecoration(
                         color: Colors.grey[100],
                         borderRadius: BorderRadius.circular(12)),
@@ -238,8 +239,8 @@ class _CommentTreeState extends State<CommentTree> {
                   ),
                   Padding(
                       padding: const EdgeInsets.only(top: 4),
-                      child: _buildLikeReply(
-                          widget.comment.commentId, widget.postId, uid, data, isRootLiked))
+                      child: _buildLikeReply(widget.comment.commentId,
+                          widget.postId, uid, data, isRootLiked))
                 ],
               );
             });
@@ -247,4 +248,3 @@ class _CommentTreeState extends State<CommentTree> {
     );
   }
 }
-

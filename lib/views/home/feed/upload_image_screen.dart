@@ -128,7 +128,7 @@ class _UploadImageState extends State<UploadImage>
     }, (right) => {AlertDialog});
   }
 
-  displayUploadFormScreen(CurrentUser user) {
+  displayUploadFormScreen(CurrentUserId user) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -249,7 +249,7 @@ class _UploadImageState extends State<UploadImage>
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser?>();
+    final user = context.watch<CurrentUserId?>();
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(

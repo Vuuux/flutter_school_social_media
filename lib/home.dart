@@ -38,7 +38,7 @@ class _HomeState extends State<Home> {
   EventualNotifier<int> _currentAnonymousIndex = EventualNotifier(0);
   EventualNotifier<int> _currentIndex = EventualNotifier(0);
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  late CurrentUser? user;
+  late CurrentUserId? user;
 
   //Các tab ở chế độ thường
 
@@ -150,7 +150,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    user = Provider.of<CurrentUser?>(context);
+    user = Provider.of<CurrentUserId?>(context);
     _saveDeviceToken(user!.uid);
     final tabs = [
       const Feed(),

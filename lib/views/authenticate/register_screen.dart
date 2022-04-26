@@ -127,7 +127,8 @@ class _RegisterState extends State<Register> {
       String err = '';
       switch (error.code) {
         case 'email-already-in-use':
-          err = "Người dùng này đã tồn tại!";
+          err =
+              "Người dùng này đã tồn tại! Nếu bạn nghĩ ai đó đã sử dụng email của bạn mà không được cho phép, hãy sử dụng chức năng quên mật khẩu để khôi phục tài khoản";
           break;
         case 'invalid-email':
           err = "Email không hợp lệ!";
@@ -142,7 +143,8 @@ class _RegisterState extends State<Register> {
           err = "Lỗi không rõ, xin vui lòng thử lại: " + error.code;
           break;
       }
-      Get.snackbar("Lỗi", err, snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar("Lỗi", err,
+          snackPosition: SnackPosition.BOTTOM, duration: Duration(seconds: 3));
     });
   }
 

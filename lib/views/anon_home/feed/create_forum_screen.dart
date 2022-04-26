@@ -89,7 +89,7 @@ class _CreateForumState extends State<CreateForum>
     Navigator.pop(context, "UPLOADED");
   }
 
-  displayUploadFormScreen(CurrentUser user) {
+  displayUploadFormScreen(CurrentUserId user) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -222,7 +222,7 @@ class _CreateForumState extends State<CreateForum>
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser?>();
+    final user = context.watch<CurrentUserId?>();
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(

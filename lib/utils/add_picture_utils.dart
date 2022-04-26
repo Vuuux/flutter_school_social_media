@@ -36,7 +36,7 @@ class _AddPicturesUtilsState extends State<AddPicturesUtils> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser>();
+    final user = context.watch<CurrentUserId>();
     return loading
         ? Loading()
         : Scaffold(
@@ -89,9 +89,7 @@ class _AddPicturesUtilsState extends State<AddPicturesUtils> {
                         firebaseStorageReference.putFile(_image!);
                     TaskSnapshot taskSnapshot = await uploadTask;
                     x = (await taskSnapshot.ref.getDownloadURL()).toString();
-                    Map<String, dynamic> map = {
-                      '0' : x
-                    };
+                    Map<String, dynamic> map = {'0': x};
 
                     dynamic result =
                         DatabaseServices(uid: user.uid).uploadPhotos(map);

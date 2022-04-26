@@ -7,8 +7,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:http/http.dart';
-import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/notification.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/task.dart';
@@ -137,8 +135,8 @@ class DatabaseServices {
     }
   }
 
-  Future<List<Ctuer>> getFollowers() async {
-    List<Ctuer> ctuers = [];
+  Future<List<UserData>> getFollowers() async {
+    List<UserData> ctuers = [];
     var snapshot = await followerReference.doc(uid).get();
     Map<String, DocumentReference> data =
         Map<String, DocumentReference>.from(snapshot['followers']);
@@ -146,18 +144,18 @@ class DatabaseServices {
     for (var value in data.values) {
       await value.get().then((val) {
         Map<String, dynamic> ctuer = val.data() as Map<String, dynamic>;
-        ctuers.add(Ctuer.fromJson(ctuer));
+        ctuers.add(UserData.fromMap(ctuer));
       });
     }
 
     // for(int i = 0; i < values.length ; i++){
-    //   ctuers.add(Ctuer.fromJson(values[i]));
+    //   ctuers.add(UserData.fromJson(values[i]));
     // }
     return ctuers;
   }
 
-  Future<List<Ctuer>> getFollowings() async {
-    List<Ctuer> ctuers = [];
+  Future<List<UserData>> getFollowings() async {
+    List<UserData> ctuers = [];
     var snapshot = await followingReference.doc(uid).get();
     Map<String, DocumentReference> data =
         Map<String, DocumentReference>.from(snapshot['userFollowings']);
@@ -165,12 +163,12 @@ class DatabaseServices {
     for (var value in data.values) {
       await value.get().then((val) {
         Map<String, dynamic> ctuer = val.data() as Map<String, dynamic>;
-        ctuers.add(Ctuer.fromJson(ctuer));
+        ctuers.add(UserData.fromMap(ctuer));
       });
     }
 
     // for(int i = 0; i < values.length ; i++){
-    //   ctuers.add(Ctuer.fromJson(values[i]));
+    //   ctuers.add(UserData.fromJson(values[i]));
     // }
     return ctuers;
   }
@@ -358,7 +356,7 @@ class DatabaseServices {
   Future uploadBondData(
       {required UserData userData,
       required bool myAnon,
-      required Ctuer ctuer,
+      required UserData ctuer,
       required bool friendAnon,
       required String chatRoomID}) async {
     return bondReference.doc(chatRoomID).set({
@@ -493,7 +491,7 @@ class DatabaseServices {
     //     .orderBy("timestamp", descending: true)
     //     .get();
 
-    return timelineReference.get();
+    return timelineReference.orderBy("timestamp", descending: true).get();
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getPostById(
@@ -792,24 +790,11 @@ class DatabaseServices {
     return userReference.doc(uid).snapshots().map(_userDataFromSnapshot);
   }
 
-  createChatRoom(String chatRoomId, String userId, String ctuerId,
-      Map<String, dynamic> data) async {
+  createChatRoom(String chatRoomId, Map<String, dynamic> data) async {
     chatReference.doc(chatRoomId).set(data).catchError((e) {
       print(e.toString());
     });
   }
-
-  // createAnonChatRoom(String userId, String anonId, Map<String, dynamic> data) async {
-  //   return chatRef
-  //       .doc(userId)
-  //       .collection('chatRooms')
-  //       .doc(anonId)
-  //       .collection('conversation')
-  //       .add(data)
-  //       .catchError((e) {
-  //     print(e.toString());
-  //   });
-  // }
 
   addConversationMessages(String chatRoomId, messageMap) async {
     chatReference
@@ -887,6 +872,17 @@ class DatabaseServices {
         .where('isAnon', isEqualTo: false)
         .limit(60)
         .get();
+
+    // List<NotificationModel> notificationsItems = [];
+
+    //return notificationsItems;
+  }
+
+  Future deleteAllNotifications() async {
+    var snapshots = await feedReference.doc(uid).collection('feedItems').get();
+    for (var doc in snapshots.docs) {
+      await doc.reference.delete();
+    }
 
     // List<NotificationModel> notificationsItems = [];
 

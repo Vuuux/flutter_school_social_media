@@ -28,28 +28,30 @@ class ForumItem extends StatefulWidget {
 }
 
 class _ForumItemState extends State<ForumItem> {
-
   onOpenPostOption(BuildContext nContext) {
-    return widget.currentUser!.id == widget.forum.ownerId ? showDialog(
-        context: nContext,
-        builder: (context) {
-          return SimpleDialog(
-            children: <Widget>[
-              SimpleDialogOption(
-                child: const Text(
-                  "Xóa bài viết",
-                ),
-                onPressed: () => DatabaseServices(uid: '').deletePost(widget.forum.ownerId, widget.forum.forumId),
-              ),
-              SimpleDialogOption(
-                child: const Text(
-                  "Đóng",
-                ),
-                onPressed: () {},
-              )
-            ],
-          );
-        }) : null;
+    return widget.currentUser!.id == widget.forum.ownerId
+        ? showDialog(
+            context: nContext,
+            builder: (context) {
+              return SimpleDialog(
+                children: <Widget>[
+                  SimpleDialogOption(
+                    child: const Text(
+                      "Xóa bài viết",
+                    ),
+                    onPressed: () => DatabaseServices(uid: '')
+                        .deletePost(widget.forum.ownerId, widget.forum.forumId),
+                  ),
+                  SimpleDialogOption(
+                    child: const Text(
+                      "Đóng",
+                    ),
+                    onPressed: () {},
+                  )
+                ],
+              );
+            })
+        : null;
   }
 
   buildPostFooter() {
@@ -97,8 +99,7 @@ class _ForumItemState extends State<ForumItem> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => ShowForumComments(
-                          context: context,
-                          forum: widget.forum))),
+                          context: context, forum: widget.forum))),
               child: Icon(
                 Icons.chat,
                 size: 28.0,
@@ -125,7 +126,7 @@ class _ForumItemState extends State<ForumItem> {
     );
   }
 
-  CurrentUser? user;
+  CurrentUserId? user;
   int likeCount = 0;
   bool showHeart = false;
 
@@ -145,7 +146,7 @@ class _ForumItemState extends State<ForumItem> {
 
   @override
   Widget build(BuildContext context) {
-    user = context.watch<CurrentUser?>();
+    user = context.watch<CurrentUserId?>();
     widget.isLiked = (widget.forum.upVotes[user!.uid] == true);
     getCurrentUserData(user!.uid).then((value) {
       setState(() {
@@ -153,9 +154,8 @@ class _ForumItemState extends State<ForumItem> {
       });
     });
     return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: ForumTile(forum: widget.forum, userId: user!.uid)
-    );
+        padding: const EdgeInsets.all(4.0),
+        child: ForumTile(forum: widget.forum, userId: user!.uid));
   }
 
   handleLikePost(String ownerId, String postId) {
@@ -200,8 +200,6 @@ class _ForumItemState extends State<ForumItem> {
   }
 
   buildCommentPage() {
-    return ShowForumComments(
-        context: context,
-        forum: widget.forum);
+    return ShowForumComments(context: context, forum: widget.forum);
   }
 }

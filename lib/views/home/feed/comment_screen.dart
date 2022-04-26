@@ -62,7 +62,7 @@ class _ShowCommentsState extends State<ShowComments> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser?>();
+    final user = context.watch<CurrentUserId?>();
 
     return Scaffold(
       appBar: AppBar(
@@ -141,7 +141,7 @@ class _ShowCommentsState extends State<ShowComments> {
                         });
                   });
             } else {
-              return Loading() ;
+              return Loading();
             }
           } else {
             return Loading();

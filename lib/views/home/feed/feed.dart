@@ -9,7 +9,6 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:luanvanflutter/controller/controller.dart';
-import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
@@ -38,7 +37,7 @@ class _FeedState extends State<Feed> {
   final timelineReference = FirebaseFirestore.instance.collection('posts');
   ScrollController scrollController = ScrollController();
   TextEditingController searchController = TextEditingController();
-  late CurrentUser currentUser;
+  late CurrentUserId currentUser;
   final picker = ImagePicker(); //API chọn hình ảnh
   final FirebaseAuth auth = FirebaseAuth.instance;
   Future<QuerySnapshot>? postFuture;
@@ -85,7 +84,7 @@ class _FeedState extends State<Feed> {
     });
   }
 
-  Widget postList(CurrentUser currentUser) {
+  Widget postList(CurrentUserId currentUser) {
     return StreamBuilder<QuerySnapshot>(
       stream: Stream.fromFuture(postFuture!),
       builder: (context, snapshot) {
@@ -133,7 +132,7 @@ class _FeedState extends State<Feed> {
   void initState() {
     super.initState();
     String userId = auth.currentUser!.uid;
-    currentUser = CurrentUser(uid: userId);
+    currentUser = CurrentUserId(uid: userId);
     loadData();
   }
 
@@ -233,7 +232,7 @@ class _FeedState extends State<Feed> {
         ),
         designSize: const Size(360, 690),
         orientation: Orientation.portrait);
-    CurrentUser? user = context.watch<CurrentUser?>();
+    CurrentUserId? user = context.watch<CurrentUserId?>();
     currentUser = user!;
     return StreamBuilder<UserData>(
         stream: DatabaseServices(uid: user.uid).userData,

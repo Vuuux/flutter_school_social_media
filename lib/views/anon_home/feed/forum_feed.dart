@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:luanvanflutter/controller/controller.dart';
-import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/forum.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
@@ -28,12 +27,12 @@ class _AnonForumFeedState extends State<AnonForumFeed> {
   Stream<QuerySnapshot>? forumsStream;
   final timelineReference = FirebaseFirestore.instance.collection('posts');
   ScrollController scrollController = ScrollController();
-  Ctuer currentCtuer = Ctuer();
+  UserData currentCtuer = UserData();
   final picker = ImagePicker();
   late Stream<QuerySnapshot> forumStream;
   bool isGrid = true;
 
-  Widget forumList(CurrentUser currentUser) {
+  Widget forumList(CurrentUserId currentUser) {
     return StreamBuilder<QuerySnapshot>(
       stream: forumsStream,
       builder: (context, snapshot) {
@@ -287,7 +286,7 @@ class _AnonForumFeedState extends State<AnonForumFeed> {
         ),
         designSize: const Size(360, 690),
         orientation: Orientation.portrait);
-    final user = context.watch<CurrentUser?>();
+    final user = context.watch<CurrentUserId?>();
     return StreamBuilder<UserData>(
         stream: DatabaseServices(uid: user!.uid).userData,
         builder: (context, snapshot) {

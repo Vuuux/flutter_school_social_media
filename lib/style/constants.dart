@@ -61,6 +61,15 @@ const Color black = Colors.black;
 const primaryColor = kPrimaryColor;
 const Color darkGreyColor = Color(0xFF121212);
 
+const String KEY_NOTIFICATION_QUESTION = "question";
+const String KEY_NOTIFICATION_MESSAGE = "message";
+const String KEY_NOTIFICATION_REQUEST = "request";
+const String KEY_NOTIFICATION_ACCEPT_REQUEST = "accept-request";
+const String KEY_NOTIFICATION_COMP = "compatibility";
+const String KEY_NOTIFICATION_LIKE = "like";
+const String KEY_NOTIFICATION_COMMENT = "comment";
+const String KEY_NOTIFICATION_REPLY = "reply";
+
 class FadeRoute extends PageRouteBuilder {
   final Widget page;
   FadeRoute({required this.page})

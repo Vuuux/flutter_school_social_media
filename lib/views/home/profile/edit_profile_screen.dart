@@ -64,7 +64,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     'Mạng máy tính và truyền thông',
   ];
 
-  updateUser(BuildContext context, CurrentUser user) async {
+  updateUser(BuildContext context, CurrentUserId user) async {
     Future uploadPic() async {
       Reference firebaseStorageReference =
           FirebaseStorage.instance.ref().child(_image!.path);
@@ -179,7 +179,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser?>();
+    final user = context.watch<CurrentUserId?>();
     final userData = widget.userData;
     ScreenUtil.init(
         const BoxConstraints(

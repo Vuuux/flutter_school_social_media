@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:luanvanflutter/controller/controller.dart';
-import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
@@ -26,18 +25,18 @@ class _ChatScreenState extends State<ChatScreen> {
   late String userId;
   late String ctuerId;
 
-  CurrentUser? user;
+  CurrentUserId? user;
 
   @override
   void initState() {
     super.initState();
   }
 
-  getUserInfo(CurrentUser user) async {
+  getUserInfo(CurrentUserId user) async {
     chatsScreenStream = DatabaseServices(uid: '').getChatRooms(user.uid);
   }
 
-  Widget chatRoomList(CurrentUser user) {
+  Widget chatRoomList(CurrentUserId user) {
     return StreamBuilder<QuerySnapshot>(
         stream: chatsScreenStream,
         builder: (context, snapshot) {
@@ -88,7 +87,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser?>();
+    final user = context.watch<CurrentUserId?>();
     getUserInfo(user!);
     return Scaffold(
       appBar: AppBar(

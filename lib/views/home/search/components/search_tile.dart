@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
+import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/views/home/chat/conversation_screen.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:provider/src/provider.dart';
@@ -13,9 +14,8 @@ class SearchTile extends StatelessWidget {
 
   const SearchTile({Key? key, required this.userData}) : super(key: key);
 
-  createChatRoomAndStartConversation(BuildContext context, String uid, UserData userData) {
-    //String chatRoomID = getChatRoomID(userData.email, ctuer.nickname);
-    //List<String> users =
+  createChatRoomAndStartConversation(
+      BuildContext context, String uid, UserData userData) {
     String chatRoomId = const Uuid().v4();
     List<String> users = [uid, userData.id];
 
@@ -23,43 +23,15 @@ class SearchTile extends StatelessWidget {
       "users": users,
       "chatRoomId": chatRoomId,
       "timestamp": Timestamp.now(),
-      "isPrivateChat": false
     };
 
-    DatabaseServices(uid: '').createChatRoom(chatRoomId, uid, userData.id,
-        chatRoomMap);
-    //TODO: START CONVERSATION
-    // Map<String, dynamic> chatRoomMap = {
-    //   "users": users,
-    //   "chatRoomId": chatRoomID
-    // };
-    // DatabaseServices(uid: '').uploadBondData(
-    //     userData: userData,
-    //     myAnon: true,
-    //     ctuer: ctuer,
-    //     friendAnon: false,
-    //     chatRoomID: chatRoomID);
+    DatabaseServices(uid: uid).createChatRoom(chatRoomId, chatRoomMap);
 
-    //DatabaseServices(uid: '').createAnonChatRoom(chatRoomID, chatRoomMap);
-    //TODO: AnonymousConversation
-    // Navigator.of(context).pushAndRemoveUntil(
-    //   FadeRoute(
-    //     page: AnonymousConversation(
-    //       friendAnon: false,
-    //       ctuerList: widget.ctuerList,
-    //       ctuer: ctuer,
-    //       chatRoomId: chatRoomID,
-    //       userData: userData,
-    //     ),
-    //   ),
-    //   ModalRoute.withName('AnonymousConversation'),
-    // );
-
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-        builder: (context) =>
-            ConversationScreen(
-                chatRoomId: chatRoomId, ctuer: userData, userId: uid)), (
-        route) => false);
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (context) => ConversationScreen(
+                chatRoomId: chatRoomId, ctuer: userData, userId: uid)),
+        (route) => false);
   }
 
   Widget buildSearchTile(BuildContext context, String uid) {
@@ -68,7 +40,8 @@ class SearchTile extends StatelessWidget {
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-                builder: (context) => OthersProfile(ctuerId: userData.id)),);
+                builder: (context) => OthersProfile(ctuerId: userData.id)),
+          );
           //     .pushAndRemoveUntil(
           //   FadeRoute(
           //     page: OthersProfile(
@@ -100,11 +73,11 @@ class SearchTile extends StatelessWidget {
                       height: 180,
                       child: userData.avatar.isNotEmpty
                           ? Image.network(
-                        userData.avatar,
-                        fit: BoxFit.fill,
-                      )
+                              userData.avatar,
+                              fit: BoxFit.fill,
+                            )
                           : Image.asset('assets/images/profile1.png',
-                          fit: BoxFit.fill),
+                              fit: BoxFit.fill),
                     ),
                   ),
                 ),
@@ -125,7 +98,7 @@ class SearchTile extends StatelessWidget {
                     color: Colors.grey,
                     borderRadius: BorderRadius.circular(30)),
                 padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
                 child: const Text('Text'),
               ),
             ),
@@ -139,7 +112,7 @@ class SearchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser?>();
+    final user = context.watch<CurrentUserId?>();
     return buildSearchTile(context, user!.uid);
   }
 }

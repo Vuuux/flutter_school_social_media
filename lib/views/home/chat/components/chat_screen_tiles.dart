@@ -5,7 +5,6 @@ import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:intl/intl.dart';
 import 'package:luanvanflutter/controller/controller.dart';
-import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/views/home/chat/conversation_screen.dart';
@@ -35,11 +34,12 @@ class ChatScreenTile extends StatelessWidget {
           if (snapshot.data!.docs.length - 1 < 0) {
             return const Text('');
           } else {
-            latestMsg  = snapshot.data!.docs[snapshot.data!.docs.length - 1]
+            latestMsg = snapshot.data!.docs[snapshot.data!.docs.length - 1]
                 .get("message");
-            latestTime = f.format(snapshot.data!.docs[snapshot.data!.docs.length - 1]
-                .get("timestamp")
-                .toDate())
+            latestTime = f
+                .format(snapshot.data!.docs[snapshot.data!.docs.length - 1]
+                    .get("timestamp")
+                    .toDate())
                 .toString();
             return Text(latestMsg.length >= 20 ? '...' : latestMsg,
                 style: const TextStyle(color: Colors.grey));
@@ -50,12 +50,12 @@ class ChatScreenTile extends StatelessWidget {
       },
     );
   }
-  
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser?>();
-    chatMessagesStream = DatabaseServices(uid: '').getConversationMessages(chatRoomId);
+    final user = context.watch<CurrentUserId?>();
+    chatMessagesStream =
+        DatabaseServices(uid: '').getConversationMessages(chatRoomId);
     return StreamBuilder<UserData>(
         stream: DatabaseServices(uid: user!.uid).userData,
         builder: (context, snapshot) {
@@ -71,8 +71,9 @@ class ChatScreenTile extends StatelessWidget {
               ),
             ),
             onPressed: () {
-
-               Navigator.of(context).push(MaterialPageRoute(builder: (context) => ConversationScreen(chatRoomId: chatRoomId, ctuer: ctuer, userId: userId)));
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => ConversationScreen(
+                      chatRoomId: chatRoomId, ctuer: ctuer, userId: userId)));
               // .pushAndRemoveUntil(
               //   FadeRoute(
               //     page: ConversationScreen(

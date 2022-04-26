@@ -4,7 +4,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:luanvanflutter/controller/controller.dart';
-import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:uuid/uuid.dart';
 import 'compatibility_card.dart';
@@ -20,7 +19,8 @@ class QuestionGame extends StatefulWidget {
     Key? key,
     required this.questions,
     required this.ctuer,
-    required this.userData, required this.gameRoomId,
+    required this.userData,
+    required this.gameRoomId,
   }) : super(key: key);
 
   @override
@@ -46,27 +46,32 @@ class _QuestionGameState extends State<QuestionGame>
 
   List<CompatibilityCard> cards = [
     const CompatibilityCard('3x2+5-3x8=', 'Không biết', '2'),
+    const CompatibilityCard('Bạn có nhiều bạn không?', 'Có', 'Khôngg'),
     const CompatibilityCard(
-        'Bạn có nhiều bạn không?', 'Có', 'Khôngg'),
-    const CompatibilityCard('Bạn thích sẽ follow ai trước??', 'Sơn Tùng', 'Jack'),
+        'Bạn thích sẽ follow ai trước??', 'Sơn Tùng', 'Jack'),
     const CompatibilityCard(
         'Bạn nhìn điều gì của mỗi người trước?', 'Vẻ ngoài', 'Tâm hồn'),
     const CompatibilityCard('Bạn từng 1 lần chơi ngu chưa?', 'Yess', 'Không'),
-    const CompatibilityCard('Bạn bị công an thổi lần nào chưa?', 'Rồi huhu', 'Tất nhiên là chưa rồi!'),
-    const CompatibilityCard('Thích bắt chuyện với người lạ chứ?', 'Yes!', 'Không nha!'),
+    const CompatibilityCard('Bạn bị công an thổi lần nào chưa?', 'Rồi huhu',
+        'Tất nhiên là chưa rồi!'),
+    const CompatibilityCard(
+        'Thích bắt chuyện với người lạ chứ?', 'Yes!', 'Không nha!'),
     const CompatibilityCard('Socola hay Vani?', 'Socola', 'Vani'),
     const CompatibilityCard('Bạn yêu cha hay mẹ hơn?', 'Mẹ', 'Cha'),
-    const CompatibilityCard('Từng hôn bản thân trong gương chưa?', 'Rồi >//<', 'Chưa, ew!'),
-    const CompatibilityCard('Đã từng khóc nhiều đến mức thiếp đi chưa?', 'yeahh', 'nahh'),
     const CompatibilityCard(
-        'Đã từng làm điều mà bạn tự bảo sẽ không bao giờ làm chưa?', 'Rồi', 'Không'),
+        'Từng hôn bản thân trong gương chưa?', 'Rồi >//<', 'Chưa, ew!'),
     const CompatibilityCard(
-        'Đang uống nước tự nhiên cười sặc?',
-        'Rồi =))',
-        'Chưa'),
+        'Đã từng khóc nhiều đến mức thiếp đi chưa?', 'yeahh', 'nahh'),
+    const CompatibilityCard(
+        'Đã từng làm điều mà bạn tự bảo sẽ không bao giờ làm chưa?',
+        'Rồi',
+        'Không'),
+    const CompatibilityCard(
+        'Đang uống nước tự nhiên cười sặc?', 'Rồi =))', 'Chưa'),
     const CompatibilityCard('Thích da nâu hay da trắng?', 'Nâu', 'Trắng'),
-    const CompatibilityCard('Uống say bất tỉnh lần nào chưa?', 'Rồi', 'Chưa nhá'),
-    const  CompatibilityCard('Bạn đã từng thử hù ai chưa?', 'Rồi', 'Khôngg'),
+    const CompatibilityCard(
+        'Uống say bất tỉnh lần nào chưa?', 'Rồi', 'Chưa nhá'),
+    const CompatibilityCard('Bạn đã từng thử hù ai chưa?', 'Rồi', 'Khôngg'),
     const CompatibilityCard('Từng khóc vì ai đó chưa?', 'Rồi', 'Không'),
     const CompatibilityCard('Bạn có nuôi chó chứ?', 'Có', 'hôngg'),
     const CompatibilityCard(
@@ -75,10 +80,11 @@ class _QuestionGameState extends State<QuestionGame>
         'Bạn nghĩ giữa nam và nữ có thể có tình bạn trong sáng không?',
         'Có',
         'Không nhéeee'),
-    const CompatibilityCard('Bây giờ bạn có cảm thấy hạnh phúc không?', 'Có :>', 'Không'),
-    const CompatibilityCard('Have you ever doubted your sexuality?', 'Yes', 'No'),
+    const CompatibilityCard(
+        'Bây giờ bạn có cảm thấy hạnh phúc không?', 'Có :>', 'Không'),
+    const CompatibilityCard(
+        'Have you ever doubted your sexuality?', 'Yes', 'No'),
     const CompatibilityCard('Had/Have a dog?', 'Yes', 'No'),
-    
   ];
   List<int> indexes = [];
 
@@ -144,21 +150,21 @@ class _QuestionGameState extends State<QuestionGame>
         myAnswers: myAnswers,
       );
       DatabaseServices(uid: '').uploadQAGameQuestions(
-        gameRoomId:
-            widget.gameRoomId,
+        gameRoomId: widget.gameRoomId,
         questions: questions,
       );
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => CompatibilityStatus(
-              userData: widget.userData,
-              ctuer: widget.ctuer, gameRoomId: widget.gameRoomId,),
+            userData: widget.userData,
+            ctuer: widget.ctuer,
+            gameRoomId: widget.gameRoomId,
+          ),
         ),
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -202,8 +208,8 @@ class _QuestionGameState extends State<QuestionGame>
                                         CrossAxisAlignment.center,
                                     children: <Widget>[
                                       Padding(
-                                        padding:
-                                            const EdgeInsets.fromLTRB(6, 0, 6, 0),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            6, 0, 6, 0),
                                         child: AutoSizeText(
                                           currentCompatibilityCard!.question,
                                           textAlign: TextAlign.center,
@@ -304,9 +310,8 @@ class _QuestionGameState extends State<QuestionGame>
                               icon: Icon(controller.isAnimating
                                   ? Icons.pause
                                   : Icons.play_arrow),
-                              label: Text(controller.isAnimating
-                                  ? "Pause"
-                                  : "Play"),
+                              label: Text(
+                                  controller.isAnimating ? "Pause" : "Play"),
                             );
                           }),
                     ],

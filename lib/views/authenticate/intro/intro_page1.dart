@@ -7,7 +7,6 @@ import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/utils/widget_extensions.dart';
 import '../../../models/user.dart';
-import '../../../models/ctuer.dart';
 import 'intro_page2.dart';
 
 class IntroPage1 extends StatefulWidget {
@@ -26,12 +25,16 @@ class _IntroPage1State extends State<IntroPage1> {
   final EventualNotifier<bool> _isShow = EventualNotifier<bool>(false);
   @override
   void initState() {
-    index = Random().nextInt(widget.ctuerList.length);
-
-    chosenCtuer = widget.ctuerList[index];
-    while (chosenCtuer.username == widget.userData.username) {
+    if (widget.ctuerList.length > 1) {
       index = Random().nextInt(widget.ctuerList.length);
+
       chosenCtuer = widget.ctuerList[index];
+      while (chosenCtuer.username == widget.userData.username) {
+        index = Random().nextInt(widget.ctuerList.length);
+        chosenCtuer = widget.ctuerList[index];
+      }
+    } else {
+      chosenCtuer = widget.ctuerList.first;
     }
     print(chosenCtuer.username);
     super.initState();

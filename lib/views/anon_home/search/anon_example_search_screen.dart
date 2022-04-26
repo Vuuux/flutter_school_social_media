@@ -12,7 +12,7 @@ import 'package:provider/src/provider.dart';
 
 class AnonSimpleSearch extends StatefulWidget {
   AnonSimpleSearch({Key? key}) : super(key: key);
-  CurrentUser? currentUserData;
+  CurrentUserId? currentUserData;
   @override
   _AnonSimpleSearchState createState() => _AnonSimpleSearchState();
 }
@@ -22,7 +22,8 @@ class _AnonSimpleSearchState extends State<AnonSimpleSearch> {
   Future<QuerySnapshot>? searchResultsFuture;
 
   handleSearch(String query) {
-    Future<QuerySnapshot> users = DatabaseServices(uid: '').userReference
+    Future<QuerySnapshot> users = DatabaseServices(uid: '')
+        .userReference
         .where("username", isGreaterThanOrEqualTo: query)
         .get();
     setState(() {
@@ -93,7 +94,7 @@ class _AnonSimpleSearchState extends State<AnonSimpleSearch> {
         List<UserResult> searchResults = [];
         snapshot.data!.docs.forEach((doc) {
           UserData user = UserData.fromDocumentSnapshot(doc);
-          if(user.id != widget.currentUserData!.uid){
+          if (user.id != widget.currentUserData!.uid) {
             searchResults.add(UserResult(user: user));
           }
         });
@@ -106,12 +107,12 @@ class _AnonSimpleSearchState extends State<AnonSimpleSearch> {
 
   @override
   Widget build(BuildContext context) {
-    widget.currentUserData = context.watch<CurrentUser?>();
+    widget.currentUserData = context.watch<CurrentUserId?>();
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor.withOpacity(0.8),
       appBar: buildSearchField(),
       body:
-      searchResultsFuture == null ? buildNoContent() : buildSearchResults(),
+          searchResultsFuture == null ? buildNoContent() : buildSearchResults(),
     );
   }
 }
@@ -125,8 +126,7 @@ class UserResult extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).primaryColor.withOpacity(0.7),
-      child:
-      Column(
+      child: Column(
         children: <Widget>[
           GestureDetector(
             child: ListTile(
@@ -134,19 +134,23 @@ class UserResult extends StatelessWidget {
                 backgroundImage: CachedNetworkImageProvider(user.avatar),
                 backgroundColor: kPrimaryColor,
               ),
-              title: Text(user.username,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold
-              ),),
-              subtitle: Text(user.username, style: const TextStyle(
-                color: kPrimaryColor,
-              ),),
+              title: Text(
+                user.username,
+                style: const TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                user.username,
+                style: const TextStyle(
+                  color: kPrimaryColor,
+                ),
+              ),
             ),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)
-            => OthersAnonProfile(ctuerId: user.id))),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => OthersAnonProfile(ctuerId: user.id))),
           ),
-          const Divider(height: 2.0,
+          const Divider(
+            height: 2.0,
           )
         ],
       ),

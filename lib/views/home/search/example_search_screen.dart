@@ -11,7 +11,7 @@ import 'package:provider/src/provider.dart';
 
 class SimpleSearch extends StatefulWidget {
   SimpleSearch({Key? key}) : super(key: key);
-  CurrentUser? currentUserData;
+  CurrentUserId? currentUserData;
   @override
   _SimpleSearchState createState() => _SimpleSearchState();
 }
@@ -108,7 +108,7 @@ class _SimpleSearchState extends State<SimpleSearch> {
 
   @override
   Widget build(BuildContext context) {
-    widget.currentUserData = context.watch<CurrentUser?>();
+    widget.currentUserData = context.watch<CurrentUserId?>();
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor.withOpacity(0.8),
       appBar: buildSearchField(),

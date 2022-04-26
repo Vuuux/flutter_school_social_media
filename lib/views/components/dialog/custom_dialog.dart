@@ -28,7 +28,7 @@ class CustomDialog extends StatelessWidget {
   }
 
   dialogContent(BuildContext context) {
-    final user = Provider.of<CurrentUser?>(context);
+    final user = Provider.of<CurrentUserId?>(context);
     List<UserData> ctuerList;
     return StreamBuilder<Object>(
         stream: DatabaseServices(uid: user!.uid).userData,

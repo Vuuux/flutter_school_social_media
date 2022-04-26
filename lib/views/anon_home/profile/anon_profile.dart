@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:luanvanflutter/controller/auth_controller.dart';
 import 'package:luanvanflutter/controller/controller.dart';
-import 'package:luanvanflutter/models/ctuer.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/style/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -101,7 +100,7 @@ class _AnonProfileState extends State<AnonProfile> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser?>();
+    final user = context.watch<CurrentUserId?>();
     userUid = user!.uid;
     ScreenUtil.init(
         const BoxConstraints(

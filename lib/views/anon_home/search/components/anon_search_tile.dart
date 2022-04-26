@@ -14,7 +14,8 @@ class AnonSearchTile extends StatelessWidget {
 
   const AnonSearchTile({Key? key, required this.userData}) : super(key: key);
 
-  createChatRoomAndStartConversation(BuildContext context, String uid, UserData userData) {
+  createChatRoomAndStartConversation(
+      BuildContext context, String uid, UserData userData) {
     String chatRoomId = const Uuid().v4();
     List<String> users = [uid, userData.id];
 
@@ -25,8 +26,8 @@ class AnonSearchTile extends StatelessWidget {
       "isPrivateChat": true
     };
 
-    DatabaseServices(uid: '').createAnonChatRoom(chatRoomId, uid, userData.id,
-        chatRoomMap);
+    DatabaseServices(uid: '')
+        .createAnonChatRoom(chatRoomId, uid, userData.id, chatRoomMap);
     //TODO: START CONVERSATION
     // Map<String, dynamic> chatRoomMap = {
     //   "users": users,
@@ -54,11 +55,11 @@ class AnonSearchTile extends StatelessWidget {
     //   ModalRoute.withName('AnonymousConversation'),
     // );
 
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-        builder: (context) =>
-            ConversationScreen(
-                chatRoomId: chatRoomId, ctuer: userData, userId: uid)), (
-        route) => false);
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+            builder: (context) => ConversationScreen(
+                chatRoomId: chatRoomId, ctuer: userData, userId: uid)),
+        (route) => false);
   }
 
   Widget buildSearchTile(BuildContext context, String uid) {
@@ -67,7 +68,8 @@ class AnonSearchTile extends StatelessWidget {
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-                builder: (context) => OthersAnonProfile(ctuerId: userData.id)),);
+                builder: (context) => OthersAnonProfile(ctuerId: userData.id)),
+          );
           //     .pushAndRemoveUntil(
           //   FadeRoute(
           //     page: OthersProfile(
@@ -99,11 +101,11 @@ class AnonSearchTile extends StatelessWidget {
                       height: 180,
                       child: userData.avatar.isNotEmpty
                           ? Image.network(
-                        userData.avatar,
-                        fit: BoxFit.fill,
-                      )
+                              userData.avatar,
+                              fit: BoxFit.fill,
+                            )
                           : Image.asset('assets/images/profile1.png',
-                          fit: BoxFit.fill),
+                              fit: BoxFit.fill),
                     ),
                   ),
                 ),
@@ -124,7 +126,7 @@ class AnonSearchTile extends StatelessWidget {
                     color: Colors.grey,
                     borderRadius: BorderRadius.circular(30)),
                 padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
                 child: const Text('Text'),
               ),
             ),
@@ -138,7 +140,7 @@ class AnonSearchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser?>();
+    final user = context.watch<CurrentUserId?>();
     return buildSearchTile(context, user!.uid);
   }
 }

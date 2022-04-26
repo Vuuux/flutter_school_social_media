@@ -4,9 +4,9 @@ import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/profile_notifier.dart';
 
 //class User đăng nhập
-class CurrentUser {
+class CurrentUserId {
   final String uid;
-  CurrentUser({required this.uid});
+  CurrentUserId({required this.uid});
 }
 
 //dữ liệu User chi tiết
@@ -30,23 +30,23 @@ class UserData extends Equatable {
   late final String address; //chỗ ở
 
   UserData(
-      {required this.id,
-      required this.email,
-      required this.username,
-      required this.nickname,
-      required this.gender,
-      required this.major,
-      required this.bio,
-      required this.avatar,
-      required this.isAnon,
-      required this.anonBio,
-      required this.anonInterest,
-      required this.anonAvatar,
-      required this.fame,
-      required this.media,
-      required this.course,
-      required this.playlist,
-      required this.address});
+      {this.id = "",
+      this.username = "",
+      this.nickname = "",
+      this.email = "",
+      this.bio = "",
+      this.gender = "",
+      this.major = "",
+      this.avatar = "",
+      this.isAnon = false,
+      this.anonBio = "",
+      this.anonInterest = "",
+      this.anonAvatar = "",
+      this.fame = 0,
+      this.media = "",
+      this.course = "",
+      this.playlist = "",
+      this.address = ""});
 
   UserData.fromMap(Map<String, dynamic> data) {
     id = data['id'];

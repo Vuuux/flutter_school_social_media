@@ -16,19 +16,19 @@ class AuthService {
   //tạo firebaseAuth để kết nối tới server
 
   //tạo User obj của FirebaseUser nếu chưa có
-  CurrentUser? _getFirebaseCurrentUser(User? user) {
-    return user != null ? CurrentUser(uid: user.uid) : null;
+  CurrentUserId? _getFirebaseCurrentUser(User? user) {
+    return user != null ? CurrentUserId(uid: user.uid) : null;
   }
 
   //trả về trạng thái có đăng nhập hay chưa
-  Stream<CurrentUser?> get user {
+  Stream<CurrentUserId?> get user {
     return _auth.authStateChanges().map(_getFirebaseCurrentUser);
   }
 
   //trả về user hiện tại
   Future getUser() async {
     User? firebaseUser = _auth.currentUser;
-    return firebaseUser != null ? CurrentUser(uid: firebaseUser.uid) : null;
+    return firebaseUser != null ? CurrentUserId(uid: firebaseUser.uid) : null;
   }
 
   Future signInAnonymous() async {

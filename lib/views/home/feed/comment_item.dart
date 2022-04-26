@@ -16,7 +16,9 @@ class CommentItem extends StatefulWidget {
 
   //final ValueChanged<MyProfileData> updateMyDataToMain;
   //final ValueChanged<List<String>> replyComment;
-  CommentItem({Key? key, required this.postId,required this.data, required this.size}) : super(key: key);
+  CommentItem(
+      {Key? key, required this.postId, required this.data, required this.size})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _CommentItem();
@@ -27,7 +29,7 @@ class _CommentItem extends State<CommentItem> {
   @override
   void initState() {
     super.initState();
-    if(mounted){
+    if (mounted) {
       getReply();
     }
   }
@@ -43,12 +45,13 @@ class _CommentItem extends State<CommentItem> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<CurrentUser?>();
+    final user = context.watch<CurrentUserId?>();
     widget.isLiked = widget.data.likes[user!.uid] == true;
     getReply();
     return Padding(
-      padding: widget.data.replyTo.isEmpty ? const EdgeInsets.all(8.0)
-            : const EdgeInsets.fromLTRB(34.0,8.0,8.0,8.0),
+      padding: widget.data.replyTo.isEmpty
+          ? const EdgeInsets.all(8.0)
+          : const EdgeInsets.fromLTRB(34.0, 8.0, 8.0, 8.0),
       child: Stack(
         children: <Widget>[
           Row(
@@ -84,26 +87,26 @@ class _CommentItem extends State<CommentItem> {
                             padding: const EdgeInsets.only(left: 4.0),
                             child: widget.data.replyTo.isEmpty
                                 ? Text(
-                              widget.data.comment,
-                              maxLines: null,
-                            )
+                                    widget.data.comment,
+                                    maxLines: null,
+                                  )
                                 : RichText(
-                              text: TextSpan(
-                                children: <TextSpan>[
-                                  TextSpan(
-                                      text: replyName + ' ',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.blue[800])),
-                                  TextSpan(
-                                      text: widget.data.comment,
-                                      // Utils.commentWithoutReplyUser(
-                                      //     widget.data.comment),
-                                      style: const TextStyle(
-                                          color: Colors.black)),
-                                ],
-                              ),
-                            ),
+                                    text: TextSpan(
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                            text: replyName + ' ',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.blue[800])),
+                                        TextSpan(
+                                            text: widget.data.comment,
+                                            // Utils.commentWithoutReplyUser(
+                                            //     widget.data.comment),
+                                            style: const TextStyle(
+                                                color: Colors.black)),
+                                      ],
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
@@ -112,7 +115,7 @@ class _CommentItem extends State<CommentItem> {
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
                       borderRadius:
-                      const BorderRadius.all(Radius.circular(15.0)),
+                          const BorderRadius.all(Radius.circular(15.0)),
                     ),
                   ),
                   Padding(
@@ -129,7 +132,9 @@ class _CommentItem extends State<CommentItem> {
                                       color: widget.isLiked
                                           ? Colors.blue[900]
                                           : Colors.grey[700]))),
-                          const SizedBox(width: 5,),
+                          const SizedBox(
+                            width: 5,
+                          ),
                           GestureDetector(
                               onTap: () {
                                 //TODO: handle reply
@@ -141,9 +146,10 @@ class _CommentItem extends State<CommentItem> {
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.grey[700]))),
-                          const SizedBox(width: 5,),
-                          Text(
-                              timeago.format(widget.data.timestamp.toDate())),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(timeago.format(widget.data.timestamp.toDate())),
                         ],
                       ),
                     ),
@@ -160,75 +166,74 @@ class _CommentItem extends State<CommentItem> {
   }
 
   handleLikeComment(String uid) async {
-    await DatabaseServices(uid: uid).likeComment(
-        widget.postId, widget.data.commentId);
+    await DatabaseServices(uid: uid)
+        .likeComment(widget.postId, widget.data.commentId);
     setState(() {
       widget.isLiked = !widget.isLiked;
       widget.data.likes[uid] = !widget.data.likes[uid];
     });
   }
 
-  buildReplySection(CurrentUser user) {
+  buildReplySection(CurrentUserId user) {
     return SizedBox(
         height: 200,
         //mainAxisAlignment: MainAxisAlignment.start,
-        child:
-        StreamBuilder<QuerySnapshot>(
-            stream: Stream.fromFuture(DatabaseServices(uid: user.uid).getComments(widget.postId)),
-            builder: (context, snapshot){
-              if(snapshot.hasData){
+        child: StreamBuilder<QuerySnapshot>(
+            stream: Stream.fromFuture(
+                DatabaseServices(uid: user.uid).getComments(widget.postId)),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
                 return ListView.builder(
                   shrinkWrap: true,
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
                     return CommentItem(
                         postId: widget.postId,
-                        data:
-                        CommentModel.fromDocument(snapshot.data!.docs[index]),
+                        data: CommentModel.fromDocument(
+                            snapshot.data!.docs[index]),
                         size: const Size(100, 100));
                   },
                 );
               }
               return const SizedBox.shrink();
-            })
-    );
-   }
+            }));
+  }
 
   Future<void> getReply() async {
-    if(widget.data.replyTo.isNotEmpty){
-      DocumentSnapshot snapshot = await DatabaseServices(uid: widget.data.userId)
-          .getUserByUserId()
-          .then((value) => value);
+    if (widget.data.replyTo.isNotEmpty) {
+      DocumentSnapshot snapshot =
+          await DatabaseServices(uid: widget.data.userId)
+              .getUserByUserId()
+              .then((value) => value);
       UserData userData = UserData.fromDocumentSnapshot(snapshot);
       setState(() {
         replyName = userData.username;
       });
-
     }
   }
 
   buildLikeCount() {
     return widget.data.getLikeCount() > 0
         ? Positioned(
-      bottom: 10,
-      right: 0,
-      child: Card(
-          elevation: 2.0,
-          child: Padding(
-            padding: const EdgeInsets.all(2.0),
-            child: Row(
-              children: <Widget>[
-                Icon(
-                  Icons.thumb_up,
-                  size: 14,
-                  color: Colors.blue[900],
-                ),
-                Text('${widget.data.getLikeCount()}',
-                    style: const TextStyle(fontSize: 14)),
-              ],
-            ),
-          )),
-    )
+            bottom: 10,
+            right: 0,
+            child: Card(
+                elevation: 2.0,
+                child: Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.thumb_up,
+                        size: 14,
+                        color: Colors.blue[900],
+                      ),
+                      Text('${widget.data.getLikeCount()}',
+                          style: const TextStyle(fontSize: 14)),
+                    ],
+                  ),
+                )),
+          )
         : Container();
   }
 }

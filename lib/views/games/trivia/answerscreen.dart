@@ -1,11 +1,15 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/controller.dart';
-import 'package:luanvanflutter/models/ctuer.dart';
+
 import 'package:luanvanflutter/models/user.dart';
-import 'package:luanvanflutter/style/decoration.dart';
+import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/home.dart';
+import 'package:luanvanflutter/views/components/custom_input_field.dart';
+import 'package:uuid/uuid.dart';
 
 class AnswerScreen extends StatefulWidget {
   String triviaRoomID;
@@ -15,11 +19,13 @@ class AnswerScreen extends StatefulWidget {
   List<UserData> ctuerList;
 
   AnswerScreen(
-      {required this.ctuerList,
+      {Key? key,
+      required this.ctuerList,
       required this.userData,
       required this.ctuer,
       required this.triviaRoomID,
-      required this.question});
+      required this.question})
+      : super(key: key);
 
   @override
   _AnswerScreenState createState() => _AnswerScreenState();
@@ -29,103 +35,71 @@ class _AnswerScreenState extends State<AnswerScreen> {
   late String player1Text;
   late String player2Text;
   late String message;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   TextEditingController messageTextEditingController =
       new TextEditingController();
 
-  getChatRoomID(String a, String b) {
-    codeUnit(String a) {
-      int count = 0;
-      for (int i = 0; i < a.length; i++) {
-        count += a.codeUnitAt(i);
-      }
-      return count;
-    }
-
-    if (a.length < b.length) {
-      return "$a\_$b";
-    } else if (a.length > b.length) {
-      return "$b\_$a";
-    } else {
-      print(codeUnit(a) + codeUnit(b));
-      return (codeUnit(a) + codeUnit(b)).toString();
-    }
-  }
-
-  createChatRoomAndStartConversation(UserData userData, UserData hmmie) {
-    String chatRoomID = getChatRoomID(userData.nickname, hmmie.nickname);
-    List<String> users = [userData.email, hmmie.email];
+  Future<String> createChatRoomAndStartConversation(
+      UserData userData, UserData ctuer) async {
+    String chatRoomID = Uuid().v4();
+    List<String> users = [userData.id, ctuer.id];
 
     Map<String, dynamic> chatRoomMap = {
       "users": users,
-      "chatRoomId": chatRoomID
+      "chatRoomId": chatRoomID,
+      "timestamp": Timestamp.now(),
     };
-    //TODO: ADD uid
-    //DatabaseServices(uid: '').createAnonChatRoom(chatRoomID, chatRoomMap);
+    await DatabaseServices(uid: userData.id)
+        .createChatRoom(chatRoomID, chatRoomMap);
+    return chatRoomID;
   }
 
-  sendMessage() {
+  sendMessage() async {
     if (message.isNotEmpty) {
-      createChatRoomAndStartConversation(widget.userData, widget.ctuer);
+      String chatRoomId = await createChatRoomAndStartConversation(
+          widget.userData, widget.ctuer);
 
       Map<String, dynamic> questionMap = {
         "message": widget.question,
         "sendBy": widget.userData.username,
-        "time": Timestamp.now(),
-        "email": widget.userData.email,
-        "type": 'question'
+        "timestamp": Timestamp.now(),
+        "senderId": widget.userData.id,
+        "type": KEY_NOTIFICATION_QUESTION
       };
       Map<String, dynamic> messageMap = {
         "message": message,
         "sendBy": widget.userData.username,
-        "time": Timestamp.now(),
-        "email": widget.userData.email,
-        "type": 'message'
+        "timestamp": Timestamp.now(),
+        "senderId": widget.userData.id,
+        "type": KEY_NOTIFICATION_MESSAGE
       };
 
-      //TODO: ADD UID
-      DatabaseServices(uid: '').addAnonConversationMessages(
-          getChatRoomID(widget.userData.nickname, widget.ctuer.nickname),
-          questionMap);
-      DatabaseServices(uid: '').addAnonConversationMessages(
-          getChatRoomID(widget.userData.nickname, widget.ctuer.nickname),
-          messageMap);
+      DatabaseServices(uid: _auth.currentUser?.uid)
+          .addConversationMessages(chatRoomId, questionMap);
+      DatabaseServices(uid: _auth.currentUser?.uid)
+          .addConversationMessages(chatRoomId, messageMap);
 
-      DatabaseServices(uid: '')
+      DatabaseServices(uid: _auth.currentUser?.uid)
           .feedReference
-          .doc(widget.ctuer.email)
-          .collection('feed')
+          .doc(widget.ctuer.id)
+          .collection('feedItems')
           .add({
         'type': 'question',
         'msgInfo': widget.question,
         'ownerID': widget.ctuer.email,
         'ownerName': widget.ctuer.username,
         'timestamp': DateTime.now(),
+        'status': 'unseen',
         'userDp': widget.userData.anonAvatar,
         'userID': widget.userData.nickname,
       });
 
       setState(() {
-        //saveReceiverCloud(widget.ctuer);
         message = "";
         messageTextEditingController.clear();
       });
     }
   }
-
-  // saveReceiverCloud(UserData hmmie) async {
-  //   QuerySnapshot query =
-  //       (await DatabaseServices(uid: hmmie.id).getReceiverToken(hmmie.email)) as QuerySnapshot<Object?>;
-  //   String val = query.docs[0].get('token').toString();
-  //   DatabaseServices(uid: '').cloudRef.doc().set({
-  //     'type': 'question',
-  //     'ownerID': hmmie.email,
-  //     'ownerName': hmmie.username,
-  //     'timestamp': DateTime.now(),
-  //     'userDp': widget.userData.anonAvatar,
-  //     'userID': widget.userData.nickname,
-  //     'token': val,
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +107,7 @@ class _AnswerScreenState extends State<AnswerScreen> {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Now I do"),
+          title: Text("Trả lời"),
           elevation: 0.0,
         ),
         body: Column(
@@ -150,7 +124,7 @@ class _AnswerScreenState extends State<AnswerScreen> {
                 ),
                 child: AutoSizeText(
                   widget.question,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
@@ -160,54 +134,52 @@ class _AnswerScreenState extends State<AnswerScreen> {
             ),
             Padding(
               padding: EdgeInsets.all(30),
-              child: TextFormField(
-                // initialValue: userData.name,
-                // validator: (val) {
-                //   return val.isEmpty ? 'Please provide some' : null;
-                // },
+              child: CustomInputField(
                 controller: messageTextEditingController,
-                onChanged: (val) {
-                  setState(() {
-                    message = val;
-                    player1Text = val;
-                  });
-                },
-                style: TextStyle(color: Colors.white),
-                decoration: textFieldInputDecoration('Your answer'),
-                maxLines: 3,
+                title: 'Câu trả lời của bạn',
+                content: 'Đáp án',
               ),
             ),
-            FlatButton(
-              child: const Text(
-                'Submit',
+            ElevatedButton(
+              child: Text(
+                "ĐỒNG Ý",
                 style: TextStyle(
                   fontWeight: FontWeight.w400,
                   fontSize: 18,
-                  color: Colors.black,
+                  color: Get.isDarkMode ? Colors.black : Colors.white,
                 ),
               ),
               onPressed: () {
                 // print(widget.userData.name);
                 // print(widget.hmmie);
-                sendMessage();
-                DatabaseServices(uid: '').updateTrivia(
-                    triviaRoomID: widget.triviaRoomID,
-                    question: widget.question,
-                    answer1: player1Text,
-                    answer2: player2Text);
-                // return Home(widget.userData, widget.hmmies);
-
-                Navigator.of(context).pop(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const Home(),
-                  ),
-                );
+                _validateInput(context);
               },
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _validateInput(BuildContext context) {
+    if (messageTextEditingController.text.isEmpty) {
+      Get.snackbar("Bắt buộc", "Vui lòng nhập câu trả lời của bạn",
+          snackPosition: SnackPosition.BOTTOM);
+    } else {
+      message = messageTextEditingController.text;
+      player1Text = messageTextEditingController.text;
+      sendMessage();
+      DatabaseServices(uid: _auth.currentUser?.uid).updateTrivia(
+          triviaRoomID: widget.triviaRoomID,
+          question: widget.question,
+          answer1: player1Text,
+          answer2: player2Text);
+
+      Navigator.of(context).pop(
+        MaterialPageRoute(
+          builder: (context) => const Home(),
+        ),
+      );
+    }
   }
 }
