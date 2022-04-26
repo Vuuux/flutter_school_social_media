@@ -2,9 +2,12 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -31,6 +34,7 @@ class IntroPage2 extends StatefulWidget {
 class _IntroPage2State extends State<IntroPage2> {
   GlobalKey<FlipCardState> cardKey = GlobalKey<FlipCardState>();
   late String triviaRoomId = Uuid().v4();
+  FirebaseAuth _auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     String gender =
@@ -131,7 +135,8 @@ class _IntroPage2State extends State<IntroPage2> {
                                                 child: Row(
                                                   children: [
                                                     Text(
-                                                      widget.chosenCtuer.fame
+                                                      widget.chosenCtuer.likes
+                                                              .length
                                                               .toString() +
                                                           " ",
                                                       style: const TextStyle(
@@ -285,17 +290,33 @@ class _IntroPage2State extends State<IntroPage2> {
             bottom: MediaQuery.of(context).size.height * 0.03,
             right: MediaQuery.of(context).size.width * 0.30,
             child: FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => Trivia(
-                      ctuerData: widget.chosenCtuer,
-                      currentUserData: widget.userData,
-                      ctuerList: widget.ctuerList,
-                      triviaRoomId: triviaRoomId,
+              onPressed: () async {
+                var response =
+                    await DatabaseServices(uid: _auth.currentUser!.uid)
+                        .increaseFame(
+                            widget.chosenCtuer.id,
+                            widget.userData.likes.length,
+                            SubUserData(
+                                id: widget.userData.id,
+                                username: widget.userData.username,
+                                avatar: widget.userData.avatar,
+                                bio: widget.userData.bio));
+
+                response.fold((result) {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => Trivia(
+                        ctuerData: widget.chosenCtuer,
+                        currentUserData: widget.userData,
+                        ctuerList: widget.ctuerList,
+                        triviaRoomId: triviaRoomId,
+                      ),
                     ),
-                  ),
-                );
+                  );
+                },
+                    (error) => Get.snackbar(
+                        "Lỗi", "Có lỗi xảy ra: " + error.code,
+                        snackPosition: SnackPosition.BOTTOM));
               },
               heroTag: "heart",
               backgroundColor: Colors.white,

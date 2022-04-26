@@ -503,8 +503,8 @@ class _OthersAnonProfileState extends State<OthersAnonProfile> {
                                               splashColor: Colors.transparent,
                                               padding: const EdgeInsets.only(
                                                   left: 21, right: 21),
-                                              child: createColumns(
-                                                  'Fame', widget.ctuer!.fame),
+                                              child: createColumns('Fame',
+                                                  widget.ctuer!.likes.length),
                                               onPressed: () {},
                                             ),
                                           ],

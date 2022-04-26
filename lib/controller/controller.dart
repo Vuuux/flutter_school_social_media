@@ -112,7 +112,9 @@ class DatabaseServices {
         "username": username,
         "nickname": nickname,
         "isAnon": isAnon,
-        "avatar": avatar,
+        "avatar": avatar.isEmpty
+            ? avatar
+            : "https://firebasestorage.googleapis.com/v0/b/god-project-ctu.appspot.com/o/Profile%20Pictures?alt=media&token=128aa6d4-42ec-40f5-b3db-3371e85ca126",
         "gender": gender,
         "major": major,
         "bio": bio,
@@ -123,7 +125,7 @@ class DatabaseServices {
             "https://firebasestorage.googleapis.com/v0/b/god-project-ctu.appspot.com/o/Profile%20Pictures?alt=media&token=128aa6d4-42ec-40f5-b3db-3371e85ca126",
         'followers': {},
         'followings': {},
-        'fame': 0,
+        'likes': {},
         "media": '',
         "playlist": playlist,
         "course": course,
@@ -436,18 +438,16 @@ class DatabaseServices {
   }
 
   //tăng điểm danh tiếng
-  Future increaseFame(
-      int initialValue, String raterEmail, bool isAdditional) async {
-    if (isAdditional) {
-      await userReference
-          .doc(uid)
-          .collection('likes')
-          .doc(raterEmail)
-          .set({'like': raterEmail});
+  Future<Either<bool, FirebaseException>> increaseFame(
+      String targetId, int initialValue, SubUserData userData) async {
+    try {
+      await userReference.doc(targetId).update({
+        "likes": FieldValue.arrayUnion([SubUserData.toJson(userData)])
+      });
+      return const Left(true);
+    } on FirebaseException catch (error) {
+      return Right(error);
     }
-    return await userReference.doc(uid).update({
-      'fame': initialValue + 1,
-    });
   }
 
   Future decreaseFame(
@@ -467,19 +467,11 @@ class DatabaseServices {
 
   //--------------- POST ------------------//
   Future likePost(String likerId, String ownerId, String postId) async {
-    await timelineReference
-        // .doc(ownerId)
-        // .collection('userPosts')
-        .doc(postId)
-        .update({'likes.$likerId': true});
+    await timelineReference.doc(postId).update({'likes.$likerId': true});
   }
 
   Future unlikePost(String unlikerId, String ownerId, String postId) async {
-    await timelineReference
-        // .doc(ownerId)
-        // .collection('userPosts')
-        .doc(postId)
-        .update({'likes.$unlikerId': false});
+    await timelineReference.doc(postId).update({'likes.$unlikerId': false});
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getTimelinePosts(
@@ -708,7 +700,8 @@ class DatabaseServices {
           anonAvatar: doc.data().toString().contains('anonAvatar')
               ? doc.get('anonAvatar')
               : '',
-          fame: doc.data().toString().contains('fame') ? doc.get('fame') : 0,
+          likes: List<SubUserData>.from(
+              doc.get('likes').map((x) => SubUserData.fromJson(x))),
           media:
               doc.data().toString().contains('media') ? doc.get('media') : '',
           course:
@@ -768,7 +761,8 @@ class DatabaseServices {
         anonAvatar: doc.data().toString().contains('anonAvatar')
             ? doc.get('anonAvatar')
             : '',
-        fame: doc.data().toString().contains('fame') ? doc.get('fame') : 0,
+        likes: List<SubUserData>.from(
+            doc.get('likes').map((x) => SubUserData.fromJson(x))),
         media: doc.data().toString().contains('media') ? doc.get('media') : '',
         course:
             doc.data().toString().contains('course') ? doc.get('course') : '',
@@ -788,6 +782,15 @@ class DatabaseServices {
   //check this
   Stream<UserData> get userData {
     return userReference.doc(uid).snapshots().map(_userDataFromSnapshot);
+  }
+
+  Future<String> checkIfChatRoomExisted(List<String> chatRoomId) async {
+    var result1 = await chatReference.doc(chatRoomId[0]).get();
+    var result2 = await chatReference.doc(chatRoomId[1]).get();
+    if (result1.exists || result2.exists) {
+      return result1.exists ? chatRoomId[0] : chatRoomId[1];
+    }
+    return "";
   }
 
   createChatRoom(String chatRoomId, Map<String, dynamic> data) async {

@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/post.dart';
@@ -15,6 +16,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/src/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:image/image.dart' as ImD;
+
+import 'location_picker_screen.dart';
 
 class UploadImage extends StatefulWidget {
   final UserData userData;
@@ -37,7 +40,7 @@ class _UploadImageState extends State<UploadImage>
   final Reference storageReference =
       FirebaseStorage.instance.ref().child("Đăng ảnh");
   final postReference = FirebaseFirestore.instance.collection("posts");
-  String postId = "";
+  String postId = const Uuid().v4();
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   //nén ảnh để hiển thị nhỏ
@@ -96,6 +99,10 @@ class _UploadImageState extends State<UploadImage>
     String formattedAddress =
         "${placemark.subAdministrativeArea}, ${placemark.administrativeArea}, ${placemark.country}";
     locationController.text = formattedAddress;
+  }
+
+  _getOtherUserLocation() async {
+    Get.to(() => const LocationPicker());
   }
 
   Future controlUploadAndSave(String uid) async {
@@ -218,23 +225,48 @@ class _UploadImageState extends State<UploadImage>
                     ),
                   ),
                 ),
-                Container(
-                  width: 180,
-                  height: 100,
-                  alignment: Alignment.center,
-                  child: RaisedButton.icon(
-                    label: const Text(
-                      "Dùng vị trí hiện tại",
-                      style: TextStyle(color: Colors.white),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: RaisedButton.icon(
+                          label: const Text(
+                            "Dùng vị trí hiện tại",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0)),
+                          color: kPrimaryColor,
+                          onPressed: () {
+                            getUserLocation();
+                          },
+                          icon: const Icon(Icons.location_on_outlined),
+                        ),
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0)),
-                    color: kPrimaryColor,
-                    onPressed: () {
-                      getUserLocation();
-                    },
-                    icon: const Icon(Icons.location_on_outlined),
-                  ),
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: RaisedButton.icon(
+                          label: const Text(
+                            "Chọn vị trí khác",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0)),
+                          color: kPrimaryColor,
+                          onPressed: () {
+                            _getOtherUserLocation();
+                          },
+                          icon: const Icon(Icons.location_on_outlined),
+                        ),
+                      ),
+                    ),
+                  ],
                 )
               ],
             ),

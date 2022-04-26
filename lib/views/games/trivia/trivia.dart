@@ -207,7 +207,6 @@ class _TriviaState extends State<Trivia> {
       context,
       MaterialPageRoute(
         builder: (context) => AnswerScreen(
-            ctuerList: widget.ctuerList,
             userData: widget.currentUserData,
             triviaRoomID: widget.triviaRoomId,
             ctuer: widget.ctuerData,
@@ -221,7 +220,7 @@ class _TriviaState extends State<Trivia> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Tôi có quen bạn không?',
+          'Mở đầu cuộc trò chuyện!',
           style: TextStyle(
             fontWeight: FontWeight.w300,
             fontSize: 24,
@@ -235,9 +234,9 @@ class _TriviaState extends State<Trivia> {
         children: <Widget>[
           Container(child: currentCard),
           RaisedButton(
-            child: const Text(
-              'Đổi Card',
-              style: TextStyle(
+            child: Text(
+              'Đổi câu hỏi'.toUpperCase(),
+              style: const TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 18,
                 color: Colors.black,
@@ -250,7 +249,7 @@ class _TriviaState extends State<Trivia> {
           const SizedBox(height: 8),
           ElevatedButton(
             child: Text(
-              'Trả lời',
+              'Trả lời'.toUpperCase(),
               style: TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 18,

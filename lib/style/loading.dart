@@ -4,10 +4,12 @@ import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/utils/theme_service.dart';
 
 class Loading extends StatelessWidget {
+  const Loading({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(color: Colors.black54),
+      decoration: BoxDecoration(color: Colors.white.withOpacity(0.2)),
       child: Center(
         child: SpinKitFoldingCube(
           color: ThemeService().isDarkTheme ? kPrimaryDarkColor : kPrimaryColor,

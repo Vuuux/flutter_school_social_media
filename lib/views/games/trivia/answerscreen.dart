@@ -8,19 +8,19 @@ import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/home.dart';
+import 'package:luanvanflutter/utils/chat_utils.dart';
 import 'package:luanvanflutter/views/components/custom_input_field.dart';
-import 'package:uuid/uuid.dart';
+
+import '../../home/chat/chat_screen.dart';
 
 class AnswerScreen extends StatefulWidget {
   String triviaRoomID;
   String question;
   UserData userData;
   UserData ctuer;
-  List<UserData> ctuerList;
 
   AnswerScreen(
       {Key? key,
-      required this.ctuerList,
       required this.userData,
       required this.ctuer,
       required this.triviaRoomID,
@@ -40,8 +40,7 @@ class _AnswerScreenState extends State<AnswerScreen> {
       new TextEditingController();
 
   Future<String> createChatRoomAndStartConversation(
-      UserData userData, UserData ctuer) async {
-    String chatRoomID = Uuid().v4();
+      UserData userData, UserData ctuer, String chatRoomID) async {
     List<String> users = [userData.id, ctuer.id];
 
     Map<String, dynamic> chatRoomMap = {
@@ -56,11 +55,17 @@ class _AnswerScreenState extends State<AnswerScreen> {
 
   sendMessage() async {
     if (message.isNotEmpty) {
-      String chatRoomId = await createChatRoomAndStartConversation(
-          widget.userData, widget.ctuer);
+      List<String> chatRoomID = ChatUtils.createChatRoomIdFromUserId(
+          widget.userData.id, widget.ctuer.id);
+      String existedChatRoomId = await DatabaseServices(uid: widget.userData.id)
+          .checkIfChatRoomExisted(chatRoomID);
+      bool isChatRoomExisted = existedChatRoomId.isEmpty ? false : true;
+      String resultChatRoomId =
+          isChatRoomExisted ? existedChatRoomId : chatRoomID[0];
 
       Map<String, dynamic> questionMap = {
         "message": widget.question,
+        "triviaRoomId": widget.triviaRoomID,
         "sendBy": widget.userData.username,
         "timestamp": Timestamp.now(),
         "senderId": widget.userData.id,
@@ -68,23 +73,30 @@ class _AnswerScreenState extends State<AnswerScreen> {
       };
       Map<String, dynamic> messageMap = {
         "message": message,
+        "triviaRoomId": widget.triviaRoomID,
         "sendBy": widget.userData.username,
         "timestamp": Timestamp.now(),
         "senderId": widget.userData.id,
         "type": KEY_NOTIFICATION_MESSAGE
       };
+      if (!isChatRoomExisted) {
+        await createChatRoomAndStartConversation(
+            widget.userData, widget.ctuer, resultChatRoomId);
+      }
 
       DatabaseServices(uid: _auth.currentUser?.uid)
-          .addConversationMessages(chatRoomId, questionMap);
+          .addConversationMessages(resultChatRoomId, questionMap);
       DatabaseServices(uid: _auth.currentUser?.uid)
-          .addConversationMessages(chatRoomId, messageMap);
+          .addConversationMessages(resultChatRoomId, messageMap);
 
       DatabaseServices(uid: _auth.currentUser?.uid)
           .feedReference
           .doc(widget.ctuer.id)
           .collection('feedItems')
           .add({
-        'type': 'question',
+        'type': KEY_NOTIFICATION_QUESTION,
+        'triviaRoomId': widget.triviaRoomID,
+        'chatRoomId': resultChatRoomId,
         'msgInfo': widget.question,
         'ownerID': widget.ctuer.email,
         'ownerName': widget.ctuer.username,
@@ -92,11 +104,6 @@ class _AnswerScreenState extends State<AnswerScreen> {
         'status': 'unseen',
         'userDp': widget.userData.anonAvatar,
         'userID': widget.userData.nickname,
-      });
-
-      setState(() {
-        message = "";
-        messageTextEditingController.clear();
       });
     }
   }
@@ -168,18 +175,17 @@ class _AnswerScreenState extends State<AnswerScreen> {
     } else {
       message = messageTextEditingController.text;
       player1Text = messageTextEditingController.text;
+      player2Text = "";
       sendMessage();
       DatabaseServices(uid: _auth.currentUser?.uid).updateTrivia(
           triviaRoomID: widget.triviaRoomID,
           question: widget.question,
           answer1: player1Text,
           answer2: player2Text);
-
-      Navigator.of(context).pop(
-        MaterialPageRoute(
-          builder: (context) => const Home(),
-        ),
-      );
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => ChatScreen()),
+          (Route<dynamic> route) => route is Home);
     }
   }
 }

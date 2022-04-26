@@ -1,8 +1,13 @@
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/controller.dart';
+import 'package:luanvanflutter/models/conversation_item.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
+import 'package:luanvanflutter/utils/user_data_service.dart';
 import 'package:luanvanflutter/views/games/compatibility/compatibility_start.dart';
+import 'package:luanvanflutter/views/games/trivia/answerscreen.dart';
 import 'package:luanvanflutter/views/home/chat/chat_screen.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';
@@ -46,32 +51,43 @@ class _ConversationScreenState extends State<ConversationScreen> {
     return StreamBuilder<QuerySnapshot>(
       stream: chatMessagesStream,
       builder: (context, snapshot) {
-        return snapshot.hasData
-            ? ListView.builder(
-                controller: scrollController,
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (context, index) {
-                  return MessageTile(
+        if (snapshot.hasData) {
+          List<ConversationItemModel> messageList = snapshot.data!.docs
+              .map((doc) => ConversationItemModel.fromDocumentSnapshot(doc))
+              .toList();
+          if (messageList.length == 0) {
+            return const Center(
+              child: Text(
+                  " Bạn không có cuộc trò chuyện nào, hãy tìm thêm bạn để bắt đầu cuộc trò chuyện "),
+            );
+          }
+          return ListView.builder(
+              controller: scrollController,
+              itemCount: messageList.length,
+              itemBuilder: (context, index) {
+                return AnimationConfiguration.staggeredList(
+                    position: index,
+                    child: SlideAnimation(
+                        child: FadeInAnimation(
+                            child: MessageTile(
+                      ctuer: widget.ctuer,
                       chatRoomId: widget.chatRoomId,
-                      type: snapshot.data!.docs[index].get("type"),
-                      message: snapshot.data!.docs[index].get("message"),
-                      isSendByMe: snapshot.data!.docs[index].get("senderId") ==
-                          widget.userId,
-                      time: f
-                          .format(snapshot.data!.docs[index]
-                              .get("timestamp")
-                              .toDate())
-                          .toString());
-                })
-            : Container();
+                      messageModel: messageList[index],
+                      isSendByMe: messageList[index].senderId == widget.userId,
+                    ))));
+              });
+        }
+        return Loading();
       },
     );
   }
 
   sendMessage(UserData userData) {
+    message = messageTextEditingController.text;
     if (message.isNotEmpty) {
       Map<String, dynamic> messageMap = {
         "message": message,
+        "sendBy": userData.username,
         "senderId": widget.userId,
         "timestamp": Timestamp.now(),
         "type": 'message'
@@ -167,7 +183,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     InkWell(
                       highlightColor: Colors.transparent,
                       splashColor: Colors.transparent,
-                      child: Text(widget.ctuer.nickname,
+                      child: Text(widget.ctuer.username,
                           style: const TextStyle(fontSize: 20)),
                       onTap: () {
                         Navigator.of(context).pushAndRemoveUntil(
@@ -233,17 +249,17 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           Expanded(
                             child: TextFormField(
                               controller: messageTextEditingController,
-                              onChanged: (val) {
-                                setState(() => message = val);
-                                Future.delayed(
-                                    const Duration(milliseconds: 100), () {
-                                  scrollController.animateTo(
-                                      scrollController.position.maxScrollExtent,
-                                      duration:
-                                          const Duration(milliseconds: 500),
-                                      curve: Curves.ease);
-                                });
-                              },
+                              // onChanged: (val) {
+                              //   setState(() => message = val);
+                              //   Future.delayed(
+                              //       const Duration(milliseconds: 100), () {
+                              //     scrollController.animateTo(
+                              //         scrollController.position.maxScrollExtent,
+                              //         duration:
+                              //             const Duration(milliseconds: 500),
+                              //         curve: Curves.ease);
+                              //   });
+                              // },
                               style: const TextStyle(color: Colors.black),
                               decoration: const InputDecoration.collapsed(
                                   hintText: "Send a message...",
@@ -284,21 +300,33 @@ class _ConversationScreenState extends State<ConversationScreen> {
 }
 
 class MessageTile extends StatelessWidget {
-  final String message;
+  final UserData ctuer;
   final bool isSendByMe;
-  final String time;
-  final String type;
   final String chatRoomId;
-
+  final ConversationItemModel messageModel;
   const MessageTile(
-      {required this.message,
+      {required this.chatRoomId,
       required this.isSendByMe,
-      required this.time,
-      required this.type,
-      required this.chatRoomId});
+      required this.ctuer,
+      required this.messageModel,
+      Key? key})
+      : super(key: key);
 
   //delete msg
   //edit msg
+  _onTap() {
+    if (messageModel.type == KEY_NOTIFICATION_QUESTION &&
+        messageModel.message.isNotEmpty &
+            messageModel.triviaRoomId!.isNotEmpty &&
+        !isSendByMe) {
+      Get.to(() => AnswerScreen(
+            question: messageModel.message,
+            triviaRoomID: messageModel.triviaRoomId!,
+            ctuer: ctuer,
+            userData: UserDataService().getUserData()!,
+          ));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -332,7 +360,7 @@ class MessageTile extends StatelessWidget {
                     .chatReference
                     .doc(chatRoomId)
                     .collection('conversation')
-                    .where("message", isEqualTo: message)
+                    .where("message", isEqualTo: messageModel.message)
                     .get()
                     .then((doc) {
                   if (doc.docs[0].exists) {
@@ -348,7 +376,7 @@ class MessageTile extends StatelessWidget {
               : const EdgeInsets.only(right: 30),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
           decoration: BoxDecoration(
-            color: (type == 'message')
+            color: (messageModel.type == 'message')
                 ? (isSendByMe ? Colors.blueGrey : Colors.indigoAccent)
                 : Colors.red,
             borderRadius: isSendByMe
@@ -368,11 +396,11 @@ class MessageTile extends StatelessWidget {
                 isSendByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                time,
+                f.format(messageModel.timestamp.toDate()).toString(),
                 textAlign: TextAlign.end,
               ),
               Text(
-                message,
+                messageModel.message,
                 textAlign: TextAlign.start,
                 style: const TextStyle(
                     color: Colors.white,

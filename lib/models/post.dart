@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class PostModel{
+class PostModel {
   final String postId;
   final String ownerId;
   final String username;
@@ -10,26 +10,25 @@ class PostModel{
   final String url;
   final Map<String, dynamic> likes;
 
-  PostModel({
-    required this.postId,
-    required this.ownerId,
-    required this.username,
-    required this.location,
-    required this.description,
-    required this.url,
-    required this.likes,
-    required this.timestamp
-});
+  PostModel(
+      {required this.postId,
+      required this.ownerId,
+      required this.username,
+      required this.location,
+      required this.description,
+      required this.url,
+      required this.likes,
+      required this.timestamp});
 
   factory PostModel.fromDocument(DocumentSnapshot doc) {
     return PostModel(
-      postId: doc['postId'],
-      ownerId: doc['ownerId'],
-      username: doc['username'],
-      location: doc['location'],
-      description: doc['description'],
-      url: doc['url'],
-      likes: doc['likes'],
+      postId: doc['postId'] ?? "",
+      ownerId: doc['ownerId'] ?? "",
+      username: doc['username'] ?? "",
+      location: doc['location'] ?? "",
+      description: doc['description'] ?? "",
+      url: doc['url'] ?? "",
+      likes: doc['likes'] ?? "",
       timestamp: doc['timestamp'],
     );
   }

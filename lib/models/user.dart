@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:luanvanflutter/controller/controller.dart';
@@ -23,7 +25,7 @@ class UserData extends Equatable {
   late final String anonBio;
   late final String anonInterest;
   late final String anonAvatar;
-  late final int fame;
+  late final List<SubUserData> likes;
   late final String media;
   late final String course;
   late final String playlist;
@@ -42,7 +44,7 @@ class UserData extends Equatable {
       this.anonBio = "",
       this.anonInterest = "",
       this.anonAvatar = "",
-      this.fame = 0,
+      this.likes = const [],
       this.media = "",
       this.course = "",
       this.playlist = "",
@@ -61,7 +63,8 @@ class UserData extends Equatable {
     anonBio = data['anonBio'];
     anonInterest = data['anonInterest'];
     anonAvatar = data['anonAvatar'];
-    fame = data['fame'];
+    likes = List<SubUserData>.from(
+        data['likes'].map((x) => SubUserData.fromJson(x)));
     playlist = data['playlist'];
     course = data['course'];
     media = data['media'];
@@ -81,7 +84,8 @@ class UserData extends Equatable {
         anonBio: data['anonBio'],
         anonInterest: data['anonInterest'],
         anonAvatar: data['anonAvatar'],
-        fame: data['fame'],
+        likes: List<SubUserData>.from(
+            data['likes'].map((x) => SubUserData.fromJson(x))),
         playlist: data['playlist'],
         course: data['course'],
         media: data['media'],
@@ -110,10 +114,37 @@ class UserData extends Equatable {
         anonBio,
         anonInterest,
         anonAvatar,
-        fame,
+        likes,
         media,
         course,
         playlist,
         address
       ];
+}
+
+class SubUserData {
+  late String id;
+  late String username;
+  late String avatar;
+  late String bio;
+
+  SubUserData(
+      {this.id = "", this.username = "", this.avatar = "", this.bio = ""});
+
+  static SubUserData fromJson(Map<String, dynamic> json) {
+    return SubUserData(
+        id: json["id"] ?? "",
+        username: json["username"] ?? "",
+        avatar: json["avatar"] ?? "",
+        bio: json["bio"] ?? "");
+  }
+
+  static Map<String, dynamic> toJson(SubUserData data) {
+    Map<String, dynamic> json = {};
+    json["id"] = data.id;
+    json["username"] = data.username;
+    json["avatar"] = data.avatar;
+    json["bio"] = data.bio;
+    return json;
+  }
 }

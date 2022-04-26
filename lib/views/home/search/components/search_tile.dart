@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
+import 'package:luanvanflutter/utils/chat_utils.dart';
 import 'package:luanvanflutter/views/home/chat/conversation_screen.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:provider/src/provider.dart';
@@ -15,22 +16,29 @@ class SearchTile extends StatelessWidget {
   const SearchTile({Key? key, required this.userData}) : super(key: key);
 
   createChatRoomAndStartConversation(
-      BuildContext context, String uid, UserData userData) {
-    String chatRoomId = const Uuid().v4();
+      BuildContext context, String uid, UserData userData) async {
+    List<String> chatRoomID =
+        ChatUtils.createChatRoomIdFromUserId(uid, userData.id);
+    String existedChatRoomId =
+        await DatabaseServices(uid: uid).checkIfChatRoomExisted(chatRoomID);
+    bool isChatRoomExisted = existedChatRoomId.isEmpty ? false : true;
+    String resultChatRoomId =
+        isChatRoomExisted ? existedChatRoomId : Uuid().v4();
+
     List<String> users = [uid, userData.id];
 
     Map<String, dynamic> chatRoomMap = {
       "users": users,
-      "chatRoomId": chatRoomId,
+      "chatRoomId": resultChatRoomId,
       "timestamp": Timestamp.now(),
     };
 
-    DatabaseServices(uid: uid).createChatRoom(chatRoomId, chatRoomMap);
+    DatabaseServices(uid: uid).createChatRoom(resultChatRoomId, chatRoomMap);
 
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
             builder: (context) => ConversationScreen(
-                chatRoomId: chatRoomId, ctuer: userData, userId: uid)),
+                chatRoomId: resultChatRoomId, ctuer: userData, userId: uid)),
         (route) => false);
   }
 

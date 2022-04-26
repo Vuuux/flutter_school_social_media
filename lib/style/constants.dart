@@ -62,6 +62,7 @@ const primaryColor = kPrimaryColor;
 const Color darkGreyColor = Color(0xFF121212);
 
 const String KEY_NOTIFICATION_QUESTION = "question";
+const String KEY_NOTIFICATION_ANSWER = "answer";
 const String KEY_NOTIFICATION_MESSAGE = "message";
 const String KEY_NOTIFICATION_REQUEST = "request";
 const String KEY_NOTIFICATION_ACCEPT_REQUEST = "accept-request";

@@ -143,7 +143,6 @@ class _MyProfileState extends State<MyProfile> {
   Widget build(BuildContext context) {
     final user = context.watch<CurrentUserId?>();
     userUid = user!.uid;
-    //final hmmies = Provider.of<List<Ctuer>>(context);
     ScreenUtil.init(
         const BoxConstraints(
           maxWidth: 414,
@@ -311,7 +310,7 @@ class _MyProfileState extends State<MyProfile> {
                                           left: 21, right: 21),
                                       child: createColumns(
                                           'Fame',
-                                          userData.fame,
+                                          userData.likes.length,
                                           Get.isDarkMode
                                               ? Colors.black
                                               : Colors.white),

@@ -151,7 +151,9 @@ class NotificationsItem extends StatefulWidget {
     } else if (noti.type == KEY_NOTIFICATION_COMP) {
       notificationItemText = 'muốn chơi trò QnA với bạn';
     } else if (noti.type == KEY_NOTIFICATION_QUESTION) {
-      notificationItemText = 'muốn kết nối với bạn';
+      notificationItemText = 'đã đặt 1 câu hỏi cho bạn';
+    } else if (noti.type == KEY_NOTIFICATION_ANSWER) {
+      notificationItemText = 'đã trả lời câu hỏi của bạn';
     } else {
       notificationItemText = 'Lỗi, Unknown type = ' + noti.type;
     }

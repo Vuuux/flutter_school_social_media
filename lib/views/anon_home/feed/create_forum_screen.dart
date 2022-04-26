@@ -35,7 +35,7 @@ class _CreateForumState extends State<CreateForum>
   bool uploading = false;
   final Reference storageReference =
       FirebaseStorage.instance.ref().child("Đăng ảnh");
-  final postReference = FirebaseFirestore.instance.collection("posts");
+
   String forumId = const Uuid().v4();
   final GoogleSignIn googleSignIn = GoogleSignIn();
   String category = "";
