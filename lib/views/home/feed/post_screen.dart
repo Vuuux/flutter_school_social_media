@@ -6,19 +6,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/controller.dart';
+import 'package:luanvanflutter/controller/post_controller.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/loading.dart';
 import 'package:luanvanflutter/utils/dimen.dart';
+import 'package:luanvanflutter/utils/user_data_service.dart';
+import 'package:luanvanflutter/utils/widget_extensions.dart';
+import 'package:luanvanflutter/views/components/buttons/bottom_sheet_button.dart';
+import 'package:luanvanflutter/views/components/rounded_input_field.dart';
 import 'package:luanvanflutter/views/home/feed/post_detail.dart';
 import 'package:provider/src/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import '../../../style/constants.dart';
 import 'comment_screen.dart';
 
 class PostItem extends StatefulWidget {
   final PostModel post;
   bool isLiked = false;
-  UserData? currentUser;
 
   PostItem({Key? key, required this.post}) : super(key: key);
 
@@ -27,6 +32,27 @@ class PostItem extends StatefulWidget {
 }
 
 class _PostItemState extends State<PostItem> {
+  late UserData currentUser;
+  TextEditingController _reasonController = TextEditingController();
+  PostController _postController = Get.put(PostController());
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUserData();
+    timeago.setLocaleMessages('vi', timeago.ViMessages());
+    timeago.setLocaleMessages('vi_short', timeago.ViShortMessages());
+    for (var val in widget.post.likes.values) {
+      if (val == true) {
+        likeCount += 1;
+      }
+    }
+  }
+
+  getCurrentUserData() async {
+    currentUser = UserDataService().getUserData()!;
+    return;
+  }
+
   buildPostHeader(String uid, BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
       future: DatabaseServices(uid: uid)
@@ -76,32 +102,114 @@ class _PostItemState extends State<PostItem> {
   }
 
   onOpenPostOption(BuildContext nContext) {
-    return widget.currentUser!.id == widget.post.ownerId
+    return currentUser.id == widget.post.ownerId
         ? showDialog(
             context: nContext,
             builder: (context) {
               return SimpleDialog(
                 children: <Widget>[
                   SimpleDialogOption(
-                    child: const Text(
-                      "Xóa bài viết",
-                    ),
-                    onPressed: () => DatabaseServices(uid: '')
-                        .deletePost(widget.post.ownerId, widget.post.postId),
-                  ),
+                      child: const Text(
+                        "Xóa bài viết",
+                      ),
+                      onPressed: () async {
+                        await DatabaseServices(uid: '').deletePost(
+                            widget.post.postId, widget.post.ownerId);
+                        _postController.getPosts();
+                        Get.back();
+                      }),
                   SimpleDialogOption(
                     child: const Text(
                       "Đóng",
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.back();
+                    },
                   )
                 ],
               );
             })
-        : null;
+        : showDialog(
+            context: nContext,
+            builder: (context) {
+              return SimpleDialog(
+                children: <Widget>[
+                  SimpleDialogOption(
+                      child: const Text(
+                        "Báo cáo bài viết",
+                      ),
+                      onPressed: () async {
+                        await Get.bottomSheet(Container(
+                          padding: const EdgeInsets.only(top: 4),
+                          height: MediaQuery.of(context).size.height * 0.40,
+                          color: Get.isDarkMode ? darkGreyColor : Colors.white,
+                          child: Column(
+                            children: [
+                              Container(
+                                height: 6,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Get.isDarkMode
+                                        ? Colors.grey[600]
+                                        : Colors.grey[300]),
+                              ),
+                              RoundedInputField(
+                                hintText: "Nhập lý do báo cáo bài viết này",
+                                title: "Lý do báo cáo",
+                                controller: _reasonController,
+                              )
+                                  .paddingSymmetric(
+                                      horizontal: Dimen.paddingCommon15)
+                                  .expand(),
+                              BottomSheetButton(
+                                  label: "Xác nhận",
+                                  color: Get.isDarkMode
+                                      ? kPrimaryDarkColor
+                                      : kPrimaryColor,
+                                  onTap: () async {
+                                    await _validateReport();
+                                  }),
+                              BottomSheetButton(
+                                  label: "Đóng",
+                                  color: Colors.white,
+                                  isClose: true,
+                                  onTap: () {
+                                    Get.back();
+                                  }),
+                            ],
+                          ),
+                        ));
+                      }),
+                  SimpleDialogOption(
+                    child: const Text(
+                      "Đóng",
+                    ),
+                    onPressed: () {
+                      Get.back();
+                    },
+                  )
+                ],
+              );
+            });
   }
 
-  buildPostImage() {
+  _validateReport() {
+    if (_reasonController.text.isEmpty) {
+      Get.defaultDialog(
+          title: "Lỗi", middleText: "Vui lòng nhập lý do báo cáo bài viết");
+    } else {
+      DatabaseServices(uid: '')
+          .reportPost(widget.post.postId, _reasonController.text);
+      Get.defaultDialog(
+          title: "Báo cáo thành công",
+          middleText:
+              "Cảm ơn bạn đã báo cáo, bài viết này sẽ được quản trị viên kiểm duyệt");
+      Get.back();
+    }
+  }
+
+  _buildPostImage() {
     return GestureDetector(
       onDoubleTap: () =>
           handleLikePost(widget.post.ownerId, widget.post.postId),
@@ -214,30 +322,9 @@ class _PostItemState extends State<PostItem> {
   bool showHeart = false;
 
   @override
-  void initState() {
-    super.initState();
-    timeago.setLocaleMessages('vi', timeago.ViMessages());
-    timeago.setLocaleMessages('vi_short', timeago.ViShortMessages());
-    for (var val in widget.post.likes.values) {
-      if (val == true) {
-        likeCount += 1;
-      }
-    }
-  }
-
-  Future getCurrentUserData(String uid) async {
-    return await DatabaseServices(uid: uid).getUserByUserId().then((value) {
-      setState(() {
-        widget.currentUser = UserData.fromDocumentSnapshot(value);
-      });
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     user = context.watch<CurrentUserId?>();
     widget.isLiked = (widget.post.likes[user!.uid] == true);
-    getCurrentUserData(user!.uid);
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -247,7 +334,7 @@ class _PostItemState extends State<PostItem> {
           SizedBox(
             height: Dimen.paddingCommon4,
           ),
-          buildPostImage(),
+          _buildPostImage(),
           buildPostFooter()
         ],
       ),
@@ -266,8 +353,10 @@ class _PostItemState extends State<PostItem> {
           widget.post.likes[user!.uid] = false;
         });
       });
-
-      DatabaseServices(uid: user!.uid).removeLikeNotifications(ownerId, postId);
+      if (currentUser.id != widget.post.ownerId) {
+        DatabaseServices(uid: user!.uid)
+            .removeLikeNotifications(ownerId, postId);
+      }
     } else if (!_isLiked) {
       DatabaseServices(uid: user!.uid)
           .likePost(user!.uid, ownerId, postId)
@@ -279,14 +368,17 @@ class _PostItemState extends State<PostItem> {
           showHeart = true;
         });
       });
-      DatabaseServices(uid: user!.uid).addLikeNotifications(
-          ownerId,
-          widget.currentUser!.username,
-          user!.uid,
-          widget.currentUser!.avatar,
-          postId,
-          widget.post.url,
-          Timestamp.now());
+
+      if (currentUser.id != widget.post.ownerId) {
+        DatabaseServices(uid: user!.uid).addLikeNotifications(
+            ownerId,
+            currentUser.username,
+            user!.uid,
+            currentUser.avatar,
+            postId,
+            widget.post.url,
+            Timestamp.now());
+      }
     }
     Timer(const Duration(milliseconds: 1000), () {
       setState(() {

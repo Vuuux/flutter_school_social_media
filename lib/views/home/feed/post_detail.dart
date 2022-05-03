@@ -46,7 +46,7 @@ class _PostDetailState extends State<PostDetail> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     PostModel post =
-                        PostModel.fromDocument(snapshot.data!.docs[0]);
+                        PostModel.fromDocumentSnapshot(snapshot.data!.docs[0]);
                     return PostItem(post: post);
                   }
                   return Loading();

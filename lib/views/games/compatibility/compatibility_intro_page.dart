@@ -52,29 +52,39 @@ class _CompatibilityIntroPageState extends State<CompatibilityIntroPage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          SizedBox(
-            height: 200,
-            width: 300,
-            child: Column(
-              children: const <Widget>[
-                AutoSizeText(
-                  '5 câu hỏi trong 10 giây!',
-                  style: TextStyle(color: Colors.white, fontSize: 17),
-                  textAlign: TextAlign.justify,
+          Center(
+            child: SizedBox(
+              height: 200,
+              width: 300,
+              child: Expanded(
+                child: Column(
+                  children: const <Widget>[
+                    AutoSizeText(
+                      '5 câu hỏi trong 10 giây!',
+                      style: TextStyle(fontSize: 17),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 3),
+                    AutoSizeText(
+                      'Câu hỏi sẽ được gởi đến bạn chat của bạn. Điểm sẽ được hiện lên.',
+                      style: TextStyle(fontSize: 17),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
-                SizedBox(height: 3),
-                AutoSizeText(
-                  'Câu hỏi sẽ được gởi đến bạn chat của bạn. Điểm sẽ được hiện lên.',
-                  style: TextStyle(color: Colors.white, fontSize: 17),
-                  textAlign: TextAlign.justify,
-                ),
-              ],
+              ),
             ),
           ),
           const SizedBox(height: 8),
           Container(
-            alignment: Alignment.center,
-            child: RaisedButton(
+            width: 150,
+            decoration: const BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(15),
+                )),
+            child: FlatButton(
+              child: const Text('Bắt đầu thôi!'),
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
@@ -88,11 +98,6 @@ class _CompatibilityIntroPageState extends State<CompatibilityIntroPage> {
                   ),
                 );
               },
-              child: const Text(
-                'Bắt đầu',
-                style:
-                    TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
-              ),
             ),
           ),
         ],

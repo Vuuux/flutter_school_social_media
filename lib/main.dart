@@ -2,9 +2,9 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get_storage/get_storage.dart';
@@ -12,8 +12,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:localization/localization.dart';
 import 'package:luanvanflutter/controller/auth_controller.dart';
 import 'package:luanvanflutter/style/theme_data.dart';
+import 'package:luanvanflutter/utils/app_localization.dart';
 import 'package:luanvanflutter/utils/theme_service.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';
+import 'package:map_location_picker/generated/l10n.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -23,6 +25,7 @@ void main() async {
   if (defaultTargetPlatform == TargetPlatform.android) {
     AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
   }
+  S.load(Locale('vi'));
   runApp(MyApp());
 }
 
@@ -43,11 +46,15 @@ class MyApp extends StatelessWidget {
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
         localizationsDelegates: const [
+          S.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: const [Locale('vi', 'VN')],
+        supportedLocales: const [
+          Locale('en', ''),
+          Locale('ar', ''),
+        ],
         theme: Themes.light,
         darkTheme: Themes.dark,
         themeMode: ThemeService().theme,

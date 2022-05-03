@@ -2,8 +2,6 @@ import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
-import 'package:luanvanflutter/controller/controller.dart';
-import 'package:luanvanflutter/models/profile_notifier.dart';
 
 //class User đăng nhập
 class CurrentUserId {
@@ -50,21 +48,23 @@ class UserData extends Equatable {
       this.playlist = "",
       this.address = ""});
 
-  UserData.fromMap(Map<String, dynamic> data) {
+  UserData.fromJson(Map<String, dynamic> data) {
     id = data['id'];
     email = data['email'];
-    username = data['name'];
+    username = data['username'];
     nickname = data['nickname'];
     gender = data['gender'];
     major = data['major'];
     bio = data['bio'];
-    avatar = data['pPic'];
+    avatar = data['avatar'];
     isAnon = data['isAnon'];
     anonBio = data['anonBio'];
     anonInterest = data['anonInterest'];
     anonAvatar = data['anonAvatar'];
-    likes = List<SubUserData>.from(
-        data['likes'].map((x) => SubUserData.fromJson(x)));
+    likes = data['likes'].length > 0
+        ? List<SubUserData>.from(
+            data['likes'].map((x) => SubUserData.fromJson(x)))
+        : [];
     playlist = data['playlist'];
     course = data['course'];
     media = data['media'];
@@ -84,20 +84,15 @@ class UserData extends Equatable {
         anonBio: data['anonBio'],
         anonInterest: data['anonInterest'],
         anonAvatar: data['anonAvatar'],
-        likes: List<SubUserData>.from(
-            data['likes'].map((x) => SubUserData.fromJson(x))),
+        likes: data['likes'].length > 0
+            ? List<SubUserData>.from(
+                data['likes'].map((x) => SubUserData.fromJson(x)))
+            : [],
         playlist: data['playlist'],
         course: data['course'],
         media: data['media'],
         address: data['address'],
         id: data['id']);
-  }
-
-  getUserData(ProfileNotifier profileNotifier, String uid) async {
-    DocumentSnapshot snapshot =
-        await DatabaseServices(uid: uid).getUserByUserId();
-    UserData data = UserData.fromDocumentSnapshot(snapshot);
-    profileNotifier.currentProfile = data;
   }
 
   @override
@@ -120,6 +115,30 @@ class UserData extends Equatable {
         playlist,
         address
       ];
+
+  static Map<String, dynamic> toJson(UserData data) {
+    Map<String, dynamic> result = {};
+    result['id'] = data.id;
+    result['email'] = data.email;
+    result['username'] = data.username;
+    result['nickname'] = data.nickname;
+    result['gender'] = data.gender;
+    result['major'] = data.major;
+    result['bio'] = data.bio;
+    result['avatar'] = data.avatar;
+    result['isAnon'] = data.isAnon;
+    result['anonBio'] = data.anonBio;
+    result['anonInterest'] = data.anonInterest;
+    result['anonAvatar'] = data.anonAvatar;
+    result['likes'] = data.likes.isNotEmpty
+        ? List<SubUserData>.from(data.likes.map((x) => SubUserData.toJson(x)))
+        : [];
+    result['playlist'] = data.playlist;
+    result['course'] = data.course;
+    result['media'] = data.media;
+    result['address'] = data.address;
+    return result;
+  }
 }
 
 class SubUserData {

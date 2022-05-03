@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/loading.dart';
@@ -72,7 +73,7 @@ class _CompatibilityStatusState extends State<CompatibilityStatus> {
                                             child: Padding(
                                               padding: const EdgeInsets.all(30),
                                               child: AutoSizeText(
-                                                "${widget.ctuer.nickname} chưa hoàn thành Quiz",
+                                                "${widget.ctuer.username} chưa hoàn thành Quiz",
                                                 style: const TextStyle(
                                                     fontSize: 40,
                                                     fontWeight:
@@ -132,25 +133,35 @@ class _CompatibilityStatusState extends State<CompatibilityStatus> {
 
   Future<int> documentThings() async {
     int count = 0;
-    DocumentSnapshot docMyAnswers = await DatabaseServices(uid: '')
-        .getDocMyCompatibilityAnswers(widget.userData.id, widget.gameRoomId);
+    List<String> myAnswers = [];
+    List<String> friendAnswers = [];
 
-    DocumentSnapshot docFriendAnswers = await DatabaseServices(uid: '')
-        .getDocFriendCompatibilityAnswers(widget.ctuer.id, widget.gameRoomId);
+    try {
+      DocumentSnapshot docMyAnswers = await DatabaseServices(uid: '')
+          .getDocMyCompatibilityAnswers(widget.userData.id, widget.gameRoomId);
+      DocumentSnapshot docFriendAnswers = await DatabaseServices(uid: '')
+          .getDocFriendCompatibilityAnswers(widget.ctuer.id, widget.gameRoomId);
+      myAnswers = List<String>.from(
+          docMyAnswers.get("answers").map((String ans) => ans.toString()));
+      friendAnswers = List<String>.from(docFriendAnswers.get("answers"));
+      if (docFriendAnswers.exists && docMyAnswers.exists) {
+        for (int i = 0; i < 5; i++) {
+          if (answer1.length < 5) {
+            answer1.add(docMyAnswers.get('answers')[i].toString());
+            answer2.add(docFriendAnswers.get('answers')[i].toString());
 
-    if (docFriendAnswers.exists && docMyAnswers.exists) {
-      for (int i = 0; i < 5; i++) {
-        if (answer1.length < 5) {
-          answer1.add(docMyAnswers.get('answers')[i].toString());
-          answer2.add(docFriendAnswers.get('answers')[i].toString());
-
-          if (docMyAnswers.get('answers')[i].toString() ==
-              docFriendAnswers.get('answers')[i].toString()) {
-            count++;
+            if (docMyAnswers.get('answers')[i].toString() ==
+                docFriendAnswers.get('answers')[i].toString()) {
+              count++;
+            }
           }
         }
       }
+    } on FirebaseException catch (error) {
+      Get.snackbar("Lỗi", "Có lỗi xảy ra:" + error.code,
+          snackPosition: SnackPosition.BOTTOM);
     }
+
     return count;
   }
 
@@ -192,12 +203,12 @@ class _CompatibilityStatusState extends State<CompatibilityStatus> {
           Align(
               alignment: const Alignment(0, 0.85),
               child: Container(
+                width: 150,
                 decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/menus/return.png'),
-                    fit: BoxFit.fill,
-                  ),
-                ),
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(15),
+                    )),
                 child: RaisedButton(
                   onPressed: () {
                     setState(() {
@@ -219,7 +230,7 @@ class _CompatibilityStatusState extends State<CompatibilityStatus> {
                     );
                   },
                   child: const Text(
-                    'Reset',
+                    'Chơi lại',
                     style: TextStyle(fontWeight: FontWeight.w100),
                   ),
                 ),

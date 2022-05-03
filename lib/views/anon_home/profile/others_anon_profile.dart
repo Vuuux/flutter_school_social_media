@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 import 'anon_follower_list.dart';
 import 'anon_following_list.dart';
@@ -239,6 +240,7 @@ class _OthersAnonProfileState extends State<OthersAnonProfile> {
     }
 
     dbServer.addNotifiCation(widget.ctuer!.id, userData.id, {
+      'notifId': Uuid().v1(),
       'type': 'request',
       'timestamp': DateTime.now(),
       'avatar': userData.avatar,

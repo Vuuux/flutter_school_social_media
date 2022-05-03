@@ -5,14 +5,14 @@ class UserDataService {
   final _box = GetStorage();
   final _key = 'userData';
 
-  void _saveDataToBox(UserData userData) {
+  void _saveDataToBox(Map<String, dynamic> userData) {
     _box.write(_key, userData);
   }
 
-  UserData? _loadThemeFromBox() => _box.read(_key);
+  UserData? _loadThemeFromBox() => UserData.fromJson(_box.read(_key));
 
   void saveUserData(UserData userData) {
-    _saveDataToBox(userData);
+    _saveDataToBox((UserData.toJson(userData)));
   }
 
   UserData? getUserData() => _loadThemeFromBox();

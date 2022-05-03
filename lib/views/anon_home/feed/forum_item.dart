@@ -39,8 +39,10 @@ class _ForumItemState extends State<ForumItem> {
                     child: const Text(
                       "Xóa bài viết",
                     ),
-                    onPressed: () => DatabaseServices(uid: '')
-                        .deletePost(widget.forum.ownerId, widget.forum.forumId),
+                    onPressed: () => DatabaseServices(uid: '').deleteForum(
+                      widget.forum.forumId,
+                      widget.forum.ownerId,
+                    ),
                   ),
                   SimpleDialogOption(
                     child: const Text(

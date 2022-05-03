@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NotificationModel {
+  final String notifId;
   final String type;
   final String userId;
   final String username;
@@ -18,7 +19,8 @@ class NotificationModel {
   final bool isAnon;
 
   NotificationModel(
-      {required this.type,
+      {required this.notifId,
+      required this.type,
       required this.userId,
       required this.username,
       required this.timestamp,
@@ -36,6 +38,8 @@ class NotificationModel {
 
   factory NotificationModel.fromDocument(DocumentSnapshot doc) {
     return NotificationModel(
+      notifId:
+          doc.data().toString().contains('notifId') ? doc.get('notifId') : '',
       type: doc.data().toString().contains('type') ? doc.get('type') : '',
       userId: doc.data().toString().contains('userId') ? doc.get('userId') : '',
       username:

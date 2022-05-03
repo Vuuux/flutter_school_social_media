@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:uuid/uuid.dart';
@@ -139,30 +140,33 @@ class _QuestionGameState extends State<QuestionGame>
       print('Xong');
       print(myAnswers);
       print(questions);
-
-      DatabaseServices(uid: '').createQAGameRoom(
-          gameRoomId: widget.gameRoomId,
-          player1: widget.userData.id,
-          player2: widget.ctuer.id);
-      DatabaseServices(uid: '').uploadAnswersQAGame(
-        uid: widget.userData.id,
-        gameRoomId: widget.gameRoomId,
-        myAnswers: myAnswers,
-      );
-      DatabaseServices(uid: '').uploadQAGameQuestions(
-        gameRoomId: widget.gameRoomId,
-        questions: questions,
-      );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CompatibilityStatus(
-            userData: widget.userData,
-            ctuer: widget.ctuer,
+      try {
+        DatabaseServices(uid: '').createQAGameRoom(
             gameRoomId: widget.gameRoomId,
+            player1: widget.userData.id,
+            player2: widget.ctuer.id);
+        DatabaseServices(uid: '').uploadAnswersQAGame(
+          uid: widget.userData.id,
+          gameRoomId: widget.gameRoomId,
+          myAnswers: myAnswers,
+        );
+        DatabaseServices(uid: '').uploadQAGameQuestions(
+          gameRoomId: widget.gameRoomId,
+          questions: questions,
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CompatibilityStatus(
+              userData: widget.userData,
+              ctuer: widget.ctuer,
+              gameRoomId: widget.gameRoomId,
+            ),
           ),
-        ),
-      );
+        );
+      } on FirebaseException catch (error) {
+        Get.snackbar("Lỗi", "Có lỗi xảy ra:" + error.code);
+      }
     }
   }
 
@@ -214,15 +218,15 @@ class _QuestionGameState extends State<QuestionGame>
                                           currentCompatibilityCard!.question,
                                           textAlign: TextAlign.center,
                                           style: const TextStyle(
-                                              fontSize: 20.0,
-                                              color: Colors.white),
+                                            fontSize: 20.0,
+                                          ),
                                         ),
                                       ),
                                       Text(
                                         timerString,
                                         style: const TextStyle(
-                                            fontSize: 112.0,
-                                            color: Colors.white),
+                                          fontSize: 112.0,
+                                        ),
                                       ),
                                       Row(
                                         mainAxisAlignment:

@@ -65,13 +65,15 @@ class AuthService {
           await _auth.createUserWithEmailAndPassword(
               email: email.trim(), password: password.trim());
       User? user = credentialResult.user;
+      String uid = user!.uid;
       bool uploadResult = false;
       final Reference storageReference =
-          FirebaseStorage.instance.ref().child("Profile Pictures");
+          FirebaseStorage.instance.ref().child("profile");
       if (user != null) {
         await _auth.signInWithEmailAndPassword(
             email: email.trim(), password: password.trim());
-        UploadTask uploadTask = storageReference.putFile(pickedAvatar);
+        UploadTask uploadTask =
+            storageReference.child("profile_$uid").putFile(pickedAvatar);
         TaskSnapshot taskSnapshot = await uploadTask;
         var imgURL = (await taskSnapshot.ref.getDownloadURL()).toString();
 

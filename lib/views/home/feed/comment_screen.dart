@@ -1,10 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comment_tree/comment_tree.dart';
+import 'package:either_dart/either.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:luanvanflutter/controller/comment_controller.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/comment.dart';
 import 'package:luanvanflutter/models/user.dart';
@@ -42,9 +45,12 @@ class ShowComments extends StatefulWidget {
 }
 
 class _ShowCommentsState extends State<ShowComments> {
+  final _commentController = Get.put(CommentController());
+
   @override
   void initState() {
     super.initState();
+    _commentController.getComments(widget.postId);
     if (mounted) {
       widget.commentController.addListener(() {
         if (widget.commentController.text.isEmpty ||
@@ -81,7 +87,7 @@ class _ShowCommentsState extends State<ShowComments> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Expanded(child: buildCommentTree(user!.uid, widget.postId)),
+          Expanded(child: buildCommentTreeNew()),
           const Divider(),
           ListTile(
             title: TextFormField(
@@ -89,7 +95,7 @@ class _ShowCommentsState extends State<ShowComments> {
               decoration: const InputDecoration(labelText: "Nhập bình luận..."),
             ),
             trailing: OutlineButton(
-              onPressed: () => handlePostComment(user.uid),
+              onPressed: () => handlePostComment(user!.uid),
               borderSide: BorderSide.none,
               child: const Text("GỬI"),
             ),
@@ -99,35 +105,30 @@ class _ShowCommentsState extends State<ShowComments> {
     );
   }
 
-  buildCommentTree(String uid, String postId) {
-    return StreamBuilder<QuerySnapshot>(
-        stream: Stream.fromFuture(
-            DatabaseServices(uid: "").getComments(widget.postId)),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData) {
-              return ListView.builder(
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    CommentModel comment;
-                    comment =
-                        CommentModel.fromDocument(snapshot.data!.docs[index]);
-                    return StreamBuilder<QuerySnapshot>(
-                        stream: Stream.fromFuture(DatabaseServices(uid: uid)
-                            .getReplyComments(postId, comment.commentId)),
-                        builder: (context, snapshot2) {
-                          List<CommentModel> cmtList = [];
-                          if (snapshot2.hasData) {
-                            for (var doc in snapshot2.data!.docs) {
-                              CommentModel cmt = CommentModel.fromDocument(doc);
-                              cmtList.add(cmt);
-                            }
-                          }
+  buildCommentTreeNew() => Obx(() {
+        return _commentController.commentList.isEmpty
+            ? Center(
+                child: Text("Chưa có bình luận nào"),
+              )
+            : ListView.builder(
+                itemCount: _commentController.commentList.length,
+                itemBuilder: (context, index) {
+                  CommentModel comment;
+                  comment = _commentController.commentList[index];
+                  return StreamBuilder<
+                          Either<QuerySnapshot, FirebaseException>>(
+                      stream: Stream.fromFuture(DatabaseServices(uid: '')
+                          .getReplyCommentsNew(
+                              widget.postId, comment.commentId)),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          List<CommentModel> cmtList = _commentController
+                              .getReplyComments(snapshot.data!);
                           return Container(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 12, horizontal: 16),
                             child: CommentTree(
-                              postId: postId,
+                              postId: widget.postId,
                               comment: comment,
                               cmtList: cmtList,
                               onClickReply: (data, replyTo, tag) {
@@ -138,16 +139,62 @@ class _ShowCommentsState extends State<ShowComments> {
                               },
                             ),
                           );
-                        });
-                  });
-            } else {
-              return Loading();
-            }
-          } else {
-            return Loading();
-          }
-        });
-  }
+                        }
+                        return Loading();
+                      });
+                });
+      });
+
+  // buildCommentTree(String uid, String postId) {
+  //   return StreamBuilder<QuerySnapshot>(
+  //       stream: Stream.fromFuture(
+  //           DatabaseServices(uid: "").getComments(widget.postId)),
+  //       builder: (context, snapshot) {
+  //         if (snapshot.connectionState == ConnectionState.done) {
+  //           if (snapshot.hasData) {
+  //             return ListView.builder(
+  //                 itemCount: snapshot.data!.docs.length,
+  //                 itemBuilder: (context, index) {
+  //                   CommentModel comment;
+  //                   comment = CommentModel.fromDocumentSnapshot(
+  //                       snapshot.data!.docs[index]);
+  //                   return StreamBuilder<QuerySnapshot>(
+  //                       stream: Stream.fromFuture(DatabaseServices(uid: uid)
+  //                           .getReplyComments(postId, comment.commentId)),
+  //                       builder: (context, snapshot2) {
+  //                         List<CommentModel> cmtList = [];
+  //                         if (snapshot2.hasData) {
+  //                           for (var doc in snapshot2.data!.docs) {
+  //                             CommentModel cmt =
+  //                                 CommentModel.fromDocumentSnapshot(doc);
+  //                             cmtList.add(cmt);
+  //                           }
+  //                         }
+  //                         return Container(
+  //                           padding: const EdgeInsets.symmetric(
+  //                               vertical: 12, horizontal: 16),
+  //                           child: CommentTree(
+  //                             postId: postId,
+  //                             comment: comment,
+  //                             cmtList: cmtList,
+  //                             onClickReply: (data, replyTo, tag) {
+  //                               widget.commentController.text =
+  //                                   '@' + data.username + ' ';
+  //                               widget.replyTo = replyTo;
+  //                               widget.tag = tag;
+  //                             },
+  //                           ),
+  //                         );
+  //                       });
+  //                 });
+  //           } else {
+  //             return Loading();
+  //           }
+  //         } else {
+  //           return Loading();
+  //         }
+  //       });
+  // }
 
   Future<String> getReplyName(String tagId) async {
     return DatabaseServices(uid: tagId).getUserByUserId().then((value) {
@@ -175,18 +222,24 @@ class _ShowCommentsState extends State<ShowComments> {
     } else {
       comment = widget.commentController.text;
     }
+    CommentModel newComment = CommentModel(
+        commentId: uuid.v4(),
+        userId: currentUser.id,
+        username: currentUser.username,
+        avatar: currentUser.avatar,
+        comment: comment,
+        replyTo: widget.replyTo,
+        tagId: widget.tag,
+        timestamp: Timestamp.now(),
+        likes: {});
 
-    DatabaseServices(uid: uid).postComment(
-      widget.postId,
-      currentUser.id,
-      uuid.v4(),
-      currentUser.username,
-      comment,
-      Timestamp.now(),
-      currentUser.avatar,
-      widget.replyTo,
-      widget.tag,
+    _commentController.addComment(
+      comment: newComment,
+      postId: widget.postId,
     );
+
+    _commentController.getComments(widget.postId);
+
     bool isNotPostOwner = widget.ownerId != uid;
     if (isNotPostOwner) {
       DatabaseServices(uid: uid).addCommentNotifications(

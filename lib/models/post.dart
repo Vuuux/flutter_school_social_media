@@ -20,7 +20,7 @@ class PostModel {
       required this.likes,
       required this.timestamp});
 
-  factory PostModel.fromDocument(DocumentSnapshot doc) {
+  factory PostModel.fromDocumentSnapshot(DocumentSnapshot doc) {
     return PostModel(
       postId: doc['postId'] ?? "",
       ownerId: doc['ownerId'] ?? "",

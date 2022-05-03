@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eventual/eventual-builder.dart';
 import 'package:eventual/eventual-notifier.dart';
 import 'package:eventual/eventual-single-builder.dart';
@@ -9,6 +10,7 @@ import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/utils/notify_service.dart';
 import 'package:luanvanflutter/utils/theme_service.dart';
+import 'package:luanvanflutter/utils/user_data_service.dart';
 import 'package:luanvanflutter/views/anon_home/anon_notifications_page.dart';
 import 'package:luanvanflutter/views/anon_home/feed/forum_feed.dart';
 import 'package:luanvanflutter/views/anon_home/profile/anon_profile.dart';
@@ -20,7 +22,6 @@ import 'package:luanvanflutter/views/home/search/example_search_screen.dart';
 import 'package:luanvanflutter/views/home/task/task_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
-
 import 'views/home/chat/chat_screen.dart';
 import 'views/home/feed/feed.dart';
 import 'views/home/notifications_page.dart';
@@ -97,6 +98,13 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    Future.delayed(Duration(milliseconds: 200), () async {
+      DocumentSnapshot snapshot =
+          await DatabaseServices(uid: user!.uid).getUserByUserId();
+      UserData data = UserData.fromDocumentSnapshot(snapshot);
+      UserDataService().saveUserData(data);
+    });
+
     notifyHelper = NotifyHelper();
     notifyHelper.initializeNotification();
     notifyHelper.requestIOSPermissions();
@@ -150,6 +158,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+
     user = Provider.of<CurrentUserId?>(context);
     _saveDeviceToken(user!.uid);
     final tabs = [

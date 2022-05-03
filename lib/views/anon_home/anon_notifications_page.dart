@@ -11,6 +11,7 @@ import 'package:luanvanflutter/utils/helper.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as tAgo;
+import 'package:uuid/uuid.dart';
 
 import '../../controller/controller.dart';
 import 'feed/anon_forum_detail.dart';
@@ -250,6 +251,7 @@ class _AnonNotificationsItemState extends State<AnonNotificationsItem> {
     widget.databaseService.acceptRequest(user.uid, widget.noti.userId);
 
     widget.databaseService.addNotifiCation(widget.noti.userId, user.uid, {
+      'notifId': Uuid().v1(),
       'type': 'accept-request',
       'timestamp': DateTime.now(),
       'avatar': widget.userData!.avatar,

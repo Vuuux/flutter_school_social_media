@@ -189,7 +189,7 @@ class _CommentItem extends State<CommentItem> {
                   itemBuilder: (context, index) {
                     return CommentItem(
                         postId: widget.postId,
-                        data: CommentModel.fromDocument(
+                        data: CommentModel.fromDocumentSnapshot(
                             snapshot.data!.docs[index]),
                         size: const Size(100, 100));
                   },

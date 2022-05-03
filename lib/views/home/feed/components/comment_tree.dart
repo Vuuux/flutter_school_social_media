@@ -33,6 +33,11 @@ class CommentTree extends StatefulWidget {
 }
 
 class _CommentTreeState extends State<CommentTree> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   Future<bool> handleLikeComment(
       String postId, String uid, CommentModel data) async {
     if (data.likes[uid] == false || data.likes.isEmpty) {
@@ -48,39 +53,48 @@ class _CommentTreeState extends State<CommentTree> {
 
   Widget _buildLikeReply(String rootCommentId, String postId, String uid,
           CommentModel data, bool isLiked) =>
-      Row(
-        children: [
-          const SizedBox(
-            width: 8,
-          ),
-          GestureDetector(
-              onTap: () async {
-                await handleLikeComment(postId, uid, data).then((value) {
-                  setState(() {
-                    isLiked = value;
+      Expanded(
+        child: Row(
+          children: [
+            const SizedBox(
+              width: 8,
+            ),
+            GestureDetector(
+                onTap: () async {
+                  await handleLikeComment(postId, uid, data).then((value) {
+                    setState(() {
+                      isLiked = value;
+                    });
                   });
-                });
-              },
+                },
+                child: Text(
+                  'Like',
+                  style: TextStyle(
+                      color: isLiked ? Colors.blue[800] : Colors.grey[700],
+                      fontWeight: FontWeight.bold),
+                )),
+            const SizedBox(
+              width: 24,
+            ),
+            GestureDetector(
+                onTap: () =>
+                    widget.onClickReply(data, rootCommentId, data.userId),
+                child: Text('Reply')),
+            const SizedBox(
+              width: 12,
+            ),
+            buildLikeCount(data),
+            SizedBox(
+              width: 8.0,
+            ),
+            Expanded(
               child: Text(
-                'Like',
-                style: TextStyle(
-                    color: isLiked ? Colors.blue[800] : Colors.grey[700],
-                    fontWeight: FontWeight.bold),
-              )),
-          const SizedBox(
-            width: 24,
-          ),
-          GestureDetector(
-              onTap: () =>
-                  widget.onClickReply(data, rootCommentId, data.userId),
-              child: Text('Reply')),
-          const SizedBox(
-            width: 12,
-          ),
-          Text(timeago.format(data.timestamp.toDate())),
-          const Spacer(),
-          buildLikeCount(data)
-        ],
+                timeago.format(data.timestamp.toDate(), locale: "vi"),
+                overflow: TextOverflow.ellipsis,
+              ),
+            )
+          ],
+        ),
       );
 
   buildLikeCount(CommentModel data) {

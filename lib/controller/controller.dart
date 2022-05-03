@@ -7,11 +7,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:either_dart/either.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:luanvanflutter/models/comment.dart';
 import 'package:luanvanflutter/models/notification.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/task.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/views/home/notifications_page.dart';
+import 'package:uuid/uuid.dart';
 
 //class xác thực đăng nhập
 //Class dịch vụ từ database
@@ -22,6 +24,10 @@ class DatabaseServices {
   DatabaseServices({this.uid});
 
   Future<DocumentSnapshot<Object?>> getUserByUserId() async {
+    return await userReference.doc(uid).get();
+  }
+
+  Future<DocumentSnapshot<Object?>> getCtuerById(String uid) async {
     return await userReference.doc(uid).get();
   }
 
@@ -63,7 +69,7 @@ class DatabaseServices {
   final qaGameReference = FirebaseFirestore.instance.collection('qaGames');
   final bondReference = FirebaseFirestore.instance.collection('bonds');
   final taskReference = FirebaseFirestore.instance.collection('tasks');
-
+  final reportReference = FirebaseFirestore.instance.collection('reports');
   Future uploadWhoData(
       {required String email,
       required String username,
@@ -146,7 +152,7 @@ class DatabaseServices {
     for (var value in data.values) {
       await value.get().then((val) {
         Map<String, dynamic> ctuer = val.data() as Map<String, dynamic>;
-        ctuers.add(UserData.fromMap(ctuer));
+        ctuers.add(UserData.fromJson(ctuer));
       });
     }
 
@@ -165,7 +171,7 @@ class DatabaseServices {
     for (var value in data.values) {
       await value.get().then((val) {
         Map<String, dynamic> ctuer = val.data() as Map<String, dynamic>;
-        ctuers.add(UserData.fromMap(ctuer));
+        ctuers.add(UserData.fromJson(ctuer));
       });
     }
 
@@ -319,6 +325,7 @@ class DatabaseServices {
         .collection('feedItems')
         .doc(postId)
         .set({
+      'notifId': Uuid().v1(),
       "type": "like",
       "username": username,
       "userId": userId,
@@ -474,16 +481,14 @@ class DatabaseServices {
     await timelineReference.doc(postId).update({'likes.$unlikerId': false});
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> getTimelinePosts(
-      String ownerId) async {
-    //NEW WAY
-    // return timelineReference
-    //     .doc(ownerId)
-    //     .collection('timelinePosts')
-    //     .orderBy("timestamp", descending: true)
-    //     .get();
-
-    return timelineReference.orderBy("timestamp", descending: true).get();
+  Future<Either<QuerySnapshot, FirebaseException>> getTimelinePosts() async {
+    try {
+      var snapshot =
+          await timelineReference.orderBy("timestamp", descending: true).get();
+      return Left(snapshot);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getPostById(
@@ -495,6 +500,20 @@ class DatabaseServices {
         .snapshots();
   }
 
+  Future<Either<QuerySnapshot, FirebaseException>> searchPost(
+      String query) async {
+    try {
+      var result = await timelineReference
+          .where("description", isGreaterThanOrEqualTo: query)
+          .orderBy('description', descending: true)
+          .orderBy("timestamp", descending: false)
+          .get();
+      return Left(result);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
+  }
+
   Future<QuerySnapshot<Map<String, dynamic>>> getMyPosts() async {
     return postReference
         .doc(uid)
@@ -503,12 +522,41 @@ class DatabaseServices {
         .get();
   }
 
+  Future<Either<QuerySnapshot, FirebaseException>> getPosts() async {
+    try {
+      var snapshot = await postReference
+          .doc(uid)
+          .collection('userPosts')
+          .orderBy("timestamp", descending: true)
+          .get();
+      return Left(snapshot);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
+  }
+
+  Future<Either<bool, FirebaseException>> deleteForum(
+      String postId, String userId) async {
+    try {
+      await forumReference.doc(postId).get().then((value) {
+        if (value.exists) {
+          value.reference.delete();
+        }
+      });
+
+      await deleteTimelinePost(postId);
+      return const Left(true);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
+  }
+
   Future<Either<bool, FirebaseException>> deletePost(
-      String userId, String postId) async {
+      String postId, String userId) async {
     try {
       await postReference
-          // .doc(userId)
-          // .collection('userPosts')
+          .doc(userId)
+          .collection("userPosts")
           .doc(postId)
           .get()
           .then((value) {
@@ -524,10 +572,21 @@ class DatabaseServices {
     }
   }
 
+  Future<Either<bool, FirebaseException>> reportPost(
+      String postId, String reason) async {
+    try {
+      await reportReference.doc(postId).set(
+          {"postId": postId, "reason": reason, "timestamp": Timestamp.now()});
+      return const Left(true);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
+  }
+
   Future<Either<bool, FirebaseException>> createPost(PostModel post) async {
     try {
       await postReference
-          .doc(post.ownerId)
+          .doc(uid)
           .collection('userPosts')
           .doc(post.postId)
           .set({
@@ -550,21 +609,6 @@ class DatabaseServices {
   }
 
   Future addPostToTimeline(PostModel post) async {
-    // await timelineReference
-    //     //     .doc(post.ownerId)
-    //     //     .collection('timelinePosts')
-    //     //     .doc(post.postId)
-    //     //     .set({
-    //     //   "postId": post.postId,
-    //     //   "username": post.username,
-    //     //   "timestamp": Timestamp.now(),
-    //     //   "ownerId": post.ownerId,
-    //     //   "description": post.description,
-    //     //   "location": post.location,
-    //     //   "likes": post.likes,
-    //     //   "url": post.url
-    //     // });
-
     await timelineReference.doc(post.postId).set({
       "postId": post.postId,
       "username": post.username,
@@ -585,31 +629,37 @@ class DatabaseServices {
     });
   }
 
-  Future postComment(
-      String postId,
-      String userId,
-      String commentId,
-      String username,
-      String comment,
-      Timestamp timestamp,
-      String avatar,
-      String replyTo,
-      String tagId) async {
+  Future postComment(String postId, CommentModel comment) async {
     return await commentReference
         .doc(postId)
         .collection('userComments')
-        .doc(commentId)
+        .doc(comment.commentId)
         .set({
-      "userId": userId,
-      "commentId": commentId,
-      "username": username,
-      "comment": comment,
-      "timestamp": timestamp,
-      "avatar": avatar,
-      "replyTo": replyTo,
-      "tagId": tagId,
+      "userId": comment.userId,
+      "commentId": comment.commentId,
+      "username": comment.username,
+      "comment": comment.comment,
+      "timestamp": comment.timestamp,
+      "avatar": comment.avatar,
+      "replyTo": comment.replyTo,
+      "tagId": comment.tagId,
       "likes": {},
     });
+  }
+
+  Future<Either<QuerySnapshot, FirebaseException>> getCommentsNew(
+      String postId) async {
+    try {
+      var response = await commentReference
+          .doc(postId)
+          .collection('userComments')
+          .where('replyTo', isEqualTo: "")
+          .orderBy('timestamp', descending: true)
+          .get();
+      return Left(response);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getComments(String postId) async {
@@ -619,6 +669,25 @@ class DatabaseServices {
         .where('replyTo', isEqualTo: "")
         .orderBy('timestamp', descending: true)
         .get();
+  }
+
+  Future<Either<bool, FirebaseException>> deleteComment(
+      String postId, String commentId) async {
+    try {
+      var response = await commentReference
+          .doc(postId)
+          .collection('userComments')
+          .doc(commentId)
+          .get()
+          .then((value) {
+        if (value.exists) {
+          value.reference.delete();
+        }
+      });
+      return Left(response);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
   }
 
   likeComment(String postId, String commentId) async {
@@ -637,7 +706,22 @@ class DatabaseServices {
         .update({'likes.$uid': false});
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> getReplyComments(
+  Future<Either<QuerySnapshot, FirebaseException>> getReplyCommentsNew(
+      String postId, String commentId) async {
+    try {
+      var response = await commentReference
+          .doc(postId)
+          .collection('userComments')
+          .where('replyTo', isEqualTo: commentId)
+          .orderBy('timestamp', descending: true)
+          .get();
+      return Left(response);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
+  }
+
+  Future<QuerySnapshot> getReplyComments(
       String postId, String commentId) async {
     return await commentReference
         .doc(postId)
@@ -657,6 +741,7 @@ class DatabaseServices {
       required String url,
       required Timestamp timestamp}) async {
     return await feedReference.doc(postOwnerId).collection('feedItems').add({
+      "notifId": Uuid().v1(),
       "type": "comment",
       "commentData": comment,
       "postId": postId,
@@ -761,8 +846,10 @@ class DatabaseServices {
         anonAvatar: doc.data().toString().contains('anonAvatar')
             ? doc.get('anonAvatar')
             : '',
-        likes: List<SubUserData>.from(
-            doc.get('likes').map((x) => SubUserData.fromJson(x))),
+        likes: doc['likes'].length > 0
+            ? List<SubUserData>.from(
+                doc['likes'].map((x) => SubUserData.fromJson(x)))
+            : [],
         media: doc.data().toString().contains('media') ? doc.get('media') : '',
         course:
             doc.data().toString().contains('course') ? doc.get('course') : '',
@@ -864,7 +951,10 @@ class DatabaseServices {
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getChatRooms(String userId) {
-    return chatReference.where("users", arrayContains: userId).snapshots();
+    return chatReference
+        .where("users", arrayContains: userId)
+        .orderBy('timestamp', descending: true)
+        .snapshots();
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> getAllNotifications() async {
@@ -900,11 +990,12 @@ class DatabaseServices {
         .set(data);
   }
 
-  Future updateNotification(String ownerId, String userId, dynamic data) async {
+  Future updateNotification(
+      String ownerId, String notifId, dynamic data) async {
     return await feedReference
         .doc(ownerId)
         .collection('feedItems')
-        .doc(userId)
+        .doc(notifId)
         .update(data);
   }
 
@@ -1040,6 +1131,7 @@ class DatabaseServices {
         .collection('anonFeedItems')
         .doc(forumId)
         .set({
+      "notifId": Uuid().v1(),
       "type": "vote",
       "username": nickname,
       "userId": userId,
@@ -1102,6 +1194,7 @@ class DatabaseServices {
         .doc(postOwnerId)
         .collection('anonFeedItems')
         .add({
+      "notifId": Uuid().v1(),
       "type": "forum-comment",
       "commentData": comment,
       "forumId": forumId,

@@ -315,8 +315,8 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
                     CommentModel comment;
-                    comment =
-                        CommentModel.fromDocument(snapshot.data!.docs[index]);
+                    comment = CommentModel.fromDocumentSnapshot(
+                        snapshot.data!.docs[index]);
                     return StreamBuilder<QuerySnapshot>(
                         stream: Stream.fromFuture(DatabaseServices(uid: uid)
                             .getForumReplyComments(forumId, comment.commentId)),
@@ -324,7 +324,8 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
                           List<CommentModel> cmtList = [];
                           if (snapshot2.hasData) {
                             for (var doc in snapshot2.data!.docs) {
-                              CommentModel cmt = CommentModel.fromDocument(doc);
+                              CommentModel cmt =
+                                  CommentModel.fromDocumentSnapshot(doc);
                               cmtList.add(cmt);
                             }
                           }

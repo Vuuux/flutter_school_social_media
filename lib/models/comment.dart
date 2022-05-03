@@ -26,7 +26,7 @@ class CommentModel {
     required this.likes,
   });
 
-  factory CommentModel.fromDocument(DocumentSnapshot doc) {
+  factory CommentModel.fromDocumentSnapshot(DocumentSnapshot doc) {
     return CommentModel(
         commentId: doc['commentId'],
         userId: doc['userId'],

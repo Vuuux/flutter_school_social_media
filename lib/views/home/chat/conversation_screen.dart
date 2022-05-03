@@ -20,6 +20,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:uuid/uuid.dart';
 
 class ConversationScreen extends StatefulWidget {
   final String chatRoomId;
@@ -58,7 +59,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
           if (messageList.length == 0) {
             return const Center(
               child: Text(
-                  " Bạn không có cuộc trò chuyện nào, hãy tìm thêm bạn để bắt đầu cuộc trò chuyện "),
+                "Nói gì đó để bắt đầu cuộc trò chuyện nào!",
+                textAlign: TextAlign.center,
+              ),
             );
           }
           return ListView.builder(
@@ -96,6 +99,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
           .addConversationMessages(widget.chatRoomId, messageMap);
       DatabaseServices(uid: '')
           .addNotifiCation(widget.ctuer.id, widget.userId, {
+        'notifId': Uuid().v1(),
         'userId': userData.id,
         'type': 'message',
         'messageData': message,
@@ -210,19 +214,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
                             builder: (context) => CompatibilityStart(
                                   ctuer: widget.ctuer,
                                   userData: userData,
-                                  gameRoomId: value.docs[0].id,
+                                  gameRoomId: value.docs.isNotEmpty
+                                      ? value.docs[0].id
+                                      : "",
                                 )));
                       });
-
-                      // Navigator.of(context).pushAndRemoveUntil(
-                      //     FadeRoute(
-                      //       page: CompatibilityStart(
-                      //           friendAnon: false,
-                      //           userData: widget.userData,
-                      //           ctuer: widget.ctuer,
-                      //           ctuerList: widget.ctuerList),
-                      //     ),
-                      //     ModalRoute.withName('CompatibilityStart'));
                     },
                   ),
                 ],

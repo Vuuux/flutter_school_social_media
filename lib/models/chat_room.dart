@@ -12,7 +12,7 @@ class ChatRoom {
   factory ChatRoom.fromDocumentSnapshot(DocumentSnapshot snapshot) {
     return ChatRoom(
       chatRoomId: snapshot["chatRoomId"],
-      users: snapshot["users"],
+      users: List<String>.from(snapshot["users"].map((user) => user)),
       timestamp: snapshot["timestamp"],
     );
   }

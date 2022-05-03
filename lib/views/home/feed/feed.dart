@@ -9,12 +9,11 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:luanvanflutter/controller/controller.dart';
+import 'package:luanvanflutter/controller/post_controller.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
-import 'package:luanvanflutter/utils/helper.dart';
-import 'package:luanvanflutter/utils/theme_service.dart';
 import 'package:luanvanflutter/views/components/app_bar/custom_sliver_app_bar.dart';
 import 'package:luanvanflutter/views/components/buttons/ripple_animation.dart';
 import 'package:luanvanflutter/views/components/dialog/custom_dialog.dart';
@@ -22,7 +21,6 @@ import 'package:luanvanflutter/views/components/search_bar.dart';
 import 'package:luanvanflutter/views/home/feed/post_screen.dart';
 import 'package:luanvanflutter/views/home/feed/upload_image_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 //Class feed chứa các bài post
 class Feed extends StatefulWidget {
@@ -33,7 +31,7 @@ class Feed extends StatefulWidget {
 }
 
 class _FeedState extends State<Feed> {
-  Stream<QuerySnapshot>? postsStream;
+  final _postController = Get.put(PostController());
   final timelineReference = FirebaseFirestore.instance.collection('posts');
   ScrollController scrollController = ScrollController();
   TextEditingController searchController = TextEditingController();
@@ -41,48 +39,41 @@ class _FeedState extends State<Feed> {
   final picker = ImagePicker(); //API chọn hình ảnh
   final FirebaseAuth auth = FirebaseAuth.instance;
   Future<QuerySnapshot>? postFuture;
-  RefreshController _controller = RefreshController(initialRefresh: false);
-
   //lấy time từ post
-
-  Future<void> _onRefresh() async {
-    await Future.delayed(Duration(seconds: 1), () {
-      searchController.clear();
-      loadData();
-    });
-    _controller.refreshCompleted();
-  }
-
-  void _onLoading() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use loadFailed(),if no data return,use LoadNodata()
-    //listPosts.add((listPosts.length+1).toString());
-    if (mounted) setState(() {});
-    _controller.loadComplete();
-  }
-
-  handleSearch(String query) {
-    Future<QuerySnapshot> posts = DatabaseServices(uid: '')
-        .timelineReference
-        .where("description", isGreaterThanOrEqualTo: query)
-        .get();
-    setState(() {
-      postFuture = posts;
-    });
+  _handleSearch(String query) {
+    _postController.searchPost(query);
   }
 
   clearSearch() {
     searchController.clear();
   }
 
-  loadData() {
-    Future<QuerySnapshot> posts = DatabaseServices(uid: currentUser.uid)
-        .getTimelinePosts(currentUser.uid);
-    setState(() {
-      postFuture = posts;
-    });
-  }
+  Widget _buildPostList() => Obx(
+        () {
+          return ListView.separated(
+            shrinkWrap: true,
+            controller: scrollController,
+            itemCount: _postController.postList.length,
+            itemBuilder: (context, index) {
+              final PostModel post = _postController.postList[index];
+              return AnimationConfiguration.staggeredList(
+                  position: index,
+                  child: SlideAnimation(
+                      child: FadeInAnimation(child: PostItem(post: post))));
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return Container(
+                height: 6,
+                width: 120,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color:
+                        Get.isDarkMode ? Colors.grey[600] : Colors.grey[300]),
+              );
+            },
+          );
+        },
+      );
 
   Widget postList(CurrentUserId currentUser) {
     return StreamBuilder<QuerySnapshot>(
@@ -90,7 +81,7 @@ class _FeedState extends State<Feed> {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<PostModel> listPost = snapshot.data!.docs
-              .map((doc) => PostModel.fromDocument(doc))
+              .map((doc) => PostModel.fromDocumentSnapshot(doc))
               .toList();
           if (listPost.isEmpty) {
             return const Center(
@@ -133,7 +124,7 @@ class _FeedState extends State<Feed> {
     super.initState();
     String userId = auth.currentUser!.uid;
     currentUser = CurrentUserId(uid: userId);
-    loadData();
+    _postController.getPosts();
   }
 
   circularProgress() {
@@ -160,13 +151,8 @@ class _FeedState extends State<Feed> {
       // .pushAndRemoveUntil(
       //     FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
     } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              UploadImage(file: imageFile, userData: userData),
-        ),
-      );
+      await Get.to(() => UploadImage(file: imageFile, userData: userData));
+      _postController.getPosts();
     }
   }
 
@@ -180,13 +166,8 @@ class _FeedState extends State<Feed> {
       // Navigator.of(context).pushAndRemoveUntil(
       //     FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
     } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              UploadImage(file: imageFile, userData: userData),
-        ),
-      );
+      await Get.to(() => UploadImage(file: imageFile, userData: userData));
+      _postController.getPosts();
     }
   }
 
@@ -252,19 +233,28 @@ class _FeedState extends State<Feed> {
                                 ),
                                 trailingIcon: Icons.image,
                                 onLeadingClick: () => null,
-                                onTrailingClick: () {
-                                  takeImage(userData!);
+                                onTrailingClick: () async {
+                                  await takeImage(userData!);
                                 }),
                           ],
                   body: Stack(
                     children: [
-                      postList(user).paddingOnly(top: 55),
+                      Obx(() => _postController.requestStatus.value ==
+                              RequestStatus.LOADING
+                          ? Loading()
+                          : RefreshIndicator(
+                              onRefresh: () async {
+                                await _postController.getPosts();
+                                return;
+                              },
+                              child: _buildPostList())).paddingOnly(top: 55),
                       CustomSearchBar(
-                        onSearchSubmit: handleSearch,
-                        onTapCancel: loadData,
+                        onSearchSubmit: (query) => _handleSearch(query),
+                        onTapCancel: () => _postController.getPosts(),
                         searchController: searchController,
                         hintText: 'Tìm kiếm bài viết...',
                       ),
+                      //Obx(() => _postController.requestStatus.value == RequestStatus.LOADING ? Loading() : _buildPostList()),
                       Positioned(
                         bottom: 80.0,
                         right: 8.0,
@@ -301,8 +291,6 @@ class _FeedState extends State<Feed> {
                       )
                     ],
                   )));
-          // RefreshIndicator(
-          //     child: createTimeLine(), onRefresh: () => retrieveTimeline()));
         });
   }
 

@@ -74,17 +74,6 @@ class ChatScreenTile extends StatelessWidget {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => ConversationScreen(
                       chatRoomId: chatRoomId, ctuer: ctuer, userId: userId)));
-              // .pushAndRemoveUntil(
-              //   FadeRoute(
-              //     page: ConversationScreen(
-              //       ctuerList: ctuerList,
-              //       ctuer: currentCtuer,
-              //       chatRoomId: chatRoomId,
-              //       userData: userData,
-              //     ),
-              //   ),
-              //   ModalRoute.withName('ConversationScreen'),
-              // );
             },
             menuItems: <FocusedMenuItem>[
               FocusedMenuItem(

@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:map_picker/map_picker.dart';
+//import 'package:map_picker/map_picker.dart';
 
 class LocationPicker extends StatefulWidget {
   const LocationPicker({Key? key}) : super(key: key);
@@ -15,7 +15,7 @@ class LocationPicker extends StatefulWidget {
 
 class _LocationPickerState extends State<LocationPicker> {
   final _controller = Completer<GoogleMapController>();
-  MapPickerController mapPickerController = MapPickerController();
+  //MapPickerController mapPickerController = MapPickerController();
 
   CameraPosition cameraPosition = const CameraPosition(
     target: LatLng(41.311158, 69.279737),
@@ -29,48 +29,48 @@ class _LocationPickerState extends State<LocationPicker> {
       body: Stack(
         alignment: Alignment.topCenter,
         children: [
-          MapPicker(
-            // pass icon widget
-            iconWidget: Image.asset(
-              "assets/images/appicon.png",
-              height: 60,
-            ),
-            //add map picker controller
-            mapPickerController: mapPickerController,
-            child: GoogleMap(
-              myLocationEnabled: true,
-              zoomControlsEnabled: false,
-              // hide location button
-              myLocationButtonEnabled: false,
-              mapType: MapType.normal,
-              //  camera position
-              initialCameraPosition: cameraPosition,
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-              },
-              onCameraMoveStarted: () {
-                // notify map is moving
-                mapPickerController.mapMoving!();
-                textController.text = "checking ...";
-              },
-              onCameraMove: (cameraPosition) {
-                this.cameraPosition = cameraPosition;
-              },
-              onCameraIdle: () async {
-                // notify map stopped moving
-                mapPickerController.mapFinishedMoving!();
-                //get address name from camera position
-                List<Placemark> placemarks = await placemarkFromCoordinates(
-                  cameraPosition.target.latitude,
-                  cameraPosition.target.longitude,
-                );
-
-                // update the ui with the address
-                textController.text =
-                    '${placemarks.first.name}, ${placemarks.first.administrativeArea}, ${placemarks.first.country}';
-              },
-            ),
-          ),
+          // MapPicker(
+          //   // pass icon widget
+          //   iconWidget: Image.asset(
+          //     "assets/images/appicon.png",
+          //     height: 60,
+          //   ),
+          //   //add map picker controller
+          //   mapPickerController: mapPickerController,
+          //   child: GoogleMap(
+          //     myLocationEnabled: true,
+          //     zoomControlsEnabled: false,
+          //     // hide location button
+          //     myLocationButtonEnabled: false,
+          //     mapType: MapType.normal,
+          //     //  camera position
+          //     initialCameraPosition: cameraPosition,
+          //     onMapCreated: (GoogleMapController controller) {
+          //       _controller.complete(controller);
+          //     },
+          //     onCameraMoveStarted: () {
+          //       // notify map is moving
+          //       mapPickerController.mapMoving!();
+          //       textController.text = "checking ...";
+          //     },
+          //     onCameraMove: (cameraPosition) {
+          //       this.cameraPosition = cameraPosition;
+          //     },
+          //     onCameraIdle: () async {
+          //       // notify map stopped moving
+          //       mapPickerController.mapFinishedMoving!();
+          //       //get address name from camera position
+          //       List<Placemark> placemarks = await placemarkFromCoordinates(
+          //         cameraPosition.target.latitude,
+          //         cameraPosition.target.longitude,
+          //       );
+          //
+          //       // update the ui with the address
+          //       textController.text =
+          //           '${placemarks.first.name}, ${placemarks.first.administrativeArea}, ${placemarks.first.country}';
+          //     },
+          //   ),
+          // ),
           Positioned(
             top: MediaQuery.of(context).viewPadding.top + 20,
             width: MediaQuery.of(context).size.width - 50,

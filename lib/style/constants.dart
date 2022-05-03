@@ -70,6 +70,8 @@ const String KEY_NOTIFICATION_COMP = "compatibility";
 const String KEY_NOTIFICATION_LIKE = "like";
 const String KEY_NOTIFICATION_COMMENT = "comment";
 const String KEY_NOTIFICATION_REPLY = "reply";
+const String KEY_NOTIFICATION_QA_GAME = "qa-game";
+const String KEY_NOTIFICATION_FOLLOWING = "following";
 
 class FadeRoute extends PageRouteBuilder {
   final Widget page;

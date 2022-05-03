@@ -46,7 +46,7 @@ class _ForumDetailState extends State<ForumDetail> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     PostModel post =
-                        PostModel.fromDocument(snapshot.data!.docs[0]);
+                        PostModel.fromDocumentSnapshot(snapshot.data!.docs[0]);
                     return PostItem(post: post);
                   }
                   return Loading();

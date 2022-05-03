@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/decoration.dart';
+import 'package:map_location_picker/google_map_location_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/src/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -42,6 +44,19 @@ class _UploadImageState extends State<UploadImage>
   final postReference = FirebaseFirestore.instance.collection("posts");
   String postId = const Uuid().v4();
   final GoogleSignIn googleSignIn = GoogleSignIn();
+  List<Placemark> placemarks = [];
+  Position? position;
+
+  @override
+  void initState() {
+    super.initState();
+    file = widget.file;
+    Future.delayed(Duration(milliseconds: 300), () async {
+      position = await _determinePosition().then((value) => value);
+      placemarks = await placemarkFromCoordinates(
+          position!.latitude, position!.longitude);
+    });
+  }
 
   //nén ảnh để hiển thị nhỏ
   compressPhoto() async {
@@ -89,9 +104,6 @@ class _UploadImageState extends State<UploadImage>
   }
 
   getUserLocation() async {
-    Position position = await _determinePosition().then((value) => value);
-    List<Placemark> placemarks =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
     Placemark placemark = placemarks[0];
     String completeAddress =
         '${placemark.subThoroughfare} ${placemark.thoroughfare}, ${placemark.subLocality} ${placemark.locality}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea} ${placemark.postalCode}, ${placemark.country}';
@@ -102,7 +114,16 @@ class _UploadImageState extends State<UploadImage>
   }
 
   _getOtherUserLocation() async {
-    Get.to(() => const LocationPicker());
+    LocationResult? result = await showLocationPicker(
+      context,
+      "AIzaSyBkRBdX3_nLwpk2CwXO4CAkJbPMXuSFOPs",
+      initialCenter: LatLng(position!.latitude, position!.latitude),
+      myLocationButtonEnabled: true,
+      layersButtonEnabled: true,
+      countries: ['VN'],
+    );
+    locationController.text = result!.address;
+    //Get.to(() => const LocationPicker());
   }
 
   Future controlUploadAndSave(String uid) async {
@@ -271,12 +292,6 @@ class _UploadImageState extends State<UploadImage>
               ],
             ),
     );
-  }
-
-  @override
-  void initState() {
-    file = widget.file;
-    super.initState();
   }
 
   @override

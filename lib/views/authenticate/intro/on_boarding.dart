@@ -4,6 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
+import 'package:luanvanflutter/utils/notify_service.dart';
 import 'package:luanvanflutter/views/authenticate/intro/filterpage.dart';
 import 'package:luanvanflutter/views/components/dialog/custom_dialog.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';
@@ -40,7 +41,7 @@ class _OnBoardingState extends State<OnBoarding> {
           image: Image.asset("assets/images/cuteghost.png"),
           title: "Chế độ ẩn danh để bạn dễ dàng đặt câu hỏi",
           body:
-              "Kết bạn mỗi ngày và bắt đầu cuộc trò chuyện với 1 trò chơi nhỏ",
+              "Hỏi đáp những vấn đề thầm kín mà không sợ lộ thông tin cá nhân",
           decoration: pageDecoration),
       PageViewModel(
         image: Image.asset("assets/images/converse.png"),
@@ -74,68 +75,18 @@ class _OnBoardingState extends State<OnBoarding> {
     super.initState();
   }
 
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-  late AndroidInitializationSettings androidInitializationSettings;
-  late IOSInitializationSettings iosInitializationSettings;
-  late InitializationSettings initializationSettings;
+  late NotifyHelper notifyHelper;
 
   void initializing() async {
-    androidInitializationSettings =
-        const AndroidInitializationSettings('mipmap/ic_launcher');
-    iosInitializationSettings = IOSInitializationSettings(
-        onDidReceiveLocalNotification: onDidReceiveLocalNotification);
-    initializationSettings = InitializationSettings(
-        android: androidInitializationSettings, iOS: iosInitializationSettings);
-    flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: onSelectNotification);
+    notifyHelper = NotifyHelper();
+    notifyHelper.initializeNotification();
+    notifyHelper.requestIOSPermissions();
   }
 
   void _showNotifications() async {
-    await notification();
-  }
-
-  void _showNotificationsAfterSecond() async {
-    await notificationAfterSec();
-  }
-
-  Future<void> notification() async {
-    AndroidNotificationDetails androidNotificationDetails =
-        const AndroidNotificationDetails(
-            'Channel ID', 'Channel title', 'channel body',
-            priority: Priority.high,
-            importance: Importance.max,
-            ticker: 'test');
-
-    IOSNotificationDetails iosNotificationDetails =
-        const IOSNotificationDetails();
-
-    NotificationDetails notificationDetails = NotificationDetails(
-        android: androidNotificationDetails, iOS: iosNotificationDetails);
-    await flutterLocalNotificationsPlugin.show(
-        0, 'Xin chào bạn', 'sử dụng app vui vẻ nhé', notificationDetails);
-    createAlertDialog();
-  }
-
-  Future<void> notificationAfterSec() async {
-    // var timeDelayed = DateTime.now().add(Duration(seconds: 5));
-    var time = const Time(21, 00, 0);
-    AndroidNotificationDetails androidNotificationDetails =
-        const AndroidNotificationDetails(
-            'second channel ID', 'second Channel title', 'second channel body',
-            priority: Priority.high,
-            importance: Importance.max,
-            ticker: 'test');
-
-    IOSNotificationDetails iosNotificationDetails =
-        const IOSNotificationDetails();
-
-    NotificationDetails notificationDetails = NotificationDetails(
-        android: androidNotificationDetails, iOS: iosNotificationDetails);
-    // await flutterLocalNotificationsPlugin.task(1, 'Hello there',
-    //     'please subscribe my channel', timeDelayed, notificationDetails);
-    await flutterLocalNotificationsPlugin.showDailyAtTime(
-        1, "CTUER", "Kết bạn ngay!", time, notificationDetails);
+    notifyHelper.displayNotification(
+        title: "Chào mừng đến với CTUPG",
+        body: "Sử dụng ứng dụng vui vẻ và an toàn nhé!");
   }
 
   Future<void> onSelectNotification(String? payLoad) async {
@@ -181,8 +132,6 @@ class _OnBoardingState extends State<OnBoarding> {
           ),
           onDone: () {
             _showNotifications();
-            _showNotificationsAfterSecond();
-
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
