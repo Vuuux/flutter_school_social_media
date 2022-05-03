@@ -6,6 +6,7 @@ import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
 import 'package:luanvanflutter/utils/user_data_service.dart';
+import 'package:luanvanflutter/views/components/send_message_widget.dart';
 import 'package:luanvanflutter/views/games/compatibility/compatibility_start.dart';
 import 'package:luanvanflutter/views/games/trivia/answerscreen.dart';
 import 'package:luanvanflutter/views/home/chat/chat_screen.dart';
@@ -85,7 +86,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     );
   }
 
-  sendMessage(UserData userData) {
+  _sendMessage(UserData userData) {
     message = messageTextEditingController.text;
     if (message.isNotEmpty) {
       Map<String, dynamic> messageMap = {
@@ -187,7 +188,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     InkWell(
                       highlightColor: Colors.transparent,
                       splashColor: Colors.transparent,
-                      child: Text(widget.ctuer.username,
+                      child: Text(widget.ctuer.username.split(" ").last,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(fontSize: 20)),
                       onTap: () {
                         Navigator.of(context).pushAndRemoveUntil(
@@ -245,17 +247,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           Expanded(
                             child: TextFormField(
                               controller: messageTextEditingController,
-                              // onChanged: (val) {
-                              //   setState(() => message = val);
-                              //   Future.delayed(
-                              //       const Duration(milliseconds: 100), () {
-                              //     scrollController.animateTo(
-                              //         scrollController.position.maxScrollExtent,
-                              //         duration:
-                              //             const Duration(milliseconds: 500),
-                              //         curve: Curves.ease);
-                              //   });
-                              // },
                               style: const TextStyle(color: Colors.black),
                               decoration: const InputDecoration.collapsed(
                                   hintText: "Send a message...",
@@ -263,10 +254,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                   border: InputBorder.none),
                             ),
                           ),
-                          const Spacer(),
                           GestureDetector(
                             onTap: () {
-                              sendMessage(userData);
+                              _sendMessage(userData);
                             },
                             child: Container(
                               height: 40,
@@ -372,9 +362,20 @@ class MessageTile extends StatelessWidget {
               : const EdgeInsets.only(right: 30),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
           decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                  offset: Offset(-1, 4),
+                  color: Colors.grey.shade300,
+                  blurRadius: 5,
+                  spreadRadius: 1)
+            ],
             color: (messageModel.type == 'message')
-                ? (isSendByMe ? Colors.blueGrey : Colors.indigoAccent)
-                : Colors.red,
+                ? (!isSendByMe
+                    ? Get.isDarkMode
+                        ? kPrimaryDarkColor
+                        : Colors.red
+                    : Colors.white)
+                : kStudyColor,
             borderRadius: isSendByMe
                 ? const BorderRadius.only(
                     topLeft: Radius.circular(23),
@@ -394,15 +395,21 @@ class MessageTile extends StatelessWidget {
               Text(
                 f.format(messageModel.timestamp.toDate()).toString(),
                 textAlign: TextAlign.end,
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16,
+                    fontFamily: 'OverpassRegular'),
               ),
               Text(
                 messageModel.message,
                 textAlign: TextAlign.start,
-                style: const TextStyle(
-                    color: Colors.white,
+                style: TextStyle(
+                    color: Colors.black,
                     fontSize: 16,
                     fontFamily: 'OverpassRegular',
-                    fontWeight: FontWeight.w300),
+                    fontWeight: messageModel.type == 'message'
+                        ? FontWeight.w300
+                        : FontWeight.bold),
               ),
             ],
           ),

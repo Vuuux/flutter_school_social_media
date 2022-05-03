@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/loading.dart';
+import 'package:luanvanflutter/views/games/compatibility/compatibility_start.dart';
 
 class CompatibilityStatus extends StatefulWidget {
   final String gameRoomId;
@@ -203,14 +204,15 @@ class _CompatibilityStatusState extends State<CompatibilityStatus> {
           Align(
               alignment: const Alignment(0, 0.85),
               child: Container(
+                height: 50,
                 width: 150,
                 decoration: const BoxDecoration(
                     color: Colors.blue,
                     borderRadius: BorderRadius.all(
-                      Radius.circular(15),
+                      Radius.circular(20),
                     )),
-                child: RaisedButton(
-                  onPressed: () {
+                child: GestureDetector(
+                  onTap: () {
                     setState(() {
                       score = 0;
                     });
@@ -228,10 +230,17 @@ class _CompatibilityStatusState extends State<CompatibilityStatus> {
                       gameRoomId: widget.gameRoomId,
                       myAnswers: [],
                     );
+                    Get.to(() => CompatibilityStart(
+                        userData: widget.userData, ctuer: widget.ctuer));
                   },
-                  child: const Text(
-                    'Chơi lại',
-                    style: TextStyle(fontWeight: FontWeight.w100),
+                  child: Center(
+                    child: Text(
+                      'CHƠI LẠI',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w100,
+                          color: Get.isDarkMode ? Colors.black : Colors.white),
+                    ),
                   ),
                 ),
               ))

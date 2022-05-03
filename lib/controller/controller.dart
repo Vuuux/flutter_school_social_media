@@ -785,8 +785,10 @@ class DatabaseServices {
           anonAvatar: doc.data().toString().contains('anonAvatar')
               ? doc.get('anonAvatar')
               : '',
-          likes: List<SubUserData>.from(
-              doc.get('likes').map((x) => SubUserData.fromJson(x))),
+          likes: doc['likes'].length > 0
+              ? List<SubUserData>.from(
+                  doc.get('likes').map((x) => SubUserData.fromJson(x)))
+              : [],
           media:
               doc.data().toString().contains('media') ? doc.get('media') : '',
           course:
@@ -798,24 +800,6 @@ class DatabaseServices {
               ? doc.get('address')
               : '',
           id: doc.data().toString().contains('id') ? doc.get('id') : '');
-      //   id: doc.get('id') ?? '',
-      //   email: doc.get('email') ?? '',
-      //   avatar: doc.get('avatar') ?? '',
-      //   username: doc.get('username') ?? '',
-      //   bio: doc.get('bio') ?? '',
-      //   community: doc.get('community') ?? '',
-      //   gender: doc.get('gender') ?? '',
-      //   major: doc.get('major') ?? '',
-      //   nickname: doc.get('nickname') ?? '',
-      //   isAnon: doc.get('isAnon') ?? false,
-      //   anonBio: doc.get('anonBio') ?? '',
-      //   anonInterest: doc.get('anonInterest') ?? '',
-      //   anonAvatar: doc.get('anonAvatar') ?? '',
-      //   fame: doc.get('fame') ?? 0,
-      //   media: doc.get('media') ?? '',
-      //   course: doc.get('course') ?? '',
-      //   playlist: doc.get('playlist') ?? '',
-      //   address: doc.get('address') ?? '');
     }).toList();
   }
 

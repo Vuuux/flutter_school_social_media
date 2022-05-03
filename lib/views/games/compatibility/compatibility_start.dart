@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
@@ -105,7 +106,11 @@ class _CompatibilityStartState extends State<CompatibilityStart> {
                       Radius.circular(15),
                     )),
                 child: FlatButton(
-                  child: const Text('Kết quả'),
+                  child: Text(
+                    'Kết quả',
+                    style: TextStyle(
+                        color: Get.isDarkMode ? Colors.black : Colors.white),
+                  ),
                   onPressed: () {
                     sendRequest(widget.userData);
                     Navigator.of(context).push(
@@ -128,7 +133,11 @@ class _CompatibilityStartState extends State<CompatibilityStart> {
                       Radius.circular(15),
                     )),
                 child: FlatButton(
-                  child: const Text('Chơi'),
+                  child: Text(
+                    'Chơi',
+                    style: TextStyle(
+                        color: Get.isDarkMode ? Colors.black : Colors.white),
+                  ),
                   onPressed: () {
                     sendRequest(widget.userData);
                     Navigator.of(context).push(

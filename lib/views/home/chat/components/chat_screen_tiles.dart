@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
@@ -130,7 +131,9 @@ class ChatScreenTile extends StatelessWidget {
                         width: 40,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                            color: kPrimaryColor,
+                            color: Get.isDarkMode
+                                ? kPrimaryDarkColor
+                                : kPrimaryColor,
                             borderRadius: BorderRadius.circular(30)),
                         child: ClipOval(
                           child: SizedBox(

@@ -271,13 +271,13 @@ class _NotificationsItemState extends State<NotificationsItem> {
     });
 
     widget.databaseService.addFollowing(user.uid, widget.noti.userId, {
-      'userId': widget.userData!.id,
+      'id': widget.userData!.id,
       'username': widget.userData!.username,
-      'avatar': widget.userData!.avatar
+      'avatar': widget.userData!.avatar,
     });
 
     widget.databaseService.addFollower(user.uid, widget.noti.userId, {
-      'userId': widget.noti.userId,
+      'id': widget.noti.userId,
       'username': widget.noti.username,
       'avatar': widget.noti.avatar
     });
@@ -299,7 +299,8 @@ class _NotificationsItemState extends State<NotificationsItem> {
               padding: const EdgeInsets.only(bottom: 1.0),
               child: Container(
                 width: MediaQuery.of(context).size.width,
-                color: widget.noti.status == 'unseen'
+                color: widget.noti.status == 'unseen' ||
+                        widget.noti.status == 'requesting'
                     ? Colors.white
                     : Colors.grey[600],
                 child: ListTile(

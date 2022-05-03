@@ -70,7 +70,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 itemBuilder: (context, index) {
                   UserData user =
                       UserData.fromDocumentSnapshot(snapshot.data!.docs[index]);
-                  return SearchTile(userData: user);
+                  return SearchTile(ctuer: user);
                 });
           } else {
             return const SizedBox.shrink();

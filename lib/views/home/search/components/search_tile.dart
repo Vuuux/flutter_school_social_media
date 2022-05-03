@@ -1,19 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/utils/chat_utils.dart';
+import 'package:luanvanflutter/utils/user_data_service.dart';
 import 'package:luanvanflutter/views/home/chat/conversation_screen.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
 import 'package:provider/src/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class SearchTile extends StatelessWidget {
-  final UserData userData;
+  final UserData ctuer;
 
-  const SearchTile({Key? key, required this.userData}) : super(key: key);
+  const SearchTile({Key? key, required this.ctuer}) : super(key: key);
 
   createChatRoomAndStartConversation(
       BuildContext context, String uid, UserData userData) async {
@@ -23,7 +25,7 @@ class SearchTile extends StatelessWidget {
         await DatabaseServices(uid: uid).checkIfChatRoomExisted(chatRoomID);
     bool isChatRoomExisted = existedChatRoomId.isEmpty ? false : true;
     String resultChatRoomId =
-        isChatRoomExisted ? existedChatRoomId : Uuid().v4();
+        isChatRoomExisted ? existedChatRoomId : chatRoomID[0];
 
     List<String> users = [uid, userData.id];
 
@@ -33,33 +35,25 @@ class SearchTile extends StatelessWidget {
       "timestamp": Timestamp.now(),
     };
 
-    DatabaseServices(uid: uid).createChatRoom(resultChatRoomId, chatRoomMap);
-
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-            builder: (context) => ConversationScreen(
-                chatRoomId: resultChatRoomId, ctuer: userData, userId: uid)),
-        (route) => false);
+    if (!isChatRoomExisted) {
+      await DatabaseServices(uid: uid)
+          .createChatRoom(resultChatRoomId, chatRoomMap);
+      Get.to(() => ConversationScreen(
+          chatRoomId: resultChatRoomId, ctuer: userData, userId: uid));
+    } else {
+      Get.to(() => ConversationScreen(
+          chatRoomId: existedChatRoomId, ctuer: userData, userId: uid));
+    }
   }
 
   Widget buildSearchTile(BuildContext context, String uid) {
-    if (uid != userData.id) {
+    if (uid != ctuer.id) {
       return RaisedButton(
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-                builder: (context) => OthersProfile(ctuerId: userData.id)),
+                builder: (context) => OthersProfile(ctuerId: ctuer.id)),
           );
-          //     .pushAndRemoveUntil(
-          //   FadeRoute(
-          //     page: OthersProfile(
-          //       ctuerList: widget.ctuerList,
-          //       ctuer: ctuer,
-          //       userData: userData,
-          //     ),
-          //   ),
-          //   ModalRoute.withName('OthersProfile'),
-          // );
         },
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         color: const Color(0xFFD4D4D4),
@@ -79,9 +73,9 @@ class SearchTile extends StatelessWidget {
                     child: SizedBox(
                       width: 180,
                       height: 180,
-                      child: userData.avatar.isNotEmpty
+                      child: ctuer.avatar.isNotEmpty
                           ? Image.network(
-                              userData.avatar,
+                              ctuer.avatar,
                               fit: BoxFit.fill,
                             )
                           : Image.asset('assets/images/profile1.png',
@@ -91,7 +85,7 @@ class SearchTile extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  userData.username,
+                  ctuer.username,
                   style: const TextStyle(color: Colors.black),
                 ),
               ],
@@ -99,7 +93,7 @@ class SearchTile extends StatelessWidget {
             const Spacer(),
             GestureDetector(
               onTap: () {
-                createChatRoomAndStartConversation(context, uid, userData);
+                createChatRoomAndStartConversation(context, uid, ctuer);
               },
               child: Container(
                 decoration: BoxDecoration(

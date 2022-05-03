@@ -19,6 +19,7 @@ import 'package:luanvanflutter/views/components/bottom_bar/bottom_bar.dart';
 import 'package:luanvanflutter/views/components/buttons/bottom_bar_button.dart';
 import 'package:luanvanflutter/views/home/profile/profile.dart';
 import 'package:luanvanflutter/views/home/search/example_search_screen.dart';
+import 'package:luanvanflutter/views/home/search/search_screen.dart';
 import 'package:luanvanflutter/views/home/task/task_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
@@ -169,7 +170,7 @@ class _HomeState extends State<Home> {
         uid: user!.uid,
       ),
       const MyProfile(),
-      SimpleSearch(),
+      SearchScreen(userId: user!.uid),
     ];
 
     //Các tab ở chế độ ẩn danh

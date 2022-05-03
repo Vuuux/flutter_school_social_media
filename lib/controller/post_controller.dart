@@ -25,11 +25,11 @@ class PostController extends GetxController {
   Future getPosts() async {
     setRequestStatus(RequestStatus.LOADING);
     var response = await _database.getTimelinePosts();
+    setRequestStatus(RequestStatus.SUCESS);
     response.fold((left) {
       postList.assignAll(left.docs
           .map((post) => PostModel.fromDocumentSnapshot(post))
           .toList());
-      setRequestStatus(RequestStatus.SUCESS);
     }, (right) {
       setRequestStatus(RequestStatus.ERROR);
       Get.showSnackbar(GetSnackBar(

@@ -83,9 +83,7 @@ class _QuestionGameState extends State<QuestionGame>
         'Không nhéeee'),
     const CompatibilityCard(
         'Bây giờ bạn có cảm thấy hạnh phúc không?', 'Có :>', 'Không'),
-    const CompatibilityCard(
-        'Have you ever doubted your sexuality?', 'Yes', 'No'),
-    const CompatibilityCard('Had/Have a dog?', 'Yes', 'No'),
+    const CompatibilityCard('Thích chó hay mèo?', 'Chó', 'Mèo'),
   ];
   List<int> indexes = [];
 
@@ -107,7 +105,7 @@ class _QuestionGameState extends State<QuestionGame>
   void initState() {
     controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 10),
+      duration: Duration(seconds: 20),
     );
     initialize();
     super.initState();

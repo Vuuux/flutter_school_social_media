@@ -39,6 +39,14 @@ class _FeedState extends State<Feed> {
   final picker = ImagePicker(); //API chọn hình ảnh
   final FirebaseAuth auth = FirebaseAuth.instance;
   Future<QuerySnapshot>? postFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    String userId = auth.currentUser!.uid;
+    currentUser = CurrentUserId(uid: userId);
+  }
+
   //lấy time từ post
   _handleSearch(String query) {
     _postController.searchPost(query);
@@ -74,58 +82,6 @@ class _FeedState extends State<Feed> {
           );
         },
       );
-
-  Widget postList(CurrentUserId currentUser) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: Stream.fromFuture(postFuture!),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          List<PostModel> listPost = snapshot.data!.docs
-              .map((doc) => PostModel.fromDocumentSnapshot(doc))
-              .toList();
-          if (listPost.isEmpty) {
-            return const Center(
-              child: Text(
-                "Chưa có bài viết nào.",
-                style: TextStyle(color: Colors.black),
-              ),
-            );
-          }
-          return ListView.separated(
-            shrinkWrap: true,
-            controller: scrollController,
-            itemCount: listPost.length,
-            itemBuilder: (context, index) {
-              final PostModel post = listPost[index];
-              return AnimationConfiguration.staggeredList(
-                  position: index,
-                  child: SlideAnimation(
-                      child: FadeInAnimation(child: PostItem(post: post))));
-            },
-            separatorBuilder: (BuildContext context, int index) {
-              return Container(
-                height: 6,
-                width: 120,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color:
-                        Get.isDarkMode ? Colors.grey[600] : Colors.grey[300]),
-              );
-            },
-          );
-        }
-        return Loading();
-      },
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    String userId = auth.currentUser!.uid;
-    currentUser = CurrentUserId(uid: userId);
-    _postController.getPosts();
-  }
 
   circularProgress() {
     return Container(
@@ -206,6 +162,7 @@ class _FeedState extends State<Feed> {
 
   @override
   Widget build(BuildContext context) {
+    _postController.getPosts();
     ScreenUtil.init(
         const BoxConstraints(
           maxWidth: 414,
@@ -260,33 +217,16 @@ class _FeedState extends State<Feed> {
                         right: 8.0,
                         child: RipplesAnimation(
                           onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return const CustomDialog(
-                                    title: 'Đi kết bạn nào!',
-                                    description:
-                                        'Hôm nay bạn sẽ kết bạn với Hmmie nào đây?',
-                                    buttonText: 'Tìm hiểu',
-                                  );
-                                });
+                            Get.dialog(CustomDialog(
+                              title: 'Đi kết bạn nào!',
+                              description:
+                                  'Hôm nay bạn sẽ kết bạn với Hmmie nào đây?',
+                              buttonText: 'Tìm hiểu',
+                            ));
                           },
                           size: 20.0,
                           color: kPrimaryDarkColor,
                           child: Icon(Icons.face),
-                          // style: ButtonStyle(
-                          //   shape: MaterialStateProperty.all(CircleBorder()),
-                          //   padding:
-                          //       MaterialStateProperty.all(EdgeInsets.all(20)),
-                          //   backgroundColor: MaterialStateProperty.all(
-                          //       Colors.blue), // <-- Button color
-                          //   overlayColor:
-                          //       MaterialStateProperty.resolveWith<Color?>(
-                          //           (states) {
-                          //     if (states.contains(MaterialState.pressed))
-                          //       return Colors.red; // <-- Splash color
-                          //   }),
-                          // ),
                         ),
                       )
                     ],
@@ -296,6 +236,7 @@ class _FeedState extends State<Feed> {
 
   @override
   void dispose() {
+    Get.delete<PostController>();
     super.dispose();
   }
 }

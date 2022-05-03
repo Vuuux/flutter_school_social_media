@@ -1,8 +1,10 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
+import 'package:luanvanflutter/style/constants.dart';
 
 import 'compatibility.dart';
 
@@ -60,7 +62,7 @@ class _CompatibilityIntroPageState extends State<CompatibilityIntroPage> {
                 child: Column(
                   children: const <Widget>[
                     AutoSizeText(
-                      '5 câu hỏi trong 10 giây!',
+                      '5 câu hỏi trong 20 giây!',
                       style: TextStyle(fontSize: 17),
                       textAlign: TextAlign.center,
                     ),
@@ -78,13 +80,17 @@ class _CompatibilityIntroPageState extends State<CompatibilityIntroPage> {
           const SizedBox(height: 8),
           Container(
             width: 150,
-            decoration: const BoxDecoration(
-                color: Colors.blue,
+            decoration: BoxDecoration(
+                color: Get.isDarkMode ? kPrimaryDarkColor : kPrimaryColor,
                 borderRadius: BorderRadius.all(
                   Radius.circular(15),
                 )),
             child: FlatButton(
-              child: const Text('Bắt đầu thôi!'),
+              child: Text(
+                'Bắt đầu thôi!',
+                style: TextStyle(
+                    color: Get.isDarkMode ? Colors.black : Colors.white),
+              ),
               onPressed: () {
                 Navigator.pushReplacement(
                   context,

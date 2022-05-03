@@ -299,8 +299,7 @@ class _IntroPage2State extends State<IntroPage2> {
                             SubUserData(
                                 id: widget.userData.id,
                                 username: widget.userData.username,
-                                avatar: widget.userData.avatar,
-                                bio: widget.userData.bio));
+                                avatar: widget.userData.avatar));
 
                 response.fold((result) {
                   Navigator.of(context).pushReplacement(

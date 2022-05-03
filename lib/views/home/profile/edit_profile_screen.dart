@@ -45,6 +45,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
+    _usernameController.text = widget.userData.username;
+    _bioController.text = widget.userData.bio;
+    _mediaController.text = widget.userData.media;
+    _playlistController.text = widget.userData.playlist;
   }
 
   Future getImage() async {
@@ -62,9 +66,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     'Khoa học máy tính',
     'Hệ thống thông tin',
     'Mạng máy tính và truyền thông',
+    'Khác'
   ];
 
-  updateUser(BuildContext context, CurrentUserId user) async {
+  _updateUser(BuildContext context, CurrentUserId user) async {
     Future uploadPic() async {
       Reference firebaseStorageReference =
           FirebaseStorage.instance.ref().child(_image!.path);
@@ -72,8 +77,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       UploadTask uploadTask = firebaseStorageReference.putFile(_image!);
       TaskSnapshot taskSnapshot = await uploadTask;
       x = (await taskSnapshot.ref.getDownloadURL()).toString();
-      //TODO: CATCH ERROR HERE
-      DatabaseServices(uid: user.uid)
+      await DatabaseServices(uid: user.uid)
           .updateUserData(
               email,
               name,
@@ -481,7 +485,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               home = userData.address;
                             }
 
-                            await updateUser(context, user!);
+                            await _updateUser(context, user!);
                           }
                         },
                         child: Container(

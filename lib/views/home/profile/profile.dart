@@ -17,7 +17,6 @@ import 'package:provider/provider.dart';
 import '../../../style/constants.dart';
 import '../../../models/user.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 
@@ -90,9 +89,9 @@ class _MyProfileState extends State<MyProfile> {
       children: <Widget>[
         createButtonTitleAndFunction(
             title: 'Chỉnh sửa',
-            performFunction: () => editUserProfile(userData)),
+            performFunction: () => _editUserProfile(userData)),
         createButtonTitleAndFunction(
-            title: 'Đổi mật khẩu', performFunction: editUserPassword),
+            title: 'Đổi mật khẩu', performFunction: _editUserPassword),
       ],
     );
   }
@@ -124,12 +123,12 @@ class _MyProfileState extends State<MyProfile> {
     );
   }
 
-  editUserPassword() {
+  _editUserPassword() {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => const EditPassword()));
   }
 
-  editUserProfile(UserData userData) {
+  _editUserProfile(UserData userData) {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => EditProfileScreen(userData: userData)));
   }
@@ -143,14 +142,14 @@ class _MyProfileState extends State<MyProfile> {
   Widget build(BuildContext context) {
     final user = context.watch<CurrentUserId?>();
     userUid = user!.uid;
-    ScreenUtil.init(
-        const BoxConstraints(
-          maxWidth: 414,
-          maxHeight: 869,
-        ),
-        context: context,
-        designSize: const Size(360, 690),
-        orientation: Orientation.portrait);
+    // ScreenUtil.init(
+    //     const BoxConstraints(
+    //       maxWidth: 414,
+    //       maxHeight: 869,
+    //     ),
+    //     context: context,
+    //     designSize: const Size(360, 690),
+    //     orientation: Orientation.portrait);
 
     getAllFollowers();
     getAllFollowings();
@@ -394,7 +393,7 @@ class _MyProfileState extends State<MyProfile> {
                                             fontSize: 18,
                                           )),
                                 SizedBox(
-                                  height: kSpacingUnit.w,
+                                  height: 4.0,
                                 ),
                                 const Text('K H O Á',
                                     style: TextStyle(
@@ -415,7 +414,7 @@ class _MyProfileState extends State<MyProfile> {
                                             fontSize: 15,
                                           )),
                                 SizedBox(
-                                  height: kSpacingUnit.w,
+                                  height: 4.0,
                                 ),
                                 const Text('P L A Y L I S T',
                                     style: TextStyle(
@@ -436,7 +435,7 @@ class _MyProfileState extends State<MyProfile> {
                                             fontSize: 15,
                                           )),
                                 SizedBox(
-                                  height: kSpacingUnit.w,
+                                  height: 4.0,
                                 ),
                                 const Text('Q U Ê  Q U Á N',
                                     style: TextStyle(
@@ -457,7 +456,7 @@ class _MyProfileState extends State<MyProfile> {
                                             fontSize: 15,
                                           )),
                                 SizedBox(
-                                  height: kSpacingUnit.w,
+                                  height: 4.0,
                                 ),
                               ],
                             ),

@@ -49,8 +49,8 @@ class _LoginScreenState extends State<LoginScreen> {
   _validateInput() async {
     if (_emailController.text.isNotEmpty &&
         _passwordController.text.isNotEmpty) {
-      email = _emailController.text;
-      password = _passwordController.text;
+      email = _emailController.text.trim();
+      password = _passwordController.text.trim();
       await _signIn(context);
     } else if (_emailController.text.isEmpty ||
         _passwordController.text.isEmpty) {

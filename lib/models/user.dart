@@ -145,17 +145,22 @@ class SubUserData {
   late String id;
   late String username;
   late String avatar;
-  late String bio;
 
-  SubUserData(
-      {this.id = "", this.username = "", this.avatar = "", this.bio = ""});
+  SubUserData({this.id = "", this.username = "", this.avatar = ""});
 
-  static SubUserData fromJson(Map<String, dynamic> json) {
+  static SubUserData fromDocumentSnapshot(DocumentSnapshot json) {
     return SubUserData(
         id: json["id"] ?? "",
         username: json["username"] ?? "",
-        avatar: json["avatar"] ?? "",
-        bio: json["bio"] ?? "");
+        avatar: json["avatar"] ?? "");
+  }
+
+  static SubUserData fromJson(Map<String, dynamic> json) {
+    return SubUserData(
+      id: json["id"] ?? "",
+      username: json["username"] ?? "",
+      avatar: json["avatar"] ?? "",
+    );
   }
 
   static Map<String, dynamic> toJson(SubUserData data) {
@@ -163,7 +168,6 @@ class SubUserData {
     json["id"] = data.id;
     json["username"] = data.username;
     json["avatar"] = data.avatar;
-    json["bio"] = data.bio;
     return json;
   }
 }

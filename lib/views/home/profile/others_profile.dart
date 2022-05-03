@@ -1,5 +1,15 @@
 import 'dart:io';
 
+import 'package:get/get.dart';
+import 'package:get/get.dart';
+import 'package:get/get.dart';
+import 'package:get/get.dart';
+import 'package:get/get.dart';
+import 'package:get/get.dart';
+import 'package:get/get.dart';
+import 'package:get/get.dart';
+import 'package:get/get.dart';
+import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
@@ -10,7 +20,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -30,8 +39,8 @@ class OthersProfile extends StatefulWidget {
 }
 
 class _OthersProfileState extends State<OthersProfile> {
-  int countTotalFollowers = 0;
-  int countTotalFollowings = 0;
+  List<SubUserData> followers = [];
+  List<SubUserData> followings = [];
   bool following = false;
   late String toggleFollow;
   DatabaseServices dbServer = DatabaseServices(uid: '');
@@ -52,7 +61,8 @@ class _OthersProfileState extends State<OthersProfile> {
         .get();
     if (mounted) {
       setState(() {
-        countTotalFollowings = querySnapshot.docs.length;
+        followings = List<SubUserData>.from(querySnapshot.docs
+            .map((doc) => SubUserData.fromDocumentSnapshot(doc)));
       });
     }
   }
@@ -117,7 +127,8 @@ class _OthersProfileState extends State<OthersProfile> {
         .get();
     if (mounted) {
       setState(() {
-        countTotalFollowers = querySnapshot.docs.length;
+        followers = List<SubUserData>.from(querySnapshot.docs
+            .map((doc) => SubUserData.fromDocumentSnapshot(doc)));
       });
     }
   }
@@ -169,13 +180,13 @@ class _OthersProfileState extends State<OthersProfile> {
           width: MediaQuery.of(context).size.width / 2.5,
           height: 35.0,
           child: Text(title,
-              style: const TextStyle(
-                  color: Colors.white,
+              style: TextStyle(
+                  color: Get.isDarkMode ? Colors.black : Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 16)),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: kPrimaryColor,
+            color: Get.isDarkMode ? kPrimaryDarkColor : kPrimaryColor,
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
@@ -249,30 +260,6 @@ class _OthersProfileState extends State<OthersProfile> {
       'userId': userData.id,
       'isAnon': false
     });
-
-    // Stream<QuerySnapshot> query = await dbServer.getRequestStatus(
-    //     widget.ctuer.id,
-    //     userData.id);
-    //
-    // query.forEach((event) {
-    //   if (event.docs[0].get('status') == 'accepted') {
-    //     controlFollowUser(userData);
-    //     print('User accepted follow request');
-    //
-    //     if (mounted) {
-    //       setState(() {
-    //         following = true;
-    //         sentreRequest = true;
-    //         acceptedRequest = true;
-    //         toggleFollow = "Unfollow";
-    //
-    //         getAllFollowers();
-    //         getAllFollowings();
-    //         checkIfAlreadyFollowing();
-    //       });
-    //     }
-    //   }
-    // });
   }
 
   deleteOldRequest(UserData userData) async {
@@ -332,14 +319,6 @@ class _OthersProfileState extends State<OthersProfile> {
   Widget build(BuildContext context) {
     widget.currentUser = context.watch<CurrentUserId?>();
     if (mounted) {}
-
-    ScreenUtil.init(
-        const BoxConstraints(
-          maxWidth: 414,
-          maxHeight: 869,
-        ),
-        designSize: const Size(360, 690),
-        orientation: Orientation.portrait);
     return StreamBuilder<UserData>(
         stream: DatabaseServices(uid: widget.currentUser!.uid).userData,
         builder: (context, snapshot) {
@@ -414,11 +393,13 @@ class _OthersProfileState extends State<OthersProfile> {
                                                 const SizedBox(height: 15),
                                                 Text(
                                                   widget.ctuer!.username,
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                       fontSize: 20,
                                                       fontWeight:
                                                           FontWeight.w500,
-                                                      color: kPrimaryColor),
+                                                      color: Get.isDarkMode
+                                                          ? kPrimaryDarkColor
+                                                          : kPrimaryColor),
                                                 )
                                               ],
                                             ),
@@ -434,8 +415,10 @@ class _OthersProfileState extends State<OthersProfile> {
                                           top: 3,
                                           bottom: 3,
                                         ),
-                                        decoration: const BoxDecoration(
-                                            color: kPrimaryColor,
+                                        decoration: BoxDecoration(
+                                            color: Get.isDarkMode
+                                                ? kPrimaryDarkColor
+                                                : kPrimaryColor,
                                             borderRadius: BorderRadius.all(
                                               Radius.circular(15),
                                             )),
@@ -453,26 +436,43 @@ class _OthersProfileState extends State<OthersProfile> {
                                                     left: 21, right: 21),
                                                 child: createColumns(
                                                     'Followers',
-                                                    countTotalFollowers),
-                                                onPressed: (widget.currentUser!
-                                                                .uid ==
-                                                            widget.ctuer!.id ||
-                                                        following)
-                                                    ?
-                                                    //TODO: ADD FOLLOWER LIST VIEW
-                                                    //       () => Navigator.of(context)
-                                                    //     .pushAndRemoveUntil(
-                                                    //   FadeRoute(
-                                                    //       page: FollowerList(
-                                                    //           ctuerList: hmmies,
-                                                    //           user: userData)
-                                                    //   ),
-                                                    //   ModalRoute.withName('FollowersList'),
-                                                    // )
-                                                    //:
-                                                    () =>
-                                                        print('tried pressing')
-                                                    : () {}),
+                                                    followers.length),
+                                                onPressed: () {
+                                                  Get.defaultDialog(
+                                                      title: "Người theo dõi",
+                                                      middleText:
+                                                          "Hello world!",
+                                                      backgroundColor:
+                                                          Colors.white,
+                                                      titleStyle: TextStyle(
+                                                          color: Colors.black),
+                                                      middleTextStyle: TextStyle(
+                                                          color: Get.isDarkMode
+                                                              ? kPrimaryDarkColor
+                                                              : kPrimaryColor),
+                                                      textCancel: "Đóng",
+                                                      cancelTextColor:
+                                                          Colors.black,
+                                                      buttonColor: Get
+                                                              .isDarkMode
+                                                          ? kPrimaryDarkColor
+                                                          : kPrimaryColor,
+                                                      barrierDismissible: false,
+                                                      radius: 50,
+                                                      content: Column(
+                                                        children: [
+                                                          Container(
+                                                              child: Text(
+                                                                  "Hello 1")),
+                                                          Container(
+                                                              child: Text(
+                                                                  "Hello 2")),
+                                                          Container(
+                                                              child: Text(
+                                                                  "Hello 3")),
+                                                        ],
+                                                      ));
+                                                }),
                                             FlatButton(
                                                 highlightColor:
                                                     Colors.transparent,
@@ -481,25 +481,45 @@ class _OthersProfileState extends State<OthersProfile> {
                                                     left: 21, right: 21),
                                                 child: createColumns(
                                                     'Following',
-                                                    countTotalFollowings),
-                                                onPressed: (widget.currentUser!
-                                                                .uid ==
-                                                            widget.ctuer!.id ||
-                                                        following)
-                                                    ?
-                                                    //TODO: ADD FOLLOWING LIST VIEW
-                                                    //       () => Navigator.of(context)
-                                                    //     .pushAndRemoveUntil(
-                                                    //   FadeRoute(
-                                                    //       page: FollowingList(
-                                                    //           ctuerList: hmmies,
-                                                    //           user: userData)),
-                                                    //   ModalRoute.withName('FollowingList'),
-                                                    // )
-                                                    //      :
-                                                    () =>
-                                                        print('tried pressing')
-                                                    : () {}),
+                                                    followings.length),
+                                                onPressed: () {
+                                                  Get.defaultDialog(
+                                                      title: "Người theo dõi",
+                                                      middleText:
+                                                          "Hello world!",
+                                                      backgroundColor:
+                                                          Colors.white,
+                                                      titleStyle:
+                                                          const TextStyle(
+                                                              color:
+                                                                  Colors.black),
+                                                      middleTextStyle: TextStyle(
+                                                          color: Get.isDarkMode
+                                                              ? kPrimaryDarkColor
+                                                              : kPrimaryColor),
+                                                      textConfirm: "Confirm",
+                                                      textCancel: "Cancel",
+                                                      cancelTextColor:
+                                                          Colors.white,
+                                                      confirmTextColor:
+                                                          Colors.white,
+                                                      buttonColor: Colors.red,
+                                                      barrierDismissible: false,
+                                                      radius: 50,
+                                                      content: Column(
+                                                        children: [
+                                                          Container(
+                                                              child: Text(
+                                                                  "Hello 1")),
+                                                          Container(
+                                                              child: Text(
+                                                                  "Hello 2")),
+                                                          Container(
+                                                              child: Text(
+                                                                  "Hello 3")),
+                                                        ],
+                                                      ));
+                                                }),
                                             FlatButton(
                                               highlightColor:
                                                   Colors.transparent,
@@ -541,12 +561,14 @@ class _OthersProfileState extends State<OthersProfile> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: <Widget>[
-                                              const Text('V Ề  T Ô I',
+                                              Text('V Ề  T Ô I',
                                                   style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight:
                                                           FontWeight.w300,
-                                                      color: kPrimaryColor)),
+                                                      color: Get.isDarkMode
+                                                          ? kPrimaryDarkColor
+                                                          : kPrimaryColor)),
                                               const SizedBox(
                                                 height: 5,
                                               ),
@@ -557,14 +579,16 @@ class _OthersProfileState extends State<OthersProfile> {
                                                     fontSize: 15,
                                                   )),
                                               SizedBox(
-                                                height: kSpacingUnit.w,
+                                                height: 4.0,
                                               ),
-                                              const Text('C Ộ N G   Đ Ồ N G',
+                                              Text('C Ộ N G   Đ Ồ N G',
                                                   style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight:
                                                           FontWeight.w300,
-                                                      color: kPrimaryColor)),
+                                                      color: Get.isDarkMode
+                                                          ? kPrimaryDarkColor
+                                                          : kPrimaryColor)),
                                               const SizedBox(
                                                 height: 5,
                                               ),
@@ -576,15 +600,16 @@ class _OthersProfileState extends State<OthersProfile> {
                                                     fontSize: 15,
                                                   )),
                                               SizedBox(
-                                                height: kSpacingUnit.w,
+                                                height: 4.0,
                                               ),
-                                              const Text(
-                                                  'S O C I A L   M E D I A ',
+                                              Text('S O C I A L   M E D I A ',
                                                   style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight:
                                                           FontWeight.w300,
-                                                      color: kPrimaryColor)),
+                                                      color: Get.isDarkMode
+                                                          ? kPrimaryDarkColor
+                                                          : kPrimaryColor)),
                                               const SizedBox(
                                                 height: 5,
                                               ),
@@ -593,14 +618,16 @@ class _OthersProfileState extends State<OthersProfile> {
                                                     fontSize: 15,
                                                   )),
                                               SizedBox(
-                                                height: kSpacingUnit.w,
+                                                height: 4.0,
                                               ),
-                                              const Text('K H O Á',
+                                              Text('K H O Á',
                                                   style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight:
                                                           FontWeight.w300,
-                                                      color: kPrimaryColor)),
+                                                      color: Get.isDarkMode
+                                                          ? kPrimaryDarkColor
+                                                          : kPrimaryColor)),
                                               const SizedBox(
                                                 height: 5,
                                               ),
@@ -609,14 +636,16 @@ class _OthersProfileState extends State<OthersProfile> {
                                                     fontSize: 15,
                                                   )),
                                               SizedBox(
-                                                height: kSpacingUnit.w,
+                                                height: 4.0,
                                               ),
-                                              const Text('P L A Y L I S T',
+                                              Text('P L A Y L I S T',
                                                   style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight:
                                                           FontWeight.w300,
-                                                      color: kPrimaryColor)),
+                                                      color: Get.isDarkMode
+                                                          ? kPrimaryDarkColor
+                                                          : kPrimaryColor)),
                                               const SizedBox(
                                                 height: 5,
                                               ),
@@ -625,14 +654,16 @@ class _OthersProfileState extends State<OthersProfile> {
                                                     fontSize: 15,
                                                   )),
                                               SizedBox(
-                                                height: kSpacingUnit.w,
+                                                height: 4.0,
                                               ),
-                                              const Text('S Ố N G  Ở',
+                                              Text('S Ố N G  Ở',
                                                   style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight:
                                                           FontWeight.w300,
-                                                      color: kPrimaryColor)),
+                                                      color: Get.isDarkMode
+                                                          ? kPrimaryDarkColor
+                                                          : kPrimaryColor)),
                                               const SizedBox(
                                                 height: 5,
                                               ),
@@ -641,7 +672,7 @@ class _OthersProfileState extends State<OthersProfile> {
                                                     fontSize: 15,
                                                   )),
                                               SizedBox(
-                                                height: kSpacingUnit.w,
+                                                height: 4.0,
                                               ),
                                             ],
                                           ),
@@ -652,10 +683,12 @@ class _OthersProfileState extends State<OthersProfile> {
                                               'THEO DÕI ' +
                                                   widget.ctuer!.username +
                                                   ' ĐỂ HIỂN THỊ PROFILE',
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                   fontSize: 13,
                                                   fontWeight: FontWeight.w300,
-                                                  color: kPrimaryColor)),
+                                                  color: Get.isDarkMode
+                                                      ? kPrimaryDarkColor
+                                                      : kPrimaryColor)),
                                         ),
                                   (widget.currentUser!.uid ==
                                               widget.ctuer!.id ||
@@ -735,13 +768,19 @@ Column createColumns(String title, int count) {
     children: <Widget>[
       Text(
         count.toString(),
-        style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.w600),
+        style: TextStyle(
+            fontSize: 15.0,
+            fontWeight: FontWeight.w600,
+            color: Get.isDarkMode ? Colors.black : Colors.white),
       ),
       Container(
         margin: EdgeInsets.only(top: 5.0),
         child: Text(
           title,
-          style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.w200),
+          style: TextStyle(
+              fontSize: 12.0,
+              fontWeight: FontWeight.w200,
+              color: Get.isDarkMode ? Colors.black : Colors.white),
         ),
       )
     ],
