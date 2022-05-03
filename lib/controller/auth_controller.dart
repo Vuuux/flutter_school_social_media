@@ -89,7 +89,8 @@ class AuthService {
             media: '',
             playlist: playlist,
             course: course,
-            address: address);
+            address: address,
+            role: 'user');
       }
       return Left(uploadResult);
     } on FirebaseAuthException catch (e) {

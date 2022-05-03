@@ -110,6 +110,7 @@ class DatabaseServices {
     required String playlist,
     required String course,
     required String address,
+    required String role,
   }) async {
     try {
       await userReference.doc(uid).set({
@@ -136,6 +137,7 @@ class DatabaseServices {
         "playlist": playlist,
         "course": course,
         "address": address,
+        "role": "user"
       });
       return true;
     } catch (e) {
@@ -758,54 +760,6 @@ class DatabaseServices {
   List<UserData> _ctuerListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.docs.map((doc) {
       return UserData(
-          email:
-              doc.data().toString().contains('email') ? doc.get('email') : '',
-          avatar:
-              doc.data().toString().contains('avatar') ? doc.get('avatar') : '',
-          username: doc.data().toString().contains('username')
-              ? doc.get('username')
-              : '',
-          bio: doc.data().toString().contains('bio') ? doc.get('bio') : '',
-          gender:
-              doc.data().toString().contains('gender') ? doc.get('gender') : '',
-          major:
-              doc.data().toString().contains('major') ? doc.get('major') : '',
-          nickname: doc.data().toString().contains('nickname')
-              ? doc.get('nickname')
-              : '',
-          isAnon: doc.data().toString().contains('isAnon')
-              ? doc.get('isAnon')
-              : false,
-          anonBio: doc.data().toString().contains('anonBio')
-              ? doc.get('anonBio')
-              : '',
-          anonInterest: doc.data().toString().contains('anonInterest')
-              ? doc.get('anonInterest')
-              : '',
-          anonAvatar: doc.data().toString().contains('anonAvatar')
-              ? doc.get('anonAvatar')
-              : '',
-          likes: doc['likes'].length > 0
-              ? List<SubUserData>.from(
-                  doc.get('likes').map((x) => SubUserData.fromJson(x)))
-              : [],
-          media:
-              doc.data().toString().contains('media') ? doc.get('media') : '',
-          course:
-              doc.data().toString().contains('course') ? doc.get('course') : '',
-          playlist: doc.data().toString().contains('playlist')
-              ? doc.get('playlist')
-              : '',
-          address: doc.data().toString().contains('address')
-              ? doc.get('address')
-              : '',
-          id: doc.data().toString().contains('id') ? doc.get('id') : '');
-    }).toList();
-  }
-
-  //userData from snapshot
-  UserData _userDataFromSnapshot(DocumentSnapshot doc) {
-    return UserData(
         email: doc.data().toString().contains('email') ? doc.get('email') : '',
         avatar:
             doc.data().toString().contains('avatar') ? doc.get('avatar') : '',
@@ -832,7 +786,7 @@ class DatabaseServices {
             : '',
         likes: doc['likes'].length > 0
             ? List<SubUserData>.from(
-                doc['likes'].map((x) => SubUserData.fromJson(x)))
+                doc.get('likes').map((x) => SubUserData.fromJson(x)))
             : [],
         media: doc.data().toString().contains('media') ? doc.get('media') : '',
         course:
@@ -842,7 +796,47 @@ class DatabaseServices {
             : '',
         address:
             doc.data().toString().contains('address') ? doc.get('address') : '',
-        id: doc.data().toString().contains('id') ? doc.get('id') : '');
+        id: doc.data().toString().contains('id') ? doc.get('id') : '',
+        role: doc.data().toString().contains('role') ? doc.get('role') : '',
+      );
+    }).toList();
+  }
+
+  //userData from snapshot
+  UserData _userDataFromSnapshot(DocumentSnapshot doc) {
+    return UserData(
+      email: doc.data().toString().contains('email') ? doc.get('email') : '',
+      avatar: doc.data().toString().contains('avatar') ? doc.get('avatar') : '',
+      username:
+          doc.data().toString().contains('username') ? doc.get('username') : '',
+      bio: doc.data().toString().contains('bio') ? doc.get('bio') : '',
+      gender: doc.data().toString().contains('gender') ? doc.get('gender') : '',
+      major: doc.data().toString().contains('major') ? doc.get('major') : '',
+      nickname:
+          doc.data().toString().contains('nickname') ? doc.get('nickname') : '',
+      isAnon:
+          doc.data().toString().contains('isAnon') ? doc.get('isAnon') : false,
+      anonBio:
+          doc.data().toString().contains('anonBio') ? doc.get('anonBio') : '',
+      anonInterest: doc.data().toString().contains('anonInterest')
+          ? doc.get('anonInterest')
+          : '',
+      anonAvatar: doc.data().toString().contains('anonAvatar')
+          ? doc.get('anonAvatar')
+          : '',
+      likes: doc['likes'].length > 0
+          ? List<SubUserData>.from(
+              doc['likes'].map((x) => SubUserData.fromJson(x)))
+          : [],
+      media: doc.data().toString().contains('media') ? doc.get('media') : '',
+      course: doc.data().toString().contains('course') ? doc.get('course') : '',
+      playlist:
+          doc.data().toString().contains('playlist') ? doc.get('playlist') : '',
+      address:
+          doc.data().toString().contains('address') ? doc.get('address') : '',
+      id: doc.data().toString().contains('id') ? doc.get('id') : '',
+      role: doc.data().toString().contains('role') ? doc.get('role') : '',
+    );
   }
 
   //lấy danh sách ctuer stream
@@ -853,6 +847,13 @@ class DatabaseServices {
   //check this
   Stream<UserData> get userData {
     return userReference.doc(uid).snapshots().map(_userDataFromSnapshot);
+  }
+
+  Future<String> getRole() async {
+    var response = await userReference.doc(uid).get();
+    return response.data().toString().contains('role')
+        ? response.get('role')
+        : '';
   }
 
   Future<String> checkIfChatRoomExisted(List<String> chatRoomId) async {

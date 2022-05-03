@@ -101,6 +101,8 @@ dependencies:
   map_location_picker: ^0.0.2
   multiple_localization: ^0.3.0
   equatable: ^2.0.3
+  fl_chart: ^0.36.1
+
   flutter_localizations:
     sdk: flutter
   localization: ^2.1.0

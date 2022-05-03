@@ -11,9 +11,12 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:localization/localization.dart';
 import 'package:luanvanflutter/controller/auth_controller.dart';
+import 'package:luanvanflutter/controller/controller.dart';
+import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/theme_data.dart';
 import 'package:luanvanflutter/utils/app_localization.dart';
 import 'package:luanvanflutter/utils/theme_service.dart';
+import 'package:luanvanflutter/views/admin/controllers/controller.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';
 import 'package:map_location_picker/generated/l10n.dart';
 import 'package:provider/provider.dart';
@@ -35,13 +38,22 @@ class MyApp extends StatelessWidget {
     LocalJsonLocalization.delegate.directories = ['lib/i18n'];
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(
+          create: (context) => Controller(),
+        ),
         Provider<AuthService>(
           create: (_) => AuthService(FirebaseAuth.instance),
         ),
         StreamProvider(
           create: (context) => context.read<AuthService>().user,
           initialData: null,
-        )
+        ),
+        Provider<DatabaseServices>(
+            create: (_) =>
+                DatabaseServices(uid: context.watch<CurrentUserId?>()?.uid)),
+        StreamProvider(
+            create: (context) => context.read<DatabaseServices>().userData,
+            initialData: null)
       ],
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,

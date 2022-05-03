@@ -28,25 +28,28 @@ class UserData extends Equatable {
   late final String course;
   late final String playlist;
   late final String address; //chỗ ở
+  late final String role;
 
-  UserData(
-      {this.id = "",
-      this.username = "",
-      this.nickname = "",
-      this.email = "",
-      this.bio = "",
-      this.gender = "",
-      this.major = "",
-      this.avatar = "",
-      this.isAnon = false,
-      this.anonBio = "",
-      this.anonInterest = "",
-      this.anonAvatar = "",
-      this.likes = const [],
-      this.media = "",
-      this.course = "",
-      this.playlist = "",
-      this.address = ""});
+  UserData({
+    this.id = "",
+    this.username = "",
+    this.nickname = "",
+    this.email = "",
+    this.bio = "",
+    this.gender = "",
+    this.major = "",
+    this.avatar = "",
+    this.isAnon = false,
+    this.anonBio = "",
+    this.anonInterest = "",
+    this.anonAvatar = "",
+    this.likes = const [],
+    this.media = "",
+    this.course = "",
+    this.playlist = "",
+    this.address = "",
+    this.role = "user",
+  });
 
   UserData.fromJson(Map<String, dynamic> data) {
     id = data['id'];
@@ -69,6 +72,7 @@ class UserData extends Equatable {
     course = data['course'];
     media = data['media'];
     address = data['address'];
+    role = data['role'];
   }
 
   factory UserData.fromDocumentSnapshot(DocumentSnapshot data) {
@@ -92,7 +96,8 @@ class UserData extends Equatable {
         course: data['course'],
         media: data['media'],
         address: data['address'],
-        id: data['id']);
+        id: data['id'],
+        role: data['role']);
   }
 
   @override
@@ -137,6 +142,7 @@ class UserData extends Equatable {
     result['course'] = data.course;
     result['media'] = data.media;
     result['address'] = data.address;
+    result['role'] = data.role;
     return result;
   }
 }
