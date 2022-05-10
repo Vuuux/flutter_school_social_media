@@ -48,12 +48,8 @@ class MyApp extends StatelessWidget {
           create: (context) => context.read<AuthService>().user,
           initialData: null,
         ),
-        Provider<DatabaseServices>(
-            create: (_) =>
-                DatabaseServices(uid: context.watch<CurrentUserId?>()?.uid)),
-        StreamProvider(
-            create: (context) => context.read<DatabaseServices>().userData,
-            initialData: null)
+        // ProxyProvider<CurrentUserId?, DatabaseServices>(
+        //     update: (_, user, __) => DatabaseServices(uid: user?.uid ?? "")),
       ],
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,

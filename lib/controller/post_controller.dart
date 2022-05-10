@@ -16,12 +16,10 @@ class PostController extends GetxController {
     super.onReady();
   }
 
-  final requestStatus = RequestStatus.LOADING.obs;
-
   void setRequestStatus(RequestStatus _value) => requestStatus.value = _value;
 
   var postList = <PostModel>[].obs;
-
+  final requestStatus = RequestStatus.LOADING.obs;
   Future getPosts() async {
     setRequestStatus(RequestStatus.LOADING);
     var response = await _database.getTimelinePosts();

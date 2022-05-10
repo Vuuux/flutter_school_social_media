@@ -72,56 +72,56 @@ class BarChartUsers extends StatelessWidget {
         barGroups: [
           BarChartGroupData(x: 1, barRods: [
             BarChartRodData(
-                y: 10,
+                y: 3,
                 width: 20,
                 colors: [primaryColor],
                 borderRadius: BorderRadius.circular(5))
           ]),
           BarChartGroupData(x: 2, barRods: [
             BarChartRodData(
-                y: 3,
+                y: 4,
                 width: 20,
                 colors: [primaryColor],
                 borderRadius: BorderRadius.circular(5))
           ]),
           BarChartGroupData(x: 3, barRods: [
             BarChartRodData(
-                y: 12,
+                y: 5,
                 width: 20,
                 colors: [primaryColor],
                 borderRadius: BorderRadius.circular(5))
           ]),
           BarChartGroupData(x: 4, barRods: [
             BarChartRodData(
-                y: 8,
+                y: 6,
                 width: 20,
                 colors: [primaryColor],
                 borderRadius: BorderRadius.circular(5))
           ]),
           BarChartGroupData(x: 5, barRods: [
             BarChartRodData(
-                y: 6,
+                y: 4,
                 width: 20,
                 colors: [primaryColor],
                 borderRadius: BorderRadius.circular(5))
           ]),
           BarChartGroupData(x: 6, barRods: [
             BarChartRodData(
-                y: 10,
+                y: 4,
                 width: 20,
                 colors: [primaryColor],
                 borderRadius: BorderRadius.circular(5))
           ]),
           BarChartGroupData(x: 7, barRods: [
             BarChartRodData(
-                y: 16,
+                y: 5,
                 width: 20,
                 colors: [primaryColor],
                 borderRadius: BorderRadius.circular(5))
           ]),
           BarChartGroupData(x: 8, barRods: [
             BarChartRodData(
-                y: 6,
+                y: 3,
                 width: 20,
                 colors: [primaryColor],
                 borderRadius: BorderRadius.circular(5))
@@ -135,14 +135,14 @@ class BarChartUsers extends StatelessWidget {
           ]),
           BarChartGroupData(x: 10, barRods: [
             BarChartRodData(
-                y: 9,
+                y: 3,
                 width: 20,
                 colors: [primaryColor],
                 borderRadius: BorderRadius.circular(5))
           ]),
           BarChartGroupData(x: 11, barRods: [
             BarChartRodData(
-                y: 12,
+                y: 5,
                 width: 20,
                 colors: [primaryColor],
                 borderRadius: BorderRadius.circular(5))
@@ -156,14 +156,14 @@ class BarChartUsers extends StatelessWidget {
           ]),
           BarChartGroupData(x: 13, barRods: [
             BarChartRodData(
-                y: 13,
+                y: 3,
                 width: 20,
                 colors: [primaryColor],
                 borderRadius: BorderRadius.circular(5))
           ]),
           BarChartGroupData(x: 14, barRods: [
             BarChartRodData(
-                y: 15,
+                y: 7,
                 width: 20,
                 colors: [primaryColor],
                 borderRadius: BorderRadius.circular(5))

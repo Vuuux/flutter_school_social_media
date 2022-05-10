@@ -76,25 +76,25 @@ List discussionData = [
 List referalData = [
   ReferalInfoModel(
     title: "Facebook",
-    count: 234,
+    count: 0,
     svgSrc: "assets/icons/Facebook.svg",
     color: primaryColor,
   ),
   ReferalInfoModel(
     title: "Twitter",
-    count: 234,
+    count: 0,
     svgSrc: "assets/icons/Twitter.svg",
     color: primaryColor,
   ),
   ReferalInfoModel(
     title: "Linkedin",
-    count: 234,
+    count: 0,
     svgSrc: "assets/icons/Linkedin.svg",
     color: primaryColor,
   ),
   ReferalInfoModel(
     title: "Dribble",
-    count: 234,
+    count: 0,
     svgSrc: "assets/icons/Dribbble.svg",
     color: red,
   ),

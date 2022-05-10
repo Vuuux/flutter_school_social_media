@@ -42,7 +42,9 @@ class _TaskManagerPageState extends State<TaskManagerPage> {
     super.initState();
     notifyHelper = NotifyHelper();
     notifyHelper.initializeNotification();
-    _taskController.getTasks();
+    Future.delayed(Duration.zero, () {
+      _taskController.getTasks();
+    });
   }
 
   @override

@@ -65,7 +65,6 @@ const String KEY_NOTIFICATION_QUESTION = "question";
 const String KEY_NOTIFICATION_ANSWER = "answer";
 const String KEY_NOTIFICATION_MESSAGE = "message";
 const String KEY_NOTIFICATION_REQUEST = "request";
-const String KEY_NOTIFICATION_ACCEPT_REQUEST = "accept-request";
 const String KEY_NOTIFICATION_COMP = "compatibility";
 const String KEY_NOTIFICATION_LIKE = "like";
 const String KEY_NOTIFICATION_COMMENT = "comment";

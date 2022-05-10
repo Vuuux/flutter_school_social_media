@@ -24,7 +24,7 @@ class TopReferals extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'TopReferals',
+                'Liên kết',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
@@ -32,7 +32,7 @@ class TopReferals extends StatelessWidget {
                 ),
               ),
               Text(
-                'View All',
+                'Xem tất cả',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,

@@ -249,7 +249,7 @@ class DatabaseServices {
   }
 
   //cập nhật token cho user
-  uploadToken(String fcmToken) async {
+  uploadToken(String fcmToken, String platform) async {
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
@@ -258,7 +258,7 @@ class DatabaseServices {
         .set({
       'token': fcmToken,
       'createAt': FieldValue.serverTimestamp(),
-      'platform': Platform.operatingSystem,
+      'platform': platform,
     });
   }
 
@@ -290,22 +290,22 @@ class DatabaseServices {
     });
   }
 
-  Future acceptRequest(String ownerID, String userId) async {
+  Future acceptRequest(String ownerID, String notifId) async {
     await feedReference
         .doc(ownerID)
         .collection('feedItems')
-        .doc(userId)
+        .doc(notifId)
         .update({
       'timestamp': DateTime.now(),
-      'status': 'accepted',
+      'status': 'accept',
     });
   }
 
-  Future declineRequest(String ownerID, String userId) async {
+  Future declineRequest(String ownerID, String notifId) async {
     return await feedReference
         .doc(ownerID)
         .collection('feedItems')
-        .doc(userId)
+        .doc(notifId)
         .get()
         .then((doc) {
       if (doc.exists) {
@@ -327,7 +327,7 @@ class DatabaseServices {
         .collection('feedItems')
         .doc(postId)
         .set({
-      'notifId': Uuid().v1(),
+      'notifId': Uuid().v4(),
       "type": "like",
       "username": username,
       "userId": userId,
@@ -335,7 +335,8 @@ class DatabaseServices {
       "postId": postId,
       "mediaUrl": mediaUrl,
       "timestamp": timestamp,
-      "status": "unseen",
+      "status": null,
+      "seenStatus": false,
       "isAnon": false
     });
   }
@@ -743,7 +744,7 @@ class DatabaseServices {
       required String url,
       required Timestamp timestamp}) async {
     return await feedReference.doc(postOwnerId).collection('feedItems').add({
-      "notifId": Uuid().v1(),
+      "notifId": Uuid().v4(),
       "type": "comment",
       "commentData": comment,
       "postId": postId,
@@ -752,7 +753,8 @@ class DatabaseServices {
       "avatar": avatar,
       "mediaUrl": url,
       "timestamp": timestamp,
-      "status": "unseen",
+      "status": null,
+      "seenStatus": false,
       "isAnon": false
     });
   }
@@ -845,7 +847,7 @@ class DatabaseServices {
   }
 
   //check this
-  Stream<UserData> get userData {
+  Stream<UserData?> get userData {
     return userReference.doc(uid).snapshots().map(_userDataFromSnapshot);
   }
 
@@ -967,16 +969,17 @@ class DatabaseServices {
     //return notificationsItems;
   }
 
-  Future addNotifiCation(String ownerId, String userId, dynamic data) async {
+  Future addNotifiCation(
+      String ownerId, String userId, String notifId, dynamic data) async {
     return await feedReference
         .doc(ownerId)
         .collection('feedItems')
-        .doc(userId)
+        .doc(notifId)
         .set(data);
   }
 
   Future updateNotification(
-      String ownerId, String notifId, dynamic data) async {
+      String ownerId, String notifId, Map<String, dynamic> data) async {
     return await feedReference
         .doc(ownerId)
         .collection('feedItems')
@@ -997,23 +1000,35 @@ class DatabaseServices {
     });
   }
 
-  Future getRequestNotification(String ownerId, String userId) async {
+  Future getRequestNotification(String ownerId, String notifId) async {
     return await feedReference
         .doc(ownerId)
         .collection('feedItems')
-        .doc(userId)
+        .doc(notifId)
         .get();
   }
 
-  Future getSpecificNotifications(String ownerId, String uid) async {
+  Future<DocumentSnapshot> getSpecificNotifications(
+      String ownerId, String notifId) async {
     return await feedReference
         .doc(ownerId)
         .collection('feedItems')
-        .doc(uid)
+        .doc(notifId)
         .get();
   }
 
-  Future getSpecificFollower(String ownerId, String uid) async {
+  Future<QuerySnapshot> getSpecificNotificationFromUser(
+      String ownerId, String targetId) async {
+    return await feedReference
+        .doc(ownerId)
+        .collection('feedItems')
+        .where('userId', isEqualTo: targetId)
+        .where('type', isEqualTo: 'request')
+        .get();
+  }
+
+  Future<DocumentSnapshot> getSpecificFollower(
+      String ownerId, String uid) async {
     return await followerReference
         .doc(ownerId)
         .collection('userFollowers')
@@ -1116,7 +1131,7 @@ class DatabaseServices {
         .collection('anonFeedItems')
         .doc(forumId)
         .set({
-      "notifId": Uuid().v1(),
+      "notifId": Uuid().v4(),
       "type": "vote",
       "username": nickname,
       "userId": userId,
@@ -1124,7 +1139,8 @@ class DatabaseServices {
       "forumId": forumId,
       "mediaUrl": mediaUrl,
       "timestamp": timestamp,
-      "status": "unseen",
+      "status": "unknown",
+      "seenStatus": false,
       "isAnon": true
     });
   }
@@ -1179,7 +1195,7 @@ class DatabaseServices {
         .doc(postOwnerId)
         .collection('anonFeedItems')
         .add({
-      "notifId": Uuid().v1(),
+      "notifId": Uuid().v4(),
       "type": "forum-comment",
       "commentData": comment,
       "forumId": forumId,
@@ -1188,7 +1204,8 @@ class DatabaseServices {
       "avatar": avatar,
       "mediaUrl": url,
       "timestamp": timestamp,
-      "status": "unseen",
+      "status": null,
+      "seenStatus": false,
       "isAnon": true
     });
   }

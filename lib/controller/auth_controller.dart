@@ -36,13 +36,15 @@ class AuthService {
   }
 
   //đăng nhập với email và password
-  Future<String?> signIn(String email, String password) async {
+  Future<Either<UserCredential, FirebaseAuthException>> signIn(
+      String email, String password) async {
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      return "OK";
-    } on FirebaseAuthException catch (e) {
-      print("LOGIN ERROR WITH STATUS CODE:" + e.code);
-      return e.code;
+      var response = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      return Left(response);
+    } on FirebaseAuthException catch (error) {
+      print("LOGIN ERROR WITH STATUS CODE:" + error.code);
+      return Right(error);
     }
   }
 

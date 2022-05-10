@@ -89,8 +89,10 @@ class _OthersAnonProfileState extends State<OthersAnonProfile> {
                       .getSpecificFollower(
                           widget.ctuer!.id, widget.currentUser!.uid)
                       .then((val) {
-                    if (!(val.exists) &&
-                        value.data()!['status'] == 'accepted') {
+                    if (!(val.exists)
+                        //&&
+                        //value.data()!['status'] == 'accepted'
+                        ) {
                       if (mounted) {
                         setState(() {
                           following = true;
@@ -238,14 +240,15 @@ class _OthersAnonProfileState extends State<OthersAnonProfile> {
         sentreRequest = true;
       });
     }
-
-    dbServer.addNotifiCation(widget.ctuer!.id, userData.id, {
-      'notifId': Uuid().v1(),
+    String notifId = const Uuid().v4();
+    dbServer.addNotifiCation(widget.ctuer!.id, userData.id, notifId, {
+      'notifId': notifId,
       'type': 'request',
       'timestamp': DateTime.now(),
       'avatar': userData.avatar,
       'username': userData.username,
       'status': 'requesting',
+      'seenStatus': false,
       'userId': userData.id
     });
 
@@ -339,7 +342,7 @@ class _OthersAnonProfileState extends State<OthersAnonProfile> {
         ),
         designSize: const Size(360, 690),
         orientation: Orientation.portrait);
-    return StreamBuilder<UserData>(
+    return StreamBuilder<UserData?>(
         stream: DatabaseServices(uid: widget.currentUser!.uid).userData,
         builder: (context, snapshot) {
           UserData? userData = snapshot.data;

@@ -51,7 +51,7 @@ class _AnonNotificationPageState extends State<AnonNotificationPage> {
   Widget build(BuildContext context) {
     DatabaseServices databaseService = DatabaseServices(uid: widget.uid);
 
-    return StreamBuilder<UserData>(
+    return StreamBuilder<UserData?>(
         stream: databaseService.userData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -249,14 +249,16 @@ class _AnonNotificationsItemState extends State<AnonNotificationsItem> {
       });
     });
     widget.databaseService.acceptRequest(user.uid, widget.noti.userId);
-
-    widget.databaseService.addNotifiCation(widget.noti.userId, user.uid, {
-      'notifId': Uuid().v1(),
-      'type': 'accept-request',
+    String notifId = Uuid().v4();
+    widget.databaseService
+        .addNotifiCation(widget.noti.userId, user.uid, notifId, {
+      'notifId': notifId,
+      'type': 'request',
       'timestamp': DateTime.now(),
       'avatar': widget.userData!.avatar,
       'username': widget.userData!.username,
       'status': 'following',
+      'seenStatus': false,
       'userId': widget.userData!.id
     });
 
@@ -283,7 +285,10 @@ class _AnonNotificationsItemState extends State<AnonNotificationsItem> {
       padding: const EdgeInsets.only(bottom: 1.0),
       child: Container(
         width: MediaQuery.of(context).size.width,
-        color: kPrimaryLightColor,
+        color:
+            widget.noti.status == 'unseen' || widget.noti.status == 'requesting'
+                ? Colors.white
+                : Colors.black12,
         child: ListTile(
           title: GestureDetector(
             onTap: () {

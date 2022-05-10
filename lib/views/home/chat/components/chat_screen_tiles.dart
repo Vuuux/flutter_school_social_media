@@ -57,7 +57,7 @@ class ChatScreenTile extends StatelessWidget {
     final user = context.watch<CurrentUserId?>();
     chatMessagesStream =
         DatabaseServices(uid: '').getConversationMessages(chatRoomId);
-    return StreamBuilder<UserData>(
+    return StreamBuilder<UserData?>(
         stream: DatabaseServices(uid: user!.uid).userData,
         builder: (context, snapshot) {
           UserData? userData = snapshot.data;

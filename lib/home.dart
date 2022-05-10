@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eventual/eventual-builder.dart';
 import 'package:eventual/eventual-notifier.dart';
@@ -26,6 +28,7 @@ import 'package:flutter/cupertino.dart';
 import 'views/home/chat/chat_screen.dart';
 import 'views/home/feed/feed.dart';
 import 'views/home/notifications_page.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 //Trang chủ sau đăng nhập
 class Home extends StatefulWidget {
@@ -91,8 +94,16 @@ class _HomeState extends State<Home> {
   // }
 
   _saveDeviceToken(String uid) async {
+    String platform = "";
     String? fcmToken = await _fcm.getToken();
-    DatabaseServices(uid: uid).uploadToken(fcmToken!);
+    if (kIsWeb) {
+      platform = "web";
+    } else if (Platform.isAndroid) {
+      platform = "android";
+    } else if (Platform.isIOS) {
+      platform = "ios";
+    }
+    DatabaseServices(uid: uid).uploadToken(fcmToken!, platform);
   }
 
   late NotifyHelper notifyHelper;
@@ -103,7 +114,6 @@ class _HomeState extends State<Home> {
       DocumentSnapshot snapshot =
           await DatabaseServices(uid: user!.uid).getUserByUserId();
       UserData data = UserData.fromDocumentSnapshot(snapshot);
-      UserDataService().saveUserData(data);
     });
 
     notifyHelper = NotifyHelper();

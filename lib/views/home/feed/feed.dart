@@ -45,6 +45,9 @@ class _FeedState extends State<Feed> {
     super.initState();
     String userId = auth.currentUser!.uid;
     currentUser = CurrentUserId(uid: userId);
+    Future.delayed(Duration.zero, () {
+      _postController.getPosts();
+    });
   }
 
   //lấy time từ post
@@ -162,7 +165,6 @@ class _FeedState extends State<Feed> {
 
   @override
   Widget build(BuildContext context) {
-    _postController.getPosts();
     ScreenUtil.init(
         const BoxConstraints(
           maxWidth: 414,
@@ -172,7 +174,7 @@ class _FeedState extends State<Feed> {
         orientation: Orientation.portrait);
     CurrentUserId? user = context.watch<CurrentUserId?>();
     currentUser = user!;
-    return StreamBuilder<UserData>(
+    return StreamBuilder<UserData?>(
         stream: DatabaseServices(uid: user.uid).userData,
         builder: (context, snapshot) {
           UserData? userData = snapshot.data;
@@ -217,7 +219,7 @@ class _FeedState extends State<Feed> {
                         right: 8.0,
                         child: RipplesAnimation(
                           onPressed: () {
-                            Get.dialog(CustomDialog(
+                            Get.dialog(const CustomDialog(
                               title: 'Đi kết bạn nào!',
                               description:
                                   'Hôm nay bạn sẽ kết bạn với Hmmie nào đây?',

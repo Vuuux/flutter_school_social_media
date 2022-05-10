@@ -153,7 +153,7 @@ class _MyProfileState extends State<MyProfile> {
 
     getAllFollowers();
     getAllFollowings();
-    return StreamBuilder<UserData>(
+    return StreamBuilder<UserData?>(
         stream: DatabaseServices(uid: user.uid).userData,
         builder: (context, snapshot) {
           UserData? userData = snapshot.data;

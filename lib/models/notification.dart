@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+enum FollowStatus { REQUESTING, ACCEPT, ACCEPTED, NONE }
+
 class NotificationModel {
   final String notifId;
   final String type;
@@ -12,29 +14,32 @@ class NotificationModel {
   final String? gameRoomId;
   final String? mediaUrl;
   final String? comment;
-  final String status;
+  final FollowStatus status;
   final String? messageData;
   final String? triviaRoomId;
   final String? chatRoomId;
   final bool isAnon;
+  final bool seenStatus;
 
-  NotificationModel(
-      {required this.notifId,
-      required this.type,
-      required this.userId,
-      required this.username,
-      required this.timestamp,
-      required this.avatar,
-      this.postId,
-      this.gameRoomId,
-      this.forumId,
-      this.mediaUrl,
-      required this.status,
-      required this.isAnon,
-      this.comment,
-      this.messageData,
-      this.triviaRoomId,
-      this.chatRoomId});
+  NotificationModel({
+    required this.notifId,
+    required this.type,
+    required this.userId,
+    required this.username,
+    required this.timestamp,
+    required this.avatar,
+    this.postId,
+    this.gameRoomId,
+    this.forumId,
+    this.mediaUrl,
+    required this.status,
+    required this.isAnon,
+    this.comment,
+    this.messageData,
+    this.triviaRoomId,
+    this.chatRoomId,
+    this.seenStatus = false,
+  });
 
   factory NotificationModel.fromDocument(DocumentSnapshot doc) {
     return NotificationModel(
@@ -56,7 +61,8 @@ class NotificationModel {
           : '',
       mediaUrl:
           doc.data().toString().contains('mediaUrl') ? doc.get('mediaUrl') : '',
-      status: doc.data().toString().contains('status') ? doc.get('status') : '',
+      status: StatusExtension.getFollowStatus(
+          doc.data().toString().contains('status') ? doc.get('status') : ''),
       isAnon:
           doc.data().toString().contains('isAnon') ? doc.get('isAnon') : false,
       comment: doc.data().toString().contains('commentData')
@@ -71,6 +77,26 @@ class NotificationModel {
       chatRoomId: doc.data().toString().contains('chatRoomId')
           ? doc.get('chatRoomId')
           : '',
+      seenStatus: doc.data().toString().contains('seenStatus')
+          ? doc.get('seenStatus')
+          : false,
     );
+  }
+}
+
+extension StatusExtension on NotificationModel {
+  static FollowStatus getFollowStatus(String status) {
+    switch (status) {
+      case "requesting":
+        return FollowStatus.REQUESTING;
+      case "accepted":
+        return FollowStatus.ACCEPTED;
+      case "accept":
+        return FollowStatus.ACCEPT;
+      case "declined":
+        return FollowStatus.NONE;
+      default:
+        return FollowStatus.NONE;
+    }
   }
 }

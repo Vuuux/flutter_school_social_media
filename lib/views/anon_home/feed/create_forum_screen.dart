@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
@@ -208,8 +209,9 @@ class _CreateForumState extends State<CreateForum>
                     }
                   }),
                   selected: choiceChip.isSelected,
-                  selectedColor: kPrimaryColor,
-                  backgroundColor: Colors.white,
+                  selectedColor:
+                      Get.isDarkMode ? kPrimaryDarkColor : kPrimaryColor,
+                  backgroundColor: Colors.grey[600],
                 ))
             .toList(),
       );

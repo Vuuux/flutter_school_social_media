@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/auth_controller.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/user.dart';
@@ -49,7 +50,7 @@ class _EditPasswordState extends State<EditPassword> {
                     style:
                         TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
               ),
-              body: StreamBuilder<UserData>(
+              body: StreamBuilder<UserData?>(
                   stream: DatabaseServices(uid: user!.uid).userData,
                   builder: (context, snapshot) {
                     return GestureDetector(
@@ -164,11 +165,15 @@ class _EditPasswordState extends State<EditPassword> {
                                             decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(25),
-                                                color: kPrimaryColor),
-                                            child: const Text(
-                                                'Xác nhận mật khẩu mới',
+                                                color: Get.isDarkMode
+                                                    ? kPrimaryDarkColor
+                                                    : kPrimaryColor),
+                                            child: Text('Xác nhận mật khẩu mới',
                                                 style: TextStyle(
                                                     fontSize: 18,
+                                                    color: Get.isDarkMode
+                                                        ? Colors.black
+                                                        : Colors.white,
                                                     fontWeight:
                                                         FontWeight.w400)),
                                           ),

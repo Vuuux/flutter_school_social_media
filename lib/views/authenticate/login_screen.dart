@@ -5,8 +5,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/auth_controller.dart';
 import 'package:luanvanflutter/controller/controller.dart';
+import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/floating_image.dart';
 import 'package:luanvanflutter/style/loading.dart';
+import 'package:luanvanflutter/utils/user_data_service.dart';
 import 'package:luanvanflutter/views/authenticate/forgot_password_screen.dart';
 import 'package:luanvanflutter/views/authenticate/register_screen.dart';
 import 'package:luanvanflutter/views/components/already_have_an_account_acheck.dart';
@@ -81,22 +83,21 @@ class _LoginScreenState extends State<LoginScreen> {
         loading = true;
       });
 
-      context.read<AuthService>().signIn(email, password).then((value) {
-        String err = "";
-        if (value == "OK") {
+      context.read<AuthService>().signIn(email, password).then((response) {
+        response.fold((result) {
           Fluttertoast.showToast(
               msg: "Đăng nhập thành công",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
               timeInSecForIosWeb: 1);
           setState(() {
-            error = err;
             loading = false;
           });
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => Wrapper()));
-        } else {
-          switch (value) {
+        }, (error) {
+          String err = "";
+          switch (error.code) {
             case "invalid-email":
               {
                 err = "Sai tài khoản hoặc mật khẩu!";
@@ -114,12 +115,10 @@ class _LoginScreenState extends State<LoginScreen> {
               }
           }
           setState(() {
-            error = err;
             loading = false;
+            Get.snackbar("Lỗi", err, snackPosition: SnackPosition.BOTTOM);
           });
-          final SnackBar snackBar = SnackBar(content: Text(error));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        }
+        });
       });
     }
   }

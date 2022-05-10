@@ -10,6 +10,7 @@ import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/home.dart';
 import 'package:luanvanflutter/utils/chat_utils.dart';
 import 'package:luanvanflutter/views/components/custom_input_field.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../home/chat/chat_screen.dart';
 
@@ -88,12 +89,10 @@ class _AnswerScreenState extends State<AnswerScreen> {
           .addConversationMessages(resultChatRoomId, questionMap);
       DatabaseServices(uid: _auth.currentUser?.uid)
           .addConversationMessages(resultChatRoomId, messageMap);
-
+      String notifId = Uuid().v4();
       DatabaseServices(uid: _auth.currentUser?.uid)
-          .feedReference
-          .doc(widget.ctuer.id)
-          .collection('feedItems')
-          .add({
+          .addNotifiCation(widget.ctuer.id, widget.userData.id, notifId, {
+        'notifId': notifId,
         'type': KEY_NOTIFICATION_QUESTION,
         'triviaRoomId': widget.triviaRoomID,
         'chatRoomId': resultChatRoomId,
@@ -101,7 +100,8 @@ class _AnswerScreenState extends State<AnswerScreen> {
         'ownerID': widget.ctuer.email,
         'ownerName': widget.ctuer.username,
         'timestamp': DateTime.now(),
-        'status': 'unseen',
+        'status': null,
+        'seenStatus': false,
         'userDp': widget.userData.anonAvatar,
         'userID': widget.userData.nickname,
       });

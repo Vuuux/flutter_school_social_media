@@ -81,7 +81,7 @@ class _ForumCommentTreeState extends State<ForumCommentTree> {
           const SizedBox(
             width: 12,
           ),
-          Text(timeago.format(data.timestamp.toDate())),
+          Text(timeago.format(data.timestamp.toDate(), locale: 'vi')),
           const Spacer(),
           buildLikeCount(data)
         ],

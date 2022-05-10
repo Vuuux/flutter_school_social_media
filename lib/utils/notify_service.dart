@@ -60,7 +60,11 @@ class NotifyHelper {
     tz.TZDateTime convertDate = _convertTime(hour, minute, task.remindTime);
     await flutterLocalNotificationsPlugin.zonedSchedule(
         id,
-        task.title,
+        task.remindTime == 0
+            ? "Công việc vừa bắt đầu!"
+            : "Công việc sẽ bắt đầu trong " +
+                task.remindTime.toString() +
+                " phút nữa!",
         task.note,
         convertDate,
         const NotificationDetails(

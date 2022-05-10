@@ -16,7 +16,6 @@ import 'package:provider/provider.dart';
 import '../../../style/constants.dart';
 import '../../../models/user.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'edit_anon_profile_screen.dart';
@@ -102,15 +101,7 @@ class _AnonProfileState extends State<AnonProfile> {
   Widget build(BuildContext context) {
     final user = context.watch<CurrentUserId?>();
     userUid = user!.uid;
-    ScreenUtil.init(
-        const BoxConstraints(
-          maxWidth: 414,
-          maxHeight: 869,
-        ),
-        designSize: const Size(360, 690),
-        orientation: Orientation.portrait);
-
-    return StreamBuilder<UserData>(
+    return StreamBuilder<UserData?>(
         stream: DatabaseServices(uid: user.uid).userData,
         builder: (context, snapshot) {
           UserData? userData = snapshot.data;
@@ -225,7 +216,7 @@ class _AnonProfileState extends State<AnonProfile> {
                                             fontSize: 18,
                                           )),
                                 SizedBox(
-                                  height: kSpacingUnit.w,
+                                  height: 4.0,
                                 ),
                                 const Text('K H O Á',
                                     style: TextStyle(
@@ -246,7 +237,7 @@ class _AnonProfileState extends State<AnonProfile> {
                                             fontSize: 15,
                                           )),
                                 SizedBox(
-                                  height: kSpacingUnit.w,
+                                  height: 4.0,
                                 ),
                                 const Text('P L A Y L I S T',
                                     style: TextStyle(
@@ -267,7 +258,7 @@ class _AnonProfileState extends State<AnonProfile> {
                                             fontSize: 15,
                                           )),
                                 SizedBox(
-                                  height: kSpacingUnit.w,
+                                  height: 4.0,
                                 ),
                               ],
                             ),

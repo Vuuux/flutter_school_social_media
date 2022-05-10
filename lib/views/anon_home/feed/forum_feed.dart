@@ -287,7 +287,7 @@ class _AnonForumFeedState extends State<AnonForumFeed> {
         designSize: const Size(360, 690),
         orientation: Orientation.portrait);
     final user = context.watch<CurrentUserId?>();
-    return StreamBuilder<UserData>(
+    return StreamBuilder<UserData?>(
         stream: DatabaseServices(uid: user!.uid).userData,
         builder: (context, snapshot) {
           UserData? userData = snapshot.data;

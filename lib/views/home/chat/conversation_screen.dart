@@ -98,16 +98,18 @@ class _ConversationScreenState extends State<ConversationScreen> {
       };
       DatabaseServices(uid: '')
           .addConversationMessages(widget.chatRoomId, messageMap);
+      String notifId = Uuid().v4();
       DatabaseServices(uid: '')
-          .addNotifiCation(widget.ctuer.id, widget.userId, {
-        'notifId': Uuid().v1(),
+          .addNotifiCation(widget.ctuer.id, widget.userId, notifId, {
+        'notifId': notifId,
         'userId': userData.id,
         'type': 'message',
         'messageData': message,
         'timestamp': Timestamp.now(),
         'avatar': userData.avatar,
         'username': userData.username,
-        'status': 'unseen',
+        'status': null,
+        'seenStatus': false,
         'isAnon': false
       });
 
@@ -136,7 +138,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     chatMessagesStream =
         DatabaseServices(uid: '').getConversationMessages(widget.chatRoomId);
 
-    return StreamBuilder<UserData>(
+    return StreamBuilder<UserData?>(
       stream: DatabaseServices(uid: user.uid).userData,
       builder: (context, snapshot) {
         UserData? userData = snapshot.data;

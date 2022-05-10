@@ -4,6 +4,7 @@ import 'package:comment_tree/comment_tree.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/comment.dart';
@@ -42,6 +43,7 @@ class ShowForumComments extends StatefulWidget {
 class _ShowForumCommentsState extends State<ShowForumComments> {
   int upVoteCount = 0;
   int downVoteCount = 0;
+  ScrollController _controller = ScrollController();
   @override
   void initState() {
     super.initState();
@@ -229,6 +231,17 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
     widget.isDownVoted = widget.forum.downVotes[user.uid] == true;
 
     return Scaffold(
+      bottomNavigationBar: ListTile(
+        title: TextFormField(
+          controller: widget.commentController,
+          decoration: const InputDecoration(labelText: "Nhập bình luận..."),
+        ),
+        trailing: OutlineButton(
+          onPressed: () => handlePostComment(user.uid),
+          borderSide: BorderSide.none,
+          child: const Text("GỬI"),
+        ),
+      ),
       appBar: AppBar(
         title: const Text("B Ì N H  L U Ậ N",
             textAlign: TextAlign.right,
@@ -242,64 +255,69 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
                   FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
             }),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: const Text("Nội dung"),
-          ),
-          Container(
-              margin: const EdgeInsets.all(8.0),
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24.0),
-                color: kPrimaryColor.withOpacity(0.6),
+      body: SingleChildScrollView(
+        controller: _controller,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            const Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Text(
+                "Nội dung",
+                style: TextStyle(fontSize: 18),
               ),
-              child: Center(
-                  child: Text(
-                widget.forum.description,
-                style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500),
-              ))),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text(
-                timeago.format(widget.forum.timestamp.toDate(), locale: 'vi'),
-                style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.black,
-                    fontStyle: FontStyle.italic),
-              ),
-              const SizedBox(
-                width: 10.0,
-              ),
-            ],
-          ),
-          buildForumFooter(user.uid),
-          const Divider(
-            thickness: 3,
-          ),
-          Expanded(child: buildCommentTree(user.uid, widget.forum.forumId)),
-          const Divider(
-            thickness: 3,
-          ),
-          ListTile(
-            title: TextFormField(
-              controller: widget.commentController,
-              decoration: const InputDecoration(labelText: "Nhập bình luận..."),
             ),
-            trailing: OutlineButton(
-              onPressed: () => handlePostComment(user.uid),
-              borderSide: BorderSide.none,
-              child: const Text("GỬI"),
+            ClipRRect(
+                borderRadius: BorderRadius.circular(15.0),
+                child: Container(
+                  child: CachedNetworkImage(
+                    imageUrl: widget.forum.mediaUrl,
+                    height: 200,
+                    width: 200,
+                  ),
+                )),
+            Container(
+                margin: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24.0),
+                  color: kPrimaryColor.withOpacity(0.6),
+                ),
+                child: Center(
+                    child: Text(
+                  widget.forum.description,
+                  style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500),
+                ))),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  timeago.format(widget.forum.timestamp.toDate(), locale: 'vi'),
+                  style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.black,
+                      fontStyle: FontStyle.italic),
+                ),
+                const SizedBox(
+                  width: 10.0,
+                ),
+              ],
             ),
-          )
-        ],
+            buildForumFooter(user.uid),
+            const Divider(
+              thickness: 3,
+            ),
+            buildCommentTree(user.uid, widget.forum.forumId),
+            const Divider(
+              thickness: 3,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -312,6 +330,8 @@ class _ShowForumCommentsState extends State<ShowForumComments> {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               return ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
                     CommentModel comment;

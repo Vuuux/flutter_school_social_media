@@ -34,7 +34,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   final DateFormat _dateFormat = MyDateUtils.getFormatter;
-  List<int> remindList = [5, 10, 15, 20];
+  List<int> remindList = [0, 5, 10, 15, 20];
   List<ScheduleMode> repeatList = [
     ScheduleMode.NONE,
     ScheduleMode.DAILY,
@@ -64,6 +64,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   void dispose() {
     super.dispose();
     task.dispose();
+    Get.delete<TaskController>();
   }
 
   @override
@@ -135,9 +136,11 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     ),
                     CustomInputField(
                       title: "Nhắc nhở",
-                      content: "Trước " +
-                          notifier[0].value.remindTime.toString() +
-                          " phút",
+                      content: notifier[0].value.remindTime == 0
+                          ? "Ngay lập tức"
+                          : "Trước " +
+                              notifier[0].value.remindTime.toString() +
+                              " phút",
                       widget: DropdownButton(
                         icon: const Icon(Icons.keyboard_arrow_down,
                             color: Colors.grey),
@@ -155,7 +158,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                             .map<DropdownMenuItem<String>>((int value) =>
                                 DropdownMenuItem<String>(
                                     value: value.toString(),
-                                    child: Text(value.toString())))
+                                    child: value == 0
+                                        ? Text("Ngay lập tức")
+                                        : Text(value.toString() + "phút")))
                             .toList(),
                       ),
                     ),

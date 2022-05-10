@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:animator/animator.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -169,6 +170,7 @@ class _PostItemState extends State<PostItem> {
                                       : kPrimaryColor,
                                   onTap: () async {
                                     await _validateReport();
+                                    Get.back();
                                   }),
                               BottomSheetButton(
                                   label: "Đóng",
@@ -219,8 +221,8 @@ class _PostItemState extends State<PostItem> {
           ClipRRect(
               borderRadius: BorderRadius.circular(15.0),
               child: Container(
-                child: Image.network(
-                  widget.post.url,
+                child: CachedNetworkImage(
+                  imageUrl: widget.post.url,
                   width: Get.width,
                 ),
               )),

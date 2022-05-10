@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
@@ -90,7 +91,7 @@ class UserData extends Equatable {
         anonAvatar: data['anonAvatar'],
         likes: data['likes'].length > 0
             ? List<SubUserData>.from(
-                data['likes'].map((x) => SubUserData.fromJson(x)))
+                data['likes'].map((x) => SubUserData.fromJson(x)).toList())
             : [],
         playlist: data['playlist'],
         course: data['course'],
@@ -136,7 +137,7 @@ class UserData extends Equatable {
     result['anonInterest'] = data.anonInterest;
     result['anonAvatar'] = data.anonAvatar;
     result['likes'] = data.likes.isNotEmpty
-        ? List<SubUserData>.from(data.likes.map((x) => SubUserData.toJson(x)))
+        ? data.likes.map((like) => SubUserData.toJson(like)).toList()
         : [];
     result['playlist'] = data.playlist;
     result['course'] = data.course;
