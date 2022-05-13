@@ -1,13 +1,16 @@
 import 'dart:io';
 
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:luanvanflutter/controller/auth_controller.dart';
 import 'package:luanvanflutter/controller/controller.dart';
+import 'package:luanvanflutter/models/forum.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/style/loading.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:luanvanflutter/utils/take_images_util.dart';
+import 'package:luanvanflutter/views/anon_home/feed/anon_forum_detail.dart';
 import 'package:luanvanflutter/views/components/circle_avatar.dart';
 import 'package:luanvanflutter/views/home/feed/post_detail.dart';
 import 'package:luanvanflutter/views/home/feed/post_screen.dart';
@@ -18,6 +21,7 @@ import '../../../models/user.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
+import '../feed/forum_comment_screen.dart';
 import 'edit_anon_profile_screen.dart';
 
 //Class quản lý thông tin user
@@ -73,11 +77,14 @@ class _AnonProfileState extends State<AnonProfile> {
           width: MediaQuery.of(context).size.width / 2.5,
           height: 26.0,
           child: Text(title,
-              style:
-                  const TextStyle(fontWeight: FontWeight.w300, fontSize: 12)),
+              style: TextStyle(
+                fontWeight: FontWeight.w300,
+                fontSize: 12,
+                color: Get.isDarkMode ? Colors.black : Colors.white,
+              )),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: kPrimaryLightColor,
+            color: Get.isDarkMode ? kPrimaryDarkColor : kPrimaryColor,
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
@@ -86,10 +93,7 @@ class _AnonProfileState extends State<AnonProfile> {
   }
 
   editUserProfile(UserData userData) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => EditProfileScreen(
-              userData: userData,
-            )));
+    Get.to(() => EditProfileScreen(userData: userData));
   }
 
   @override
@@ -266,7 +270,7 @@ class _AnonProfileState extends State<AnonProfile> {
                           //GRID VIEW IMAGE
                           StreamBuilder<QuerySnapshot>(
                               stream: Stream.fromFuture(
-                                  DatabaseServices(uid: user.uid).getMyPosts()),
+                                  DatabaseServices(uid: user.uid).getForums()),
                               builder: (context, snapshot) {
                                 return snapshot.hasData
                                     ? Padding(
@@ -286,33 +290,11 @@ class _AnonProfileState extends State<AnonProfile> {
                                               itemCount:
                                                   snapshot.data!.docs.length,
                                               itemBuilder: (context, index) {
-                                                var post = PostItem(
-                                                  post: PostModel(
-                                                      postId: snapshot
-                                                          .data!.docs[index]
-                                                          .get('postId'),
-                                                      ownerId: snapshot
-                                                          .data!.docs[index]
-                                                          .get('ownerId'),
-                                                      username: snapshot
-                                                          .data!.docs[index]
-                                                          .get('username'),
-                                                      location: snapshot
-                                                          .data!.docs[index]
-                                                          .get('location'),
-                                                      description: snapshot
-                                                          .data!.docs[index]
-                                                          .get('description'),
-                                                      url: snapshot
-                                                          .data!.docs[index]
-                                                          .get('url'),
-                                                      likes: snapshot.data!.docs[index].get('likes'),
-                                                      timestamp: snapshot.data!.docs[index].get('timestamp')),
-                                                );
+                                                ForumModel forum =
+                                                    ForumModel.fromDocument(
+                                                        snapshot
+                                                            .data!.docs[index]);
 
-                                                Map<dynamic, dynamic> likes =
-                                                    snapshot.data!.docs[index]
-                                                        .get('likes');
                                                 if (index ==
                                                     snapshot
                                                         .data!.docs.length) {
@@ -344,15 +326,12 @@ class _AnonProfileState extends State<AnonProfile> {
                                                     Navigator.push(
                                                         context,
                                                         MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    PostDetail(
-                                                                      postId: post
-                                                                          .post
-                                                                          .postId,
-                                                                      ownerId:
-                                                                          user.uid,
-                                                                    )));
+                                                            builder: (context) =>
+                                                                ShowForumComments(
+                                                                  forum: forum,
+                                                                  context:
+                                                                      context,
+                                                                )));
                                                   },
                                                   menuItems: <FocusedMenuItem>[
                                                     FocusedMenuItem(
@@ -394,7 +373,7 @@ class _AnonProfileState extends State<AnonProfile> {
                                                                 Radius.circular(
                                                                     20.0)),
                                                         child: Image.network(
-                                                          post.post.url,
+                                                          forum.mediaUrl,
                                                           fit: BoxFit.fill,
                                                         )),
                                                   ),

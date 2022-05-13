@@ -20,10 +20,9 @@ class EditPassword extends StatefulWidget {
 
 class _EditPasswordState extends State<EditPassword> {
   final _formKey = GlobalKey<FormState>();
-  String email = '';
-  String oldPassword = '';
-  String newPassword = '';
-  String confirmPassword = '';
+  TextEditingController _passwordController = TextEditingController();
+  TextEditingController _newPasswordController = TextEditingController();
+  TextEditingController _confirmNewPasswordController = TextEditingController();
   bool loading = false;
 
   bool checkCurrentPasswordValid = false;
@@ -75,6 +74,7 @@ class _EditPasswordState extends State<EditPassword> {
                                             const SizedBox(width: 3),
                                             Expanded(
                                               child: RoundedPasswordField(
+                                                controller: _passwordController,
                                                 title: "Mật khẩu hiện tại",
                                                 hintText: 'Mật khẩu hiện tại',
                                               ),
@@ -86,6 +86,8 @@ class _EditPasswordState extends State<EditPassword> {
                                             const SizedBox(width: 3),
                                             Expanded(
                                               child: RoundedPasswordField(
+                                                controller:
+                                                    _newPasswordController,
                                                 title: "Mật khẩu mới",
                                                 hintText: 'Mật khẩu mới',
                                               ),
@@ -96,6 +98,8 @@ class _EditPasswordState extends State<EditPassword> {
                                           children: <Widget>[
                                             Expanded(
                                               child: RoundedPasswordField(
+                                                controller:
+                                                    _confirmNewPasswordController,
                                                 title: "Nhập lại mật khẩu mới",
                                                 hintText:
                                                     'Xác nhận mật khẩu mới',
@@ -110,7 +114,8 @@ class _EditPasswordState extends State<EditPassword> {
                                                 await context
                                                             .read<AuthService>()
                                                             .validatePassword(
-                                                                oldPassword) ==
+                                                                _passwordController
+                                                                    .text) ==
                                                         'OK'
                                                     ? true
                                                     : false;
@@ -122,36 +127,54 @@ class _EditPasswordState extends State<EditPassword> {
                                               });
 
                                               if (checkCurrentPasswordValid) {
-                                                context
-                                                    .read<AuthService>()
-                                                    .updatePassword(newPassword)
-                                                    .then((value) {
-                                                  if (value == 'OK') {
-                                                    Fluttertoast.showToast(
-                                                        msg:
-                                                            "Đổi mật khẩu thành công",
-                                                        toastLength:
-                                                            Toast.LENGTH_SHORT,
-                                                        gravity:
-                                                            ToastGravity.CENTER,
-                                                        timeInSecForIosWeb: 1);
-                                                    Navigator.of(context)
-                                                        .pushAndRemoveUntil(
-                                                            FadeRoute(
-                                                                page:
-                                                                    Wrapper()),
-                                                            ModalRoute.withName(
-                                                                'Wrapper'));
-                                                  } else {
-                                                    final SnackBar snackBar =
-                                                        SnackBar(
-                                                            content:
-                                                                Text(value));
-                                                    ScaffoldMessenger.of(
-                                                            context)
-                                                        .showSnackBar(snackBar);
-                                                  }
-                                                });
+                                                if (_newPasswordController
+                                                        .text !=
+                                                    _confirmNewPasswordController
+                                                        .text) {
+                                                  Get.snackbar("Sai thông tin",
+                                                      "Mật khẩu xác nhận mới không khớp!",
+                                                      snackPosition:
+                                                          SnackPosition.BOTTOM);
+                                                } else {
+                                                  context
+                                                      .read<AuthService>()
+                                                      .updatePassword(
+                                                          _newPasswordController
+                                                              .text)
+                                                      .then((value) {
+                                                    if (value == 'OK') {
+                                                      Get.snackbar("Thành công",
+                                                          "Đổi mật khẩu thành công",
+                                                          snackPosition:
+                                                              SnackPosition
+                                                                  .BOTTOM);
+                                                      // Fluttertoast.showToast(
+                                                      //     msg:
+                                                      //         "Đổi mật khẩu thành công",
+                                                      //     toastLength:
+                                                      //         Toast.LENGTH_SHORT,
+                                                      //     gravity:
+                                                      //         ToastGravity.CENTER,
+                                                      //     timeInSecForIosWeb: 1);
+                                                      Navigator.of(context)
+                                                          .pushAndRemoveUntil(
+                                                              FadeRoute(
+                                                                  page:
+                                                                      Wrapper()),
+                                                              ModalRoute.withName(
+                                                                  'Wrapper'));
+                                                    } else {
+                                                      final SnackBar snackBar =
+                                                          SnackBar(
+                                                              content:
+                                                                  Text(value));
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                              snackBar);
+                                                    }
+                                                  });
+                                                }
                                               }
                                             }
                                           },

@@ -70,32 +70,6 @@ class DatabaseServices {
   final bondReference = FirebaseFirestore.instance.collection('bonds');
   final taskReference = FirebaseFirestore.instance.collection('tasks');
   final reportReference = FirebaseFirestore.instance.collection('reports');
-  Future uploadWhoData(
-      {required String email,
-      required String username,
-      required String nickname,
-      required bool isAnon,
-      required String avatar,
-      required String gender,
-      required int score}) async {
-    gender == 'Male'
-        ? maleReference.doc(email).set({
-            "username": username,
-            "email": email,
-            "nickname": nickname,
-            "isAnon": isAnon,
-            "avatar": avatar,
-            "score": score,
-          })
-        : femaleReference.doc(email).set({
-            "username": username,
-            "email": email,
-            "nickname": nickname,
-            "isAnon": isAnon,
-            "avatar": avatar,
-            "score": score,
-          });
-  }
 
   Future<bool> uploadUserData({
     required String email,
@@ -410,7 +384,6 @@ class DatabaseServices {
   }
 
   Future<String> updateUserData(
-    String email,
     String username,
     String nickname,
     String gender,
@@ -425,7 +398,6 @@ class DatabaseServices {
   ) async {
     try {
       await userReference.doc(uid).update({
-        "email": email,
         "username": username,
         "nickname": nickname,
         "gender": gender,
@@ -433,7 +405,6 @@ class DatabaseServices {
         "bio": bio,
         "avatar": avatar,
         "isAnonymous": isAnon,
-        'id': uid,
         'media': media,
         'course': course,
         'playlist': playlist,

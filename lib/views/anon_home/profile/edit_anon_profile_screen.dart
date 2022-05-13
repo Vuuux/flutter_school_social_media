@@ -1,4 +1,3 @@
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:luanvanflutter/views/components/circle_avatar.dart';
@@ -46,10 +45,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _bioController.text = widget.userData.bio;
-    _nicknameController.text = widget.userData.nickname;
-    _mediaController.text = widget.userData.media;
-    _playlistController.text = widget.userData.playlist;
   }
 
   Future getImage() async {
@@ -69,7 +64,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     'Mạng máy tính và truyền thông',
   ];
 
-  updateUser(BuildContext context, CurrentUserId user) async {
+  updateUser(
+      BuildContext context, CurrentUserId user, UserData userData) async {
     Future uploadPic() async {
       Reference firebaseStorageReference =
           FirebaseStorage.instance.ref().child(_image!.path);
@@ -77,19 +73,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       UploadTask uploadTask = firebaseStorageReference.putFile(_image!);
       TaskSnapshot taskSnapshot = await uploadTask;
       x = (await taskSnapshot.ref.getDownloadURL()).toString();
-      //TODO: CATCH ERROR HERE
       DatabaseServices(uid: user.uid)
           .updateUserData(
-              email,
-              name,
-              nickname,
+              userData.username,
+              _nicknameController.text.isEmpty
+                  ? userData.nickname
+                  : _nicknameController.text,
               selectedGenderType,
               selectedMajorType,
-              bio,
+              _bioController.text,
               x,
-              false,
-              media,
-              playlist,
+              true,
+              _mediaController.text,
+              _playlistController.text,
               selectedCourse,
               home)
           .then((value) => print("RESULT:" + value));
@@ -101,47 +97,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         loading = false;
       });
     } else {
-      print(y);
-
       await DatabaseServices(uid: user.uid)
           .updateUserData(
-              email,
-              name,
-              nickname,
+              userData.username,
+              _nicknameController.text.isEmpty
+                  ? userData.nickname
+                  : _nicknameController.text,
               selectedGenderType,
               selectedMajorType,
-              bio,
+              _bioController.text,
               y,
-              false,
-              media,
-              playlist,
+              true,
+              _mediaController.text,
+              _playlistController.text,
               selectedCourse,
               home)
           .then((value) async {
         if (value == 'OK') {
-          await DatabaseServices(uid: user.uid)
-              .uploadWhoData(
-                  email: email,
-                  username: name,
-                  avatar: y,
-                  gender: selectedGenderType,
-                  score: 0,
-                  nickname: nickname,
-                  isAnon: false)
-              .then((value) {
-            if (value == 'OK') {
-              Get.snackbar('Thành công', 'Cập nhật thành công',
-                  snackPosition: SnackPosition.BOTTOM);
-              Navigator.of(context).pushAndRemoveUntil(
-                  FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
-            } else {
-              final snackBar = SnackBar(content: Text(value));
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-            }
-          });
           setState(() {
             loading = false;
           });
+          Get.snackbar("Thành công", 'Cập nhật thành công',
+              snackPosition: SnackPosition.BOTTOM);
+          Navigator.of(context).pushAndRemoveUntil(
+              FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
         } else {
           final snackBar = SnackBar(content: Text(value));
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -150,9 +129,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  String email = '';
   String error = '';
-  String name = '';
   String nickname = '';
   String bio = '';
   String media = '';
@@ -183,13 +160,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     final user = context.watch<CurrentUserId?>();
     final userData = widget.userData;
-    ScreenUtil.init(
-        const BoxConstraints(
-          maxWidth: 414,
-          maxHeight: 869,
-        ),
-        designSize: const Size(360, 690),
-        orientation: Orientation.portrait);
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -205,305 +175,287 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           title: const Text("S Ử A   T H Ô N G   T I N",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w100)),
         ),
-        body: GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: Scaffold(
-            body: Stack(children: <Widget>[
-              SingleChildScrollView(
-                child: Container(
-                  decoration: BoxDecoration(
-                    //color: Color(0xFF505050),
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Form(
-                        key: _formKey,
-                        child: Column(
+        body: Stack(children: <Widget>[
+          SingleChildScrollView(
+            child: Container(
+              decoration: BoxDecoration(
+                //color: Color(0xFF505050),
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: <Widget>[
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                const SizedBox(width: 50),
-                                Align(
-                                    alignment: Alignment.center,
-                                    child: CustomCircleAvatar(
-                                      image: (_image != null)
-                                          ? Image.file(
-                                              _image!,
-                                              fit: BoxFit.fill,
-                                            )
-                                          : Image.network(
-                                              userData.avatar,
-                                              fit: BoxFit.fill,
-                                            ),
-                                    )),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 60),
-                                  child: IconButton(
-                                    color: kPrimaryColor,
-                                    icon:
-                                        const Icon(Icons.camera_alt, size: 30),
-                                    onPressed: () {
-                                      getImage();
-                                    },
-                                  ),
-                                )
-                              ],
-                            ),
-                            Row(
-                              children: <Widget>[
-                                const SizedBox(width: 3),
-                                Expanded(
-                                  child: RoundedInputField(
-                                    controller: _nicknameController,
-                                    hintText: 'Tên của bạn',
-                                    icon: Icons.face,
-                                    title: 'Tên',
-                                  ),
-                                ),
-                              ],
+                            const SizedBox(width: 50),
+                            Align(
+                                alignment: Alignment.center,
+                                child: CustomCircleAvatar(
+                                  image: (_image != null)
+                                      ? Image.file(
+                                          _image!,
+                                          fit: BoxFit.fill,
+                                        )
+                                      : Image.network(
+                                          userData.avatar,
+                                          fit: BoxFit.fill,
+                                        ),
+                                )),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 60),
+                              child: IconButton(
+                                color: kPrimaryColor,
+                                icon: const Icon(Icons.camera_alt, size: 30),
+                                onPressed: () {
+                                  getImage();
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            const SizedBox(width: 3),
+                            Expanded(
+                              child: RoundedInputField(
+                                controller: _nicknameController,
+                                hintText: 'Tên của bạn',
+                                icon: Icons.face,
+                                title: 'Tên',
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 3),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: RoundedDropDown(
-                            title: "Giới tính",
-                            value: userData.gender,
-                            validator: (val) {
-                              return val.isEmpty
-                                  ? 'Vui lòng cung cấp giới tính chính xác'
-                                  : null;
-                            },
-                            items: _genderType
-                                .map((value) => DropdownMenuItem(
-                                      child: Text(
-                                        value,
-                                      ),
-                                      value: value,
-                                    ))
-                                .toList(),
-                            onChanged: (selectedGender) {
-                              setState(() {
-                                selectedGenderType = selectedGender;
-                              });
-                            },
-                            isExpanded: false,
-                            hintText: 'Chọn giới tính',
-                            icon: userData.gender == _genderType[0]
-                                ? Icons.male
-                                : Icons.female,
-                          )),
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: RoundedDropDown(
-                              title: "Ngành học",
-                              value: userData.major,
-                              validator: (val) {
-                                return val!.isEmpty
-                                    ? 'Vui lòng cung cấp ngành học'
-                                    : null;
-                              },
-                              items: _majorsType
-                                  .map((value) => DropdownMenuItem(
-                                        child: Text(
-                                          value,
-                                        ),
-                                        value: value,
-                                      ))
-                                  .toList(),
-                              onChanged: (selectedBlock) {
-                                setState(() {
-                                  selectedMajorType = selectedBlock;
-                                });
-                              },
-                              isExpanded: false,
-                              hintText: 'Chọn ngành học',
-                              icon: Icons.work,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      Row(
-                        children: const <Widget>[
-                          Expanded(
-                            child: RoundedInputField(
-                              icon: Icons.favorite,
-                              hintText: 'Bio',
-                              title: 'Tiểu sử',
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: RoundedDropDown(
-                            title: "Khóa",
-                            value:
-                                userData.course == "" ? null : userData.course,
-                            validator: (val) {
-                              return val == null
-                                  ? 'Vui lòng cung cấp khóa học'
-                                  : null;
-                            },
-                            items: _courses
-                                .map((value) => DropdownMenuItem(
-                                      child: Text(
-                                        value,
-                                      ),
-                                      value: value,
-                                    ))
-                                .toList(),
-                            onChanged: (val) {
-                              setState(() {
-                                selectedCourse = val;
-                              });
-                            },
-                            isExpanded: false,
-                            hintText: 'Chọn khóa',
-                            icon: Icons.school,
-                          )),
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: RoundedInputField(
-                            icon: Icons.playlist_play_outlined,
-                            hintText: 'Instagram',
-                            title: 'Instagram',
-                          )),
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: RoundedInputField(
-                              hintText: 'Nghệ sĩ ưa thích',
-                              icon: FontAwesomeIcons.music,
-                              title: 'Nghệ sĩ ưu thích',
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: RoundedDropDown(
-                              title: "Quê quán",
-                              value: userData.address == ""
-                                  ? null
-                                  : userData.address,
-                              validator: (val) {
-                                return val == null
-                                    ? 'Vui lòng cung cấp khóa hợp lệ'
-                                    : null;
-                              },
-                              items: _homeArea
-                                  .map((value) => DropdownMenuItem<String>(
-                                      child: Text(
-                                        value,
-                                        style: const TextStyle(
-                                            color: Colors.black),
-                                      ),
-                                      value: value))
-                                  .toList(),
-                              onChanged: (selectedhome) {
-                                setState(() {
-                                  home = selectedhome;
-                                });
-                              },
-                              isExpanded: false,
-                              hintText: 'Tôi đến từ...',
-                              icon: FontAwesomeIcons.home,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      GestureDetector(
-                        onTap: () async {
-                          if (_formKey.currentState!.validate()) {
-                            setState(() {
-                              loading = true;
-                            });
-                            if (email.isEmpty) {
-                              email = userData.email;
-                            }
-                            if (name.isEmpty) {
-                              name = userData.username;
-                            }
-                            if (bio.isEmpty) {
-                              bio = userData.bio;
-                            }
-                            if (selectedGenderType.isEmpty) {
-                              selectedGenderType = userData.gender;
-                            }
-
-                            if (selectedMajorType.isEmpty) {
-                              selectedMajorType = userData.major;
-                            }
-
-                            if (_image == null) {
-                              y = userData.avatar;
-                            }
-                            if (media.isEmpty) {
-                              media = userData.media;
-                            }
-                            if (playlist.isEmpty) {
-                              playlist = userData.playlist;
-                            }
-                            if (selectedCourse.isEmpty) {
-                              selectedCourse = userData.course;
-                            }
-
-                            if (home.isEmpty) {
-                              home = userData.address;
-                            }
-
-                            await updateUser(context, user!);
-                          }
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                          child: RoundedDropDown(
+                        title: "Giới tính",
+                        value: userData.gender,
+                        validator: (val) {
+                          return val.isEmpty
+                              ? 'Vui lòng cung cấp giới tính chính xác'
+                              : null;
                         },
-                        child: Container(
-                          alignment: Alignment.center,
-                          width: MediaQuery.of(context).size.width,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                              color: kPrimaryColor),
-                          child: const Text('Xác nhận',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w400)),
-                        ),
-                      ),
-                      const SizedBox(height: 3),
+                        items: _genderType
+                            .map((value) => DropdownMenuItem(
+                                  child: Text(
+                                    value,
+                                  ),
+                                  value: value,
+                                ))
+                            .toList(),
+                        onChanged: (selectedGender) {
+                          setState(() {
+                            selectedGenderType = selectedGender;
+                          });
+                        },
+                        isExpanded: false,
+                        hintText: 'Chọn giới tính',
+                        icon: userData.gender == _genderType[0]
+                            ? Icons.male
+                            : Icons.female,
+                      )),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 3),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: RoundedDropDown(
+                          title: "Ngành học",
+                          value: userData.major,
+                          validator: (val) {
+                            return val!.isEmpty
+                                ? 'Vui lòng cung cấp ngành học'
+                                : null;
+                          },
+                          items: _majorsType
+                              .map((value) => DropdownMenuItem(
+                                    child: Text(
+                                      value,
+                                    ),
+                                    value: value,
+                                  ))
+                              .toList(),
+                          onChanged: (selectedBlock) {
+                            setState(() {
+                              selectedMajorType = selectedBlock;
+                            });
+                          },
+                          isExpanded: false,
+                          hintText: 'Chọn ngành học',
+                          icon: Icons.work,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Row(
+                    children: const <Widget>[
+                      Expanded(
+                        child: RoundedInputField(
+                          icon: Icons.favorite,
+                          hintText: 'Bio',
+                          title: 'Tiểu sử',
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                          child: RoundedDropDown(
+                        title: "Khóa",
+                        value: userData.course == "" ? null : userData.course,
+                        validator: (val) {
+                          return val == null
+                              ? 'Vui lòng cung cấp khóa học'
+                              : null;
+                        },
+                        items: _courses
+                            .map((value) => DropdownMenuItem(
+                                  child: Text(
+                                    value,
+                                  ),
+                                  value: value,
+                                ))
+                            .toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            selectedCourse = val;
+                          });
+                        },
+                        isExpanded: false,
+                        hintText: 'Chọn khóa',
+                        icon: Icons.school,
+                      )),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                          child: RoundedInputField(
+                        controller: _mediaController,
+                        icon: Icons.playlist_play_outlined,
+                        hintText: 'Instagram',
+                        title: 'Instagram',
+                      )),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: RoundedInputField(
+                          controller: _playlistController,
+                          hintText: 'Nghệ sĩ ưa thích',
+                          icon: FontAwesomeIcons.music,
+                          title: 'Nghệ sĩ ưu thích',
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: RoundedDropDown(
+                          title: "Quê quán",
+                          value:
+                              userData.address == "" ? null : userData.address,
+                          validator: (val) {
+                            return val == null
+                                ? 'Vui lòng cung cấp khóa hợp lệ'
+                                : null;
+                          },
+                          items: _homeArea
+                              .map((value) => DropdownMenuItem<String>(
+                                  child: Text(
+                                    value,
+                                    style: const TextStyle(color: Colors.black),
+                                  ),
+                                  value: value))
+                              .toList(),
+                          onChanged: (selectedhome) {
+                            setState(() {
+                              home = selectedhome;
+                            });
+                          },
+                          isExpanded: false,
+                          hintText: 'Tôi đến từ...',
+                          icon: FontAwesomeIcons.home,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  GestureDetector(
+                    onTap: () async {
+                      if (_formKey.currentState!.validate()) {
+                        setState(() {
+                          loading = true;
+                        });
+                        if (selectedGenderType.isEmpty) {
+                          selectedGenderType = userData.gender;
+                        }
+
+                        if (selectedMajorType.isEmpty) {
+                          selectedMajorType = userData.major;
+                        }
+
+                        if (_image == null) {
+                          y = userData.avatar;
+                        }
+                        if (selectedCourse.isEmpty) {
+                          selectedCourse = userData.course;
+                        }
+                        if (home.isEmpty) {
+                          home = userData.address;
+                        }
+
+                        await updateUser(context, user!, userData);
+                      }
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      width: MediaQuery.of(context).size.width,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(25),
+                          color: Get.isDarkMode
+                              ? kPrimaryDarkColor
+                              : kPrimaryColor),
+                      child: Text('Xác nhận',
+                          style: TextStyle(
+                              color:
+                                  Get.isDarkMode ? Colors.black : Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400)),
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                ],
               ),
-              loading ? Loading() : const Center()
-            ]),
+            ),
           ),
-        ),
+          loading ? const Loading() : const Center()
+        ]),
       ),
     );
   }

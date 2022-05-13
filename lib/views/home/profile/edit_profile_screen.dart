@@ -1,5 +1,6 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:luanvanflutter/views/components/circle_avatar.dart';
 import 'package:luanvanflutter/views/components/rounded_dropdown.dart';
 import 'package:luanvanflutter/views/components/rounded_input_field.dart';
@@ -69,7 +70,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     'Khác'
   ];
 
-  _updateUser(BuildContext context, CurrentUserId user) async {
+  _updateUser(
+      BuildContext context, CurrentUserId user, UserData userData) async {
     Future uploadPic() async {
       Reference firebaseStorageReference =
           FirebaseStorage.instance.ref().child(_image!.path);
@@ -79,16 +81,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       x = (await taskSnapshot.ref.getDownloadURL()).toString();
       await DatabaseServices(uid: user.uid)
           .updateUserData(
-              email,
-              name,
+              _usernameController.text.isEmpty
+                  ? userData.username
+                  : _usernameController.text,
               nickname,
               selectedGenderType,
               selectedMajorType,
-              bio,
+              _bioController.text,
               x,
               false,
-              media,
-              playlist,
+              _mediaController.text,
+              _playlistController.text,
               selectedCourse,
               home)
           .then((value) => print("RESULT:" + value));
@@ -104,61 +107,38 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       await DatabaseServices(uid: user.uid)
           .updateUserData(
-              email,
-              name,
+              _usernameController.text,
               nickname,
               selectedGenderType,
               selectedMajorType,
-              bio,
+              _bioController.text,
               y,
               false,
-              media,
-              playlist,
+              _mediaController.text,
+              _playlistController.text,
               selectedCourse,
               home)
           .then((value) async {
         if (value == 'OK') {
-          await DatabaseServices(uid: user.uid)
-              .uploadWhoData(
-                  email: email,
-                  username: name,
-                  avatar: y,
-                  gender: selectedGenderType,
-                  score: 0,
-                  nickname: nickname,
-                  isAnon: false)
-              .then((value) {
-            if (value == 'OK') {
-              Fluttertoast.showToast(
-                  msg: 'Cập nhật thành công',
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.CENTER,
-                  timeInSecForIosWeb: 1);
-              Navigator.of(context).pushAndRemoveUntil(
-                  FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
-            } else {
-              final snackBar = SnackBar(content: Text(value));
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-            }
-          });
+          Get.snackbar("Thành công", 'Cập nhật thành công',
+              snackPosition: SnackPosition.BOTTOM);
           setState(() {
             loading = false;
           });
+          Get.back(canPop: true);
         } else {
           final snackBar = SnackBar(content: Text(value));
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          setState(() {
+            loading = false;
+          });
         }
       });
     }
   }
 
-  String email = '';
   String error = '';
-  String name = '';
   String nickname = '';
-  String bio = '';
-  String media = '';
-  String playlist = '';
   String selectedGenderType = '';
   String selectedMajorType = '';
   String selectedCourse = '';
@@ -185,13 +165,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     final user = context.watch<CurrentUserId?>();
     final userData = widget.userData;
-    ScreenUtil.init(
-        const BoxConstraints(
-          maxWidth: 414,
-          maxHeight: 869,
-        ),
-        designSize: const Size(360, 690),
-        orientation: Orientation.portrait);
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -451,15 +424,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             setState(() {
                               loading = true;
                             });
-                            if (email == '') {
-                              email = userData.email;
-                            }
-                            if (name == '') {
-                              name = userData.username;
-                            }
-                            if (bio == '') {
-                              bio = userData.bio;
-                            }
                             if (selectedGenderType == '') {
                               selectedGenderType = userData.gender;
                             }
@@ -471,12 +435,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             if (_image == null) {
                               y = userData.avatar;
                             }
-                            if (media == '') {
-                              media = userData.media;
-                            }
-                            if (playlist == '') {
-                              playlist = userData.playlist;
-                            }
                             if (selectedCourse == '') {
                               selectedCourse = userData.course;
                             }
@@ -485,7 +443,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               home = userData.address;
                             }
 
-                            await _updateUser(context, user!);
+                            await _updateUser(context, user!, userData);
                           }
                         },
                         child: Container(
@@ -494,10 +452,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(25),
-                              color: kPrimaryColor),
-                          child: const Text('Xác nhận',
+                              color: Get.isDarkMode
+                                  ? kPrimaryDarkColor
+                                  : kPrimaryColor),
+                          child: Text('Xác nhận',
                               style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w400)),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400,
+                                  color: Get.isDarkMode
+                                      ? Colors.black
+                                      : Colors.white)),
                         ),
                       ),
                       const SizedBox(height: 3),

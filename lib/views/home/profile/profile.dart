@@ -129,8 +129,7 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   _editUserProfile(UserData userData) {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => EditProfileScreen(userData: userData)));
+    Get.to(() => EditProfileScreen(userData: userData));
   }
 
   @override
