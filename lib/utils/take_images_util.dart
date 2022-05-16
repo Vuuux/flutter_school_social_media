@@ -1,16 +1,16 @@
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:luanvanflutter/models/user.dart';
-import 'package:luanvanflutter/views/home/feed/upload_image_screen.dart';
+import 'package:luanvanflutter/views/home/feed/post_review_screen.dart';
 
 class ChooseImage extends StatefulWidget {
   final BuildContext context;
   final UserData userData;
 
-  const ChooseImage({Key? key, required this.context, required this.userData}) : super(key: key);
+  const ChooseImage({Key? key, required this.context, required this.userData})
+      : super(key: key);
 
   @override
   _ChooseImageState createState() => _ChooseImageState();
@@ -19,12 +19,9 @@ class ChooseImage extends StatefulWidget {
 pickImageFromGallery(context, userData) async {
   Navigator.pop(context);
 
-  PickedFile? pickedFile = await ImagePicker()
-      .getImage(source: ImageSource.gallery, maxHeight: 680, maxWidth: 970);
-  File imageFile = File(
-    pickedFile!.path,
-  );
-  if (imageFile == null) {
+  XFile? pickedFile = await ImagePicker()
+      .pickImage(source: ImageSource.gallery, maxHeight: 680, maxWidth: 970);
+  if (pickedFile == null) {
     // Navigator.of(context);
     // .pushAndRemoveUntil(
     //     FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
@@ -32,8 +29,12 @@ pickImageFromGallery(context, userData) async {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            UploadImage(file: imageFile, userData: userData),
+        builder: (context) => PreviewPostScreen(
+          files: [pickedFile],
+          userData: userData,
+          isMultipleImage: false,
+          isVideo: false,
+        ),
       ),
     );
   }
@@ -41,32 +42,39 @@ pickImageFromGallery(context, userData) async {
 
 captureImageWithCamera(context, userData) async {
   Navigator.pop(context);
-  PickedFile? pickedFile = await ImagePicker()
-      .getImage(source: ImageSource.camera, maxHeight: 680, maxWidth: 970);
-  File imageFile = File(pickedFile!.path);
+  XFile? pickedFile = await ImagePicker()
+      .pickImage(source: ImageSource.camera, maxHeight: 680, maxWidth: 970);
   // File imageFile = await ImagePicker.pickImage(
   //     source: ImageSource.camera, maxHeight: 680, maxWidth: 970);
-  if (imageFile == null) {
+  if (pickedFile == null) {
     // Navigator.of(context).pushAndRemoveUntil(
     //     FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
   } else {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            UploadImage(file: imageFile, userData: userData),
+        builder: (context) => PreviewPostScreen(
+          files: [pickedFile],
+          userData: userData,
+          isMultipleImage: false,
+          isVideo: false,
+        ),
       ),
     );
   }
-  if (imageFile == null) {
+  if (pickedFile == null) {
     // Navigator.of(context).pushAndRemoveUntil(
     //     FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
   } else {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            UploadImage(file: imageFile, userData: userData),
+        builder: (context) => PreviewPostScreen(
+          files: [pickedFile],
+          userData: userData,
+          isMultipleImage: false,
+          isVideo: false,
+        ),
       ),
     );
   }
@@ -111,4 +119,3 @@ class _ChooseImageState extends State<ChooseImage> {
     return takeImage(widget.context, widget.userData);
   }
 }
-

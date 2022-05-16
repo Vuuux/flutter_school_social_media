@@ -8,33 +8,43 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/decoration.dart';
+import 'package:luanvanflutter/views/components/aspect_video_player.dart';
 import 'package:map_location_picker/google_map_location_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/src/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:image/image.dart' as ImD;
+import 'package:video_player/video_player.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 import 'location_picker_screen.dart';
 
-class UploadImage extends StatefulWidget {
+class PreviewPostScreen extends StatefulWidget {
   final UserData userData;
-  File file;
-
-  UploadImage({Key? key, required this.file, required this.userData})
-      : super(key: key);
+  final List<XFile> files;
+  final bool isMultipleImage;
+  final bool isVideo;
+  PreviewPostScreen({
+    Key? key,
+    required this.files,
+    required this.userData,
+    this.isMultipleImage = true,
+    this.isVideo = false,
+  }) : super(key: key);
 
   @override
-  _UploadImageState createState() => _UploadImageState();
+  _PreviewPostScreenState createState() => _PreviewPostScreenState();
 }
 
-class _UploadImageState extends State<UploadImage>
-    with AutomaticKeepAliveClientMixin<UploadImage> {
-  File? file;
+class _PreviewPostScreenState extends State<PreviewPostScreen>
+    with AutomaticKeepAliveClientMixin<PreviewPostScreen> {
+  List<XFile>? files;
   TextEditingController descriptionTextEditingController =
       TextEditingController();
   TextEditingController locationController = TextEditingController();
@@ -47,34 +57,94 @@ class _UploadImageState extends State<UploadImage>
   List<Placemark> placemarks = [];
   Position? position;
 
+  VideoPlayerController? _videoController;
+  VideoPlayerController? _toBeDisposed;
+
   @override
   void initState() {
     super.initState();
-    file = widget.file;
-    Future.delayed(Duration(milliseconds: 300), () async {
+    files = widget.files;
+    Future.delayed(const Duration(microseconds: 0), () async {
+      if (widget.isVideo) {
+        _playVideo(files![0]);
+      }
+    });
+
+    Future.delayed(const Duration(milliseconds: 300), () async {
       position = await _determinePosition().then((value) => value);
       placemarks = await placemarkFromCoordinates(
           position!.latitude, position!.longitude);
     });
   }
 
-  //nén ảnh để hiển thị nhỏ
-  compressPhoto() async {
-    final directory = await getTemporaryDirectory();
-    final path = directory.path;
-    ImD.Image? mImageFile = ImD.decodeImage(file!.readAsBytesSync());
-    final compressedImage = File('$path/img_$postId.jpg')
-      ..writeAsBytesSync(ImD.encodeJpg(mImageFile!, quality: 60));
-    setState(() {
-      file = compressedImage;
-    });
+  // compressPhoto() async {
+  //   final directory = await getTemporaryDirectory();
+  //   final path = directory.path;
+  //   ImD.Image? mImageFile = ImD.decodeImage(file!.readAsBytesSync());
+  //   final compressedImage = File('$path/img_$postId.jpg')
+  //     ..writeAsBytesSync(ImD.encodeJpg(mImageFile!, quality: 60));
+  //   setState(() {
+  //     file = compressedImage;
+  //   });
+  // }
+  @override
+  void deactivate() {
+    if (_videoController != null) {
+      _videoController!.setVolume(0.0);
+      _videoController!.pause();
+    }
+    super.deactivate();
   }
 
-  Future<String> uploadPhoto(mImageFile) async {
-    UploadTask mStorageUploadTask =
-        storageReference.child("post_$postId.jpg").putFile(mImageFile);
-    TaskSnapshot storageTaskSnapshot = await mStorageUploadTask;
-    String downloadUrl = await storageTaskSnapshot.ref.getDownloadURL();
+  Future<void> _playVideo(XFile? file) async {
+    if (_videoController != null) {
+      await _videoController!.setVolume(0.0);
+    }
+    if (file != null && mounted) {
+      await _disposeVideoController();
+      late VideoPlayerController controller;
+      controller = VideoPlayerController.file(File(file.path));
+      _videoController = controller;
+      const double volume = 1.0;
+      await controller.setVolume(volume);
+      await controller.initialize();
+      await controller.setLooping(true);
+      await controller.play();
+      setState(() {});
+    }
+  }
+
+  Future<void> _disposeVideoController() async {
+    if (_toBeDisposed != null) {
+      await _toBeDisposed!.dispose();
+    }
+    _toBeDisposed = _videoController;
+    _videoController = null;
+  }
+
+  Future<List<String>> uploadPhoto(
+      {required List<XFile> mImageFiles,
+      required bool isVideo,
+      required bool isMultipleImage}) async {
+    UploadTask mStorageUploadTask;
+    List<String> downloadUrl = [];
+    if (isMultipleImage) {
+      mImageFiles.asMap().forEach((index, value) async {
+        mStorageUploadTask = storageReference
+            .child("post_${postId}_$index.jpg")
+            .putFile(File(mImageFiles[0].path));
+        TaskSnapshot storageTaskSnapshot = await mStorageUploadTask;
+        String url = await storageTaskSnapshot.ref.getDownloadURL();
+        downloadUrl.add(url);
+      });
+    } else if (!isMultipleImage && !isVideo) {
+      mStorageUploadTask = storageReference
+          .child("post_$postId.jpg")
+          .putFile(File(mImageFiles[0].path));
+      TaskSnapshot storageTaskSnapshot = await mStorageUploadTask;
+      String url = await storageTaskSnapshot.ref.getDownloadURL();
+      downloadUrl.add(url);
+    } else if (isVideo) {}
     return downloadUrl;
   }
 
@@ -131,9 +201,12 @@ class _UploadImageState extends State<UploadImage>
       uploading = true;
     });
 
-    await compressPhoto();
+    //await compressPhoto();
 
-    String downloadUrl = await uploadPhoto(file);
+    List<String> downloadUrl = await uploadPhoto(
+        mImageFiles: files!,
+        isVideo: widget.isVideo,
+        isMultipleImage: widget.isMultipleImage);
     postId = const Uuid().v4();
     var response = await DatabaseServices(uid: uid).createPost(PostModel(
         postId: postId,
@@ -187,19 +260,50 @@ class _UploadImageState extends State<UploadImage>
             )
           : ListView(
               children: <Widget>[
-                SizedBox(
-                  height: 230,
-                  width: MediaQuery.of(context).size.width * 0.8,
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.5,
+                    maxWidth: MediaQuery.of(context).size.width,
+                  ),
                   child: Center(
-                    child: AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: FileImage(file!), fit: BoxFit.cover),
-                        ),
-                      ),
-                    ),
+                    child: widget.isVideo && _videoController != null
+                        ? AspectRatioVideo(_videoController)
+                        : widget.isMultipleImage
+                            ? CarouselSlider(
+                                items: widget.files
+                                    .map((file) => Builder(builder: (context) {
+                                          return Image.file(
+                                            File(file.path),
+                                            fit: BoxFit.cover,
+                                          );
+                                        }))
+                                    .toList(),
+                                options: CarouselOptions(
+                                  height: 400,
+                                  aspectRatio: 16 / 9,
+                                  viewportFraction: 0.8,
+                                  initialPage: 0,
+                                  enableInfiniteScroll: true,
+                                  reverse: false,
+                                  autoPlay: true,
+                                  autoPlayInterval: Duration(seconds: 3),
+                                  autoPlayAnimationDuration:
+                                      Duration(milliseconds: 800),
+                                  autoPlayCurve: Curves.fastOutSlowIn,
+                                  enlargeCenterPage: true,
+                                  //onPageChanged: callbackFunction,
+                                  scrollDirection: Axis.horizontal,
+                                ))
+                            : AspectRatio(
+                                aspectRatio: 16 / 9,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: FileImage(File(files![0].path)),
+                                        fit: BoxFit.cover),
+                                  ),
+                                ),
+                              ),
                   ),
                 ),
                 const Padding(

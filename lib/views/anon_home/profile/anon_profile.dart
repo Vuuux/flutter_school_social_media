@@ -14,7 +14,7 @@ import 'package:luanvanflutter/views/anon_home/feed/anon_forum_detail.dart';
 import 'package:luanvanflutter/views/components/circle_avatar.dart';
 import 'package:luanvanflutter/views/home/feed/post_detail.dart';
 import 'package:luanvanflutter/views/home/feed/post_screen.dart';
-import 'package:luanvanflutter/views/home/feed/upload_image_screen.dart';
+import 'package:luanvanflutter/views/home/feed/post_review_screen.dart';
 import 'package:provider/provider.dart';
 import '../../../style/constants.dart';
 import '../../../models/user.dart';

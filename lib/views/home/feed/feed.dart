@@ -15,12 +15,14 @@ import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/loading.dart';
 import 'package:luanvanflutter/views/components/app_bar/custom_sliver_app_bar.dart';
+import 'package:luanvanflutter/views/components/aspect_video_player.dart';
 import 'package:luanvanflutter/views/components/buttons/ripple_animation.dart';
 import 'package:luanvanflutter/views/components/dialog/custom_dialog.dart';
 import 'package:luanvanflutter/views/components/search_bar.dart';
 import 'package:luanvanflutter/views/home/feed/post_screen.dart';
-import 'package:luanvanflutter/views/home/feed/upload_image_screen.dart';
+import 'package:luanvanflutter/views/home/feed/post_review_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
 //Class feed chứa các bài post
 class Feed extends StatefulWidget {
@@ -36,9 +38,17 @@ class _FeedState extends State<Feed> {
   ScrollController scrollController = ScrollController();
   TextEditingController searchController = TextEditingController();
   late CurrentUserId currentUser;
-  final picker = ImagePicker(); //API chọn hình ảnh
+  final _picker = ImagePicker(); //API chọn hình ảnh
   final FirebaseAuth auth = FirebaseAuth.instance;
   Future<QuerySnapshot>? postFuture;
+  List<XFile>? _imageFileList;
+  void _setImageFileListFromFile(XFile? value) {
+    _imageFileList = value == null ? null : <XFile>[value];
+  }
+
+  dynamic _pickImageError;
+  bool isVideo = false;
+  String? _retrieveDataError;
 
   @override
   void initState() {
@@ -96,41 +106,108 @@ class _FeedState extends State<Feed> {
     );
   }
 
+  Future<void> _onImageButtonPressed(ImageSource source,
+      {BuildContext? context,
+      bool isMultiImage = false,
+      required UserData userData}) async {
+    if (isVideo) {
+      final XFile? file = await _picker.pickVideo(
+          source: source, maxDuration: const Duration(seconds: 10));
+      if (file != null) {
+        await Get.to(() => PreviewPostScreen(
+            files: [file],
+            userData: userData,
+            isVideo: true,
+            isMultipleImage: false));
+        _postController.getPosts();
+      }
+    } else if (isMultiImage) {
+      try {
+        final List<XFile>? pickedFileList = await _picker.pickMultiImage(
+          maxWidth: 680,
+          maxHeight: 970,
+          imageQuality: 50,
+        );
+        setState(() {
+          _imageFileList = pickedFileList;
+        });
+        if (pickedFileList != null) {
+          await Get.to(() => PreviewPostScreen(
+                files: pickedFileList,
+                userData: userData,
+                isVideo: true,
+                isMultipleImage: true,
+              ));
+          _postController.getPosts();
+        }
+      } catch (e) {
+        setState(() {
+          _pickImageError = e;
+        });
+      }
+    } else {
+      try {
+        final XFile? pickedFile = await _picker.pickImage(
+          source: source,
+          maxWidth: 680,
+          maxHeight: 970,
+          imageQuality: 50,
+        );
+        setState(() {
+          _setImageFileListFromFile(pickedFile);
+        });
+      } catch (e) {
+        setState(() {
+          _pickImageError = e;
+        });
+      }
+    }
+  }
+
+  // _pickVideo() async {
+  //   XFile? pickedFile = await _picker.pickVideo(source: ImageSource.gallery);
+  //   File _video = File(pickedFile!.path);
+  //   _videoPlayerController = VideoPlayerController.file(_video)
+  //     ..initialize().then((_) {
+  //       setState(() {});
+  //       _videoPlayerController.play();
+  //     });
+  // }
+
   //lấy ảnh từ thư viện
-  pickImageFromGallery(UserData userData) async {
+  _pickImageFromGallery(UserData userData) async {
     Navigator.pop(context);
 
-    PickedFile? pickedFile = await ImagePicker()
-        .getImage(source: ImageSource.gallery, maxHeight: 680, maxWidth: 970);
+    XFile? pickedFile = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, maxHeight: 680, maxWidth: 970);
     File imageFile = File(
       pickedFile!.path,
     );
-    if (imageFile == null) {
-      // Navigator.of(context);
-      // .pushAndRemoveUntil(
-      //     FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
+    if (pickedFile == null) {
     } else {
-      await Get.to(() => UploadImage(file: imageFile, userData: userData));
+      await Get.to(
+          () => PreviewPostScreen(files: [pickedFile], userData: userData));
       _postController.getPosts();
     }
   }
 
-  captureImageWithCamera(UserData userData) async {
+  _captureImageWithCamera(UserData userData) async {
     Navigator.pop(context);
-    PickedFile? pickedFile = await ImagePicker()
-        .getImage(source: ImageSource.camera, maxHeight: 680, maxWidth: 970);
+    XFile? pickedFile = await ImagePicker()
+        .pickImage(source: ImageSource.camera, maxHeight: 680, maxWidth: 970);
     File imageFile = File(pickedFile!.path);
 
-    if (imageFile == null) {
+    if (pickedFile == null) {
       // Navigator.of(context).pushAndRemoveUntil(
       //     FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
     } else {
-      await Get.to(() => UploadImage(file: imageFile, userData: userData));
+      await Get.to(
+          () => PreviewPostScreen(files: [pickedFile], userData: userData));
       _postController.getPosts();
     }
   }
 
-  takeImage(UserData userData) {
+  _takeImage(UserData userData) {
     return showDialog(
         context: context,
         builder: (context) {
@@ -142,14 +219,43 @@ class _FeedState extends State<Feed> {
                   "Chụp bằng camera",
                   style: TextStyle(color: Colors.black),
                 ),
-                onPressed: () => captureImageWithCamera(userData),
+                onPressed: () {
+                  isVideo = false;
+                  _captureImageWithCamera(userData);
+                },
               ),
               SimpleDialogOption(
                 child: const Text(
                   "Chọn ảnh từ thư viện",
                   style: TextStyle(color: Colors.black),
                 ),
-                onPressed: () => pickImageFromGallery(userData),
+                onPressed: () {
+                  isVideo = false;
+                  _onImageButtonPressed(ImageSource.gallery,
+                      context: context, isMultiImage: true, userData: userData);
+                },
+                //onPressed: () => _pickImageFromGallery(userData),
+              ),
+              SimpleDialogOption(
+                child: const Text(
+                  "Chọn video từ thư viện",
+                  style: TextStyle(color: Colors.black),
+                ),
+                onPressed: () {
+                  isVideo = true;
+                  _onImageButtonPressed(ImageSource.gallery,
+                      userData: userData);
+                },
+              ),
+              SimpleDialogOption(
+                child: const Text(
+                  "Quay video",
+                  style: TextStyle(color: Colors.black),
+                ),
+                onPressed: () {
+                  isVideo = true;
+                  _onImageButtonPressed(ImageSource.camera, userData: userData);
+                },
               ),
               SimpleDialogOption(
                 child: const Text(
@@ -193,7 +299,7 @@ class _FeedState extends State<Feed> {
                                 trailingIcon: Icons.image,
                                 onLeadingClick: () => null,
                                 onTrailingClick: () async {
-                                  await takeImage(userData!);
+                                  await _takeImage(userData!);
                                 }),
                           ],
                   body: Stack(

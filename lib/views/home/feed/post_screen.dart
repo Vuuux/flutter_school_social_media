@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:animator/animator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -221,9 +222,16 @@ class _PostItemState extends State<PostItem> {
           ClipRRect(
               borderRadius: BorderRadius.circular(15.0),
               child: Container(
-                child: CachedNetworkImage(
-                  imageUrl: widget.post.url,
-                  width: Get.width,
+                child: CarouselSlider(
+                  options: CarouselOptions(height: 400.0),
+                  items: widget.post.url.map((link) {
+                    return Builder(
+                      builder: (BuildContext context) {
+                        return CachedNetworkImage(
+                            imageUrl: link, width: Get.width);
+                      },
+                    );
+                  }).toList(),
                 ),
               )),
           //TODO: ANIMATOR HERE
@@ -294,7 +302,8 @@ class _PostItemState extends State<PostItem> {
                           context: context,
                           postId: widget.post.postId,
                           ownerId: widget.post.ownerId,
-                          mediaUrl: widget.post.url))),
+                          //TODO: EDIT TO LIST IMAGE
+                          mediaUrl: widget.post.url[0]))),
               child: Icon(
                 Icons.sms_outlined,
                 size: 28.0,
@@ -378,7 +387,7 @@ class _PostItemState extends State<PostItem> {
             user!.uid,
             currentUser.avatar,
             postId,
-            widget.post.url,
+            widget.post.url[0],
             Timestamp.now());
       }
     }
@@ -394,6 +403,6 @@ class _PostItemState extends State<PostItem> {
         context: context,
         postId: widget.post.postId,
         ownerId: widget.post.ownerId,
-        mediaUrl: widget.post.url);
+        mediaUrl: widget.post.url[0]);
   }
 }

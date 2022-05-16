@@ -7,7 +7,7 @@ class PostModel {
   final String location;
   final String description;
   final Timestamp timestamp;
-  final String url;
+  final List<String> url;
   final Map<String, dynamic> likes;
 
   PostModel(

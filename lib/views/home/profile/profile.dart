@@ -14,7 +14,7 @@ import 'package:luanvanflutter/utils/user_data_service.dart';
 import 'package:luanvanflutter/views/components/circle_avatar.dart';
 import 'package:luanvanflutter/views/home/feed/post_detail.dart';
 import 'package:luanvanflutter/views/home/feed/post_screen.dart';
-import 'package:luanvanflutter/views/home/feed/upload_image_screen.dart';
+import 'package:luanvanflutter/views/home/feed/post_review_screen.dart';
 import 'package:provider/provider.dart';
 import '../../../style/constants.dart';
 import '../../../models/user.dart';
@@ -140,7 +140,7 @@ class _MyProfileState extends State<MyProfile> {
     response.fold((left) {
       if (left) {
         Get.snackbar("Đã gửi",
-            "Email xác thực đã được gửi tới hòm thư của bạn. Vui lòng kiểm tra",
+            "Email xác thực đã được gửi tới hòm thư của bạn. Vui lòng kiểm tra. Sau khi đã xác thực hãy đăng nhập lại ứng dụng",
             snackPosition: SnackPosition.BOTTOM);
       } else
         Get.snackbar("Lỗi", "Không thể gửi email",
@@ -654,7 +654,7 @@ class _MyProfileState extends State<MyProfile> {
                                                                       .circular(
                                                                           20.0)),
                                                           child: Image.network(
-                                                            post.post.url,
+                                                            post.post.url[0],
                                                             fit: BoxFit.fill,
                                                           )),
                                                     ),
