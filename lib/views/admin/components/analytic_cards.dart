@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:luanvanflutter/views/admin/controllers/dashboard_controller.dart';
 import 'package:luanvanflutter/views/admin/data/data.dart';
 
 import '../constants/constants.dart';
@@ -6,7 +8,7 @@ import '../constants/responsive.dart';
 import 'analytic_info_card.dart';
 
 class AnalyticCards extends StatelessWidget {
-  const AnalyticCards({Key? key}) : super(key: key);
+  AnalyticCards({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,9 @@ class AnalyticCards extends StatelessWidget {
 }
 
 class AnalyticInfoCardGridView extends StatelessWidget {
-  const AnalyticInfoCardGridView({
+  final _dashboardController = Get.put(DashboardController());
+
+  AnalyticInfoCardGridView({
     Key? key,
     this.crossAxisCount = 4,
     this.childAspectRatio = 1.4,
@@ -39,6 +43,12 @@ class AnalyticInfoCardGridView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<int> dataCount = [
+      _dashboardController.userList.length,
+      _dashboardController.postList.length,
+      _dashboardController.reportList.length,
+      _dashboardController.forumList.length
+    ];
     return GridView.builder(
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
@@ -49,9 +59,12 @@ class AnalyticInfoCardGridView extends StatelessWidget {
         mainAxisSpacing: appPadding,
         childAspectRatio: childAspectRatio,
       ),
-      itemBuilder: (context, index) => AnalyticInfoCard(
-        info: analyticData[index],
-      ),
+      itemBuilder: (context, index) {
+        analyticData[index].count = dataCount[index];
+        return AnalyticInfoCard(
+          info: analyticData[index],
+        );
+      },
     );
   }
 }

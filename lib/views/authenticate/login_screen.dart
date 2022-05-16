@@ -69,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  _signIn(BuildContext context) {
+  _signIn(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       //Lưu username vào database
       DatabaseServices(uid: '')
@@ -77,48 +77,40 @@ class _LoginScreenState extends State<LoginScreen> {
           .then((value) async {
         snapshotUserinfo = value;
       });
-
-      //setStateLoading
       setState(() {
         loading = true;
       });
-
-      context.read<AuthService>().signIn(email, password).then((response) {
-        response.fold((result) {
-          Fluttertoast.showToast(
-              msg: "Đăng nhập thành công",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1);
-          setState(() {
-            loading = false;
-          });
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => Wrapper()));
-        }, (error) {
-          String err = "";
-          switch (error.code) {
-            case "invalid-email":
-              {
-                err = "Sai tài khoản hoặc mật khẩu!";
-                break;
-              }
-            case "wrong-password":
-              {
-                err = "Sai tài khoản hoặc mật khẩu!";
-                break;
-              }
-            case "user-not-found":
-              {
-                err = "Người dùng này không tồn tại";
-                break;
-              }
-          }
-          setState(() {
-            loading = false;
-            Get.snackbar("Lỗi", err, snackPosition: SnackPosition.BOTTOM);
-          });
-        });
+      var response = await context.read<AuthService>().signIn(email, password);
+      setState(() {
+        loading = false;
+      });
+      response.fold((result) async {
+        Fluttertoast.showToast(
+            msg: "Đăng nhập thành công",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1);
+        Get.back();
+      }, (error) {
+        String err = "";
+        switch (error.code) {
+          case "invalid-email":
+            {
+              err = "Sai tài khoản hoặc mật khẩu!";
+              break;
+            }
+          case "wrong-password":
+            {
+              err = "Sai tài khoản hoặc mật khẩu!";
+              break;
+            }
+          case "user-not-found":
+            {
+              err = "Người dùng này không tồn tại";
+              break;
+            }
+        }
+        Get.snackbar("Lỗi", err, snackPosition: SnackPosition.BOTTOM);
       });
     }
   }
@@ -215,7 +207,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         text: "ĐĂNG NHẬP",
                         press: () async {
                           await _validateInput();
-                          _signIn(context);
                         },
                       ),
                       Expanded(

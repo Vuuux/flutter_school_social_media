@@ -31,6 +31,14 @@ class AuthService {
     return firebaseUser != null ? CurrentUserId(uid: firebaseUser.uid) : null;
   }
 
+  Future<bool> deleteUser() async {
+    if (_auth.currentUser != null) {
+      await _auth.currentUser!.delete();
+      return true;
+    }
+    return false;
+  }
+
   Future signInAnonymous() async {
     return await _auth.signInAnonymously();
   }
@@ -46,6 +54,27 @@ class AuthService {
       print("LOGIN ERROR WITH STATUS CODE:" + error.code);
       return Right(error);
     }
+  }
+
+  Future<Either<bool, FirebaseAuthException>> sendVerificationEmail() async {
+    try {
+      User? currentUser = _auth.currentUser;
+      if (currentUser != null) {
+        currentUser.sendEmailVerification();
+        return const Left(true);
+      }
+      return const Left(false);
+    } on FirebaseAuthException catch (error) {
+      return Right(error);
+    }
+  }
+
+  bool isEmailVerified() {
+    User? currentUser = _auth.currentUser;
+    if (currentUser != null) {
+      return currentUser.emailVerified;
+    }
+    return false;
   }
 
   //đăng ký với Email và Password
@@ -92,7 +121,9 @@ class AuthService {
             playlist: playlist,
             course: course,
             address: address,
-            role: 'user');
+            role: 'user',
+            enabled: true,
+            verified: false);
       }
       return Left(uploadResult);
     } on FirebaseAuthException catch (e) {

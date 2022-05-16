@@ -30,27 +30,30 @@ class UserData extends Equatable {
   late final String playlist;
   late final String address; //chỗ ở
   late final String role;
+  late final bool enabled;
+  late final bool verified;
 
-  UserData({
-    this.id = "",
-    this.username = "",
-    this.nickname = "",
-    this.email = "",
-    this.bio = "",
-    this.gender = "",
-    this.major = "",
-    this.avatar = "",
-    this.isAnon = false,
-    this.anonBio = "",
-    this.anonInterest = "",
-    this.anonAvatar = "",
-    this.likes = const [],
-    this.media = "",
-    this.course = "",
-    this.playlist = "",
-    this.address = "",
-    this.role = "user",
-  });
+  UserData(
+      {this.id = "",
+      this.username = "",
+      this.nickname = "",
+      this.email = "",
+      this.bio = "",
+      this.gender = "",
+      this.major = "",
+      this.avatar = "",
+      this.isAnon = false,
+      this.anonBio = "",
+      this.anonInterest = "",
+      this.anonAvatar = "",
+      this.likes = const [],
+      this.media = "",
+      this.course = "",
+      this.playlist = "",
+      this.address = "",
+      this.role = "user",
+      this.enabled = true,
+      this.verified = false});
 
   UserData.fromJson(Map<String, dynamic> data) {
     id = data['id'];
@@ -74,6 +77,8 @@ class UserData extends Equatable {
     media = data['media'];
     address = data['address'];
     role = data['role'];
+    enabled = data['enabled'];
+    verified = data['verified'];
   }
 
   factory UserData.fromDocumentSnapshot(DocumentSnapshot data) {
@@ -98,7 +103,9 @@ class UserData extends Equatable {
         media: data['media'],
         address: data['address'],
         id: data['id'],
-        role: data['role']);
+        role: data['role'],
+        enabled: data['enabled'],
+        verified: data['verified']);
   }
 
   @override
@@ -119,7 +126,8 @@ class UserData extends Equatable {
         media,
         course,
         playlist,
-        address
+        address,
+        enabled
       ];
 
   static Map<String, dynamic> toJson(UserData data) {
@@ -144,6 +152,8 @@ class UserData extends Equatable {
     result['media'] = data.media;
     result['address'] = data.address;
     result['role'] = data.role;
+    result['enabled'] = data.enabled;
+    result['verified'] = data.verified;
     return result;
   }
 }

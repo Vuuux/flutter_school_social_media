@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/auth_controller.dart';
 import 'package:luanvanflutter/views/admin/components/drawer_list_tile.dart';
 import 'package:luanvanflutter/views/admin/constants/constants.dart';
+import 'package:luanvanflutter/views/admin/views/users/users_screen.dart';
 import 'package:provider/provider.dart';
 
 class DrawerMenu extends StatelessWidget {
-  const DrawerMenu({Key? key}) : super(key: key);
+  final PageController pageController;
+  const DrawerMenu({Key? key, required this.pageController}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,19 +26,27 @@ class DrawerMenu extends StatelessWidget {
           DrawerListTile(
               title: 'Dash Board',
               svgSrc: 'assets/icons/Dashboard.svg',
-              tap: () {}),
+              tap: () {
+                pageController.jumpToPage(0);
+              }),
           DrawerListTile(
               title: 'Quản lý người dùng',
               svgSrc: 'assets/icons/BlogPost.svg',
-              tap: () {}),
+              tap: () {
+                pageController.jumpToPage(1);
+              }),
           DrawerListTile(
               title: 'Quản lý báo cáo',
               svgSrc: 'assets/icons/Message.svg',
-              tap: () {}),
+              tap: () {
+                pageController.jumpToPage(1);
+              }),
           DrawerListTile(
               title: 'Thống kê',
               svgSrc: 'assets/icons/Statistics.svg',
-              tap: () {}),
+              tap: () {
+                pageController.jumpToPage(1);
+              }),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: appPadding * 2),
             child: Divider(

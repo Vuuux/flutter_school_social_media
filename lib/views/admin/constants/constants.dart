@@ -5,6 +5,7 @@ const primaryColor = Color.fromRGBO(17, 159, 250, 1);
 const secondaryColor = Colors.white;
 const bgColor = Color.fromRGBO(247, 251, 254, 1);
 const textColor = Colors.black;
+const disabledTextColor = Color(0x98424242);
 const lightTextColor = Colors.black26;
 const transparent = Colors.transparent;
 

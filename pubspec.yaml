@@ -102,7 +102,7 @@ dependencies:
   multiple_localization: ^0.3.0
   equatable: ^2.0.3
   fl_chart: ^0.36.1
-
+  googleapis: ^8.1.0
   flutter_localizations:
     sdk: flutter
   localization: ^2.1.0

@@ -16,7 +16,7 @@ import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/theme_data.dart';
 import 'package:luanvanflutter/utils/app_localization.dart';
 import 'package:luanvanflutter/utils/theme_service.dart';
-import 'package:luanvanflutter/views/admin/controllers/controller.dart';
+import 'package:luanvanflutter/views/admin/controllers/menu_controller.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';
 import 'package:map_location_picker/generated/l10n.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => Controller(),
+          create: (context) => MenuController(),
         ),
         Provider<AuthService>(
           create: (_) => AuthService(FirebaseAuth.instance),

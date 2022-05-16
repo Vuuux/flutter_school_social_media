@@ -85,6 +85,8 @@ class DatabaseServices {
     required String course,
     required String address,
     required String role,
+    required bool enabled,
+    required bool verified,
   }) async {
     try {
       await userReference.doc(uid).set({
@@ -111,7 +113,9 @@ class DatabaseServices {
         "playlist": playlist,
         "course": course,
         "address": address,
-        "role": "user"
+        "role": "user",
+        "enabled": enabled,
+        "verified": verified
       });
       return true;
     } catch (e) {
@@ -198,6 +202,16 @@ class DatabaseServices {
         doc.reference.delete();
       }
     });
+  }
+
+  Future<Either<QuerySnapshot, FirebaseException>> getAllUsers() async {
+    try {
+      var snapshot =
+          await userReference.orderBy("username", descending: false).get();
+      return Left(snapshot);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
   }
 
   //trả về User bằng user username
@@ -337,24 +351,6 @@ class DatabaseServices {
         .where('userId', isEqualTo: userId)
         .where('type', isEqualTo: 'request')
         .snapshots();
-  }
-
-  Future uploadBondData(
-      {required UserData userData,
-      required bool myAnon,
-      required UserData ctuer,
-      required bool friendAnon,
-      required String chatRoomID}) async {
-    return bondReference.doc(chatRoomID).set({
-      '${userData.username} Email': userData.email,
-      '${userData.username} Anon': myAnon,
-      '${ctuer.username} Email': ctuer.email,
-      '${ctuer.username} Anon': friendAnon,
-    });
-  }
-
-  getBond(String chatRoomId) async {
-    return bondReference.doc(chatRoomId).snapshots();
   }
 
   Future uploadPhotos(Map<String, dynamic> photo) async {
@@ -552,6 +548,16 @@ class DatabaseServices {
       await reportReference.doc(postId).set(
           {"postId": postId, "reason": reason, "timestamp": Timestamp.now()});
       return const Left(true);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
+  }
+
+  Future<Either<QuerySnapshot, FirebaseException>> getAllReports() async {
+    try {
+      var snapshot =
+          await reportReference.orderBy("timestamp", descending: true).get();
+      return Left(snapshot);
     } on FirebaseException catch (error) {
       return Right(error);
     }
@@ -771,6 +777,12 @@ class DatabaseServices {
             doc.data().toString().contains('address') ? doc.get('address') : '',
         id: doc.data().toString().contains('id') ? doc.get('id') : '',
         role: doc.data().toString().contains('role') ? doc.get('role') : '',
+        enabled: doc.data().toString().contains('enabled')
+            ? doc.get('enabled')
+            : true,
+        verified: doc.data().toString().contains('verified')
+            ? doc.get('verified')
+            : false,
       );
     }).toList();
   }
@@ -809,6 +821,11 @@ class DatabaseServices {
           doc.data().toString().contains('address') ? doc.get('address') : '',
       id: doc.data().toString().contains('id') ? doc.get('id') : '',
       role: doc.data().toString().contains('role') ? doc.get('role') : '',
+      enabled:
+          doc.data().toString().contains('enabled') ? doc.get('enabled') : true,
+      verified: doc.data().toString().contains('verified')
+          ? doc.get('verified')
+          : false,
     );
   }
 
@@ -1427,5 +1444,39 @@ class DatabaseServices {
     } on FirebaseException catch (error) {
       return Right(error);
     }
+  }
+
+  Future<Either<bool, FirebaseException>> deleteUserData(
+      {required String userId}) async {
+    try {
+      await userReference.doc(userId).delete();
+      return const Left(true);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
+  }
+
+  Future<Either<bool, FirebaseException>> disableUser(
+      {required String userId}) async {
+    try {
+      await userReference.doc(userId).update({"enabled": false});
+      return const Left(true);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
+  }
+
+  Future<Either<bool, FirebaseException>> enableUser(
+      {required String userId}) async {
+    try {
+      await userReference.doc(userId).update({"enabled": true});
+      return const Left(true);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
+  }
+
+  saveVerifyStatus(bool verified) async {
+    await userReference.doc(uid).update({"verified": verified});
   }
 }

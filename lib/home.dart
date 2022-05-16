@@ -25,6 +25,7 @@ import 'package:luanvanflutter/views/home/search/search_screen.dart';
 import 'package:luanvanflutter/views/home/task/task_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
+import 'controller/auth_controller.dart';
 import 'views/home/chat/chat_screen.dart';
 import 'views/home/feed/feed.dart';
 import 'views/home/notifications_page.dart';
@@ -159,6 +160,11 @@ class _HomeState extends State<Home> {
     );
   }
 
+  _saveVerifyStatus(String uid, BuildContext context) async {
+    bool response = context.read<AuthService>().isEmailVerified();
+    await DatabaseServices(uid: uid).saveVerifyStatus(response);
+  }
+
   void changePage(int index) {
     setState(() {
       _currentIndex.value = index;
@@ -171,6 +177,7 @@ class _HomeState extends State<Home> {
     Size size = MediaQuery.of(context).size;
 
     user = Provider.of<CurrentUserId?>(context);
+    _saveVerifyStatus(user!.uid, context);
     _saveDeviceToken(user!.uid);
     final tabs = [
       const Feed(),
