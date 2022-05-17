@@ -543,28 +543,9 @@ class _MyProfileState extends State<MyProfile> {
                                                 itemCount:
                                                     snapshot.data!.docs.length,
                                                 itemBuilder: (context, index) {
-                                                  var post = PostItem(
-                                                    post: PostModel(
-                                                        postId: snapshot
-                                                            .data!.docs[index]
-                                                            .get('postId'),
-                                                        ownerId: snapshot
-                                                            .data!.docs[index]
-                                                            .get('ownerId'),
-                                                        username: snapshot
-                                                            .data!.docs[index]
-                                                            .get('username'),
-                                                        location: snapshot
-                                                            .data!.docs[index]
-                                                            .get('location'),
-                                                        description: snapshot
-                                                            .data!.docs[index]
-                                                            .get('description'),
-                                                        url: snapshot
-                                                            .data!.docs[index]
-                                                            .get('url'),
-                                                        likes: snapshot.data!.docs[index].get('likes'),
-                                                        timestamp: snapshot.data!.docs[index].get('timestamp')),
+                                                  PostModel post = PostModel
+                                                      .fromDocumentSnapshot(
+                                                    snapshot.data!.docs[index],
                                                   );
 
                                                   Map<dynamic, dynamic> likes =
@@ -605,9 +586,8 @@ class _MyProfileState extends State<MyProfile> {
                                                               builder:
                                                                   (context) =>
                                                                       PostDetail(
-                                                                        postId: post
-                                                                            .post
-                                                                            .postId,
+                                                                        postId:
+                                                                            post.postId,
                                                                         ownerId:
                                                                             user.uid,
                                                                       )));
@@ -653,10 +633,14 @@ class _MyProfileState extends State<MyProfile> {
                                                                   Radius
                                                                       .circular(
                                                                           20.0)),
-                                                          child: Image.network(
-                                                            post.post.url[0],
-                                                            fit: BoxFit.fill,
-                                                          )),
+                                                          child: post.isVideo
+                                                              ? Icon(Icons
+                                                                  .play_arrow)
+                                                              : Image.network(
+                                                                  post.url[0],
+                                                                  fit: BoxFit
+                                                                      .fill,
+                                                                )),
                                                     ),
                                                   );
                                                 }),

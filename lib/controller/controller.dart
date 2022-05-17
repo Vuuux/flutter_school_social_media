@@ -577,7 +577,8 @@ class DatabaseServices {
         "description": post.description,
         "location": post.location,
         "likes": post.likes,
-        "url": post.url
+        "url": post.url,
+        "isVideo": post.isVideo
       });
 
       await addPostToTimeline(post);
@@ -597,7 +598,8 @@ class DatabaseServices {
       "description": post.description,
       "location": post.location,
       "likes": post.likes,
-      "url": post.url
+      "url": post.url,
+      "isVideo": post.isVideo
     });
   }
 

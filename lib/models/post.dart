@@ -9,6 +9,7 @@ class PostModel {
   final Timestamp timestamp;
   final List<String> url;
   final Map<String, dynamic> likes;
+  final bool isVideo;
 
   PostModel(
       {required this.postId,
@@ -18,19 +19,22 @@ class PostModel {
       required this.description,
       required this.url,
       required this.likes,
-      required this.timestamp});
+      required this.timestamp,
+      required this.isVideo});
 
   factory PostModel.fromDocumentSnapshot(DocumentSnapshot doc) {
     return PostModel(
-      postId: doc['postId'] ?? "",
-      ownerId: doc['ownerId'] ?? "",
-      username: doc['username'] ?? "",
-      location: doc['location'] ?? "",
-      description: doc['description'] ?? "",
-      url: doc['url'] ?? "",
-      likes: doc['likes'] ?? "",
-      timestamp: doc['timestamp'],
-    );
+        postId: doc['postId'] ?? "",
+        ownerId: doc['ownerId'] ?? "",
+        username: doc['username'] ?? "",
+        location: doc['location'] ?? "",
+        description: doc['description'] ?? "",
+        url: doc['url'].map<String>((link) => link.toString()).toList() ?? [],
+        likes: doc['likes'] ?? "",
+        timestamp: doc['timestamp'],
+        isVideo: doc.data().toString().contains('isVideo')
+            ? doc.get('isVideo')
+            : false);
   }
 
   int getLikeCount() {

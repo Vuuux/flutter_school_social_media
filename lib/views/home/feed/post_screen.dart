@@ -15,13 +15,17 @@ import 'package:luanvanflutter/style/loading.dart';
 import 'package:luanvanflutter/utils/dimen.dart';
 import 'package:luanvanflutter/utils/user_data_service.dart';
 import 'package:luanvanflutter/utils/widget_extensions.dart';
+import 'package:luanvanflutter/views/components/aspect_video_player.dart';
 import 'package:luanvanflutter/views/components/buttons/bottom_sheet_button.dart';
 import 'package:luanvanflutter/views/components/rounded_input_field.dart';
 import 'package:luanvanflutter/views/home/feed/post_detail.dart';
 import 'package:provider/src/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:video_player/video_player.dart';
 import '../../../style/constants.dart';
 import 'comment_screen.dart';
+
+enum PlayerState { IDLE, PLAYING, PAUSED }
 
 class PostItem extends StatefulWidget {
   final PostModel post;
@@ -37,10 +41,17 @@ class _PostItemState extends State<PostItem> {
   late UserData currentUser;
   TextEditingController _reasonController = TextEditingController();
   PostController _postController = Get.put(PostController());
+
+  VideoPlayerController? _videoController;
+
   @override
   void initState() {
     super.initState();
     getCurrentUserData();
+    _videoController = VideoPlayerController.network(widget.post.url[0])
+      ..initialize().then((_) {
+        setState(() {});
+      });
     timeago.setLocaleMessages('vi', timeago.ViMessages());
     timeago.setLocaleMessages('vi_short', timeago.ViShortMessages());
     for (var val in widget.post.likes.values) {
@@ -219,22 +230,55 @@ class _PostItemState extends State<PostItem> {
       child: Stack(
         alignment: Alignment.center,
         children: <Widget>[
-          ClipRRect(
-              borderRadius: BorderRadius.circular(15.0),
-              child: Container(
-                child: CarouselSlider(
-                  options: CarouselOptions(height: 400.0),
-                  items: widget.post.url.map((link) {
-                    return Builder(
-                      builder: (BuildContext context) {
-                        return CachedNetworkImage(
-                            imageUrl: link, width: Get.width);
-                      },
-                    );
-                  }).toList(),
-                ),
-              )),
-          //TODO: ANIMATOR HERE
+          widget.post.isVideo
+              ? GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      if (_videoController!.value.isPlaying) {
+                        playerState = PlayerState.PAUSED;
+                        _videoController!.pause();
+                      } else {
+                        playerState = PlayerState.PLAYING;
+                        _videoController!.play();
+                      }
+
+                      Timer(const Duration(milliseconds: 1000), () {
+                        setState(() {
+                          playerState = PlayerState.IDLE;
+                        });
+                      });
+                    });
+                  },
+                  child: AspectRatioVideo(_videoController),
+                )
+              : ClipRRect(
+                  borderRadius: BorderRadius.circular(15.0),
+                  child: Container(
+                    child: CarouselSlider(
+                      options: CarouselOptions(
+                        height: 400,
+                        aspectRatio: 16 / 9,
+                        viewportFraction: 0.8,
+                        initialPage: 0,
+                        enableInfiniteScroll: false,
+                        reverse: false,
+                        autoPlay: true,
+                        autoPlayInterval: Duration(seconds: 3),
+                        autoPlayAnimationDuration: Duration(milliseconds: 800),
+                        autoPlayCurve: Curves.fastOutSlowIn,
+                        enlargeCenterPage: true,
+                        scrollDirection: Axis.horizontal,
+                      ),
+                      items: widget.post.url.map((link) {
+                        return Builder(
+                          builder: (BuildContext context) {
+                            return CachedNetworkImage(
+                                imageUrl: link, width: Get.width);
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  )),
           showHeart
               ? Animator(
                   duration: const Duration(milliseconds: 1000),
@@ -249,7 +293,35 @@ class _PostItemState extends State<PostItem> {
                           color: Colors.red,
                         ),
                       ))
-              : const SizedBox.shrink()
+              : const SizedBox.shrink(),
+          if (playerState == PlayerState.PLAYING)
+            Animator(
+                duration: const Duration(milliseconds: 1000),
+                tween: Tween(begin: 0.8, end: 1.4),
+                curve: Curves.elasticOut,
+                cycles: 0,
+                builder: (context, anim, child) => Transform.scale(
+                      scale: anim.animation.value as double,
+                      child: const Icon(
+                        Icons.play_arrow,
+                        size: 80,
+                        color: Colors.white60,
+                      ),
+                    )),
+          if (playerState == PlayerState.PAUSED)
+            Animator(
+                duration: const Duration(milliseconds: 1000),
+                tween: Tween(begin: 0.8, end: 1.4),
+                curve: Curves.elasticOut,
+                cycles: 0,
+                builder: (context, anim, child) => Transform.scale(
+                      scale: anim.animation.value as double,
+                      child: const Icon(
+                        Icons.pause,
+                        size: 80,
+                        color: Colors.white60,
+                      ),
+                    )),
         ],
       ),
     );
@@ -331,6 +403,7 @@ class _PostItemState extends State<PostItem> {
   CurrentUserId? user;
   int likeCount = 0;
   bool showHeart = false;
+  PlayerState playerState = PlayerState.IDLE;
 
   @override
   Widget build(BuildContext context) {

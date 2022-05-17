@@ -14,6 +14,7 @@ import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/style/decoration.dart';
+import 'package:luanvanflutter/utils/dimen.dart';
 import 'package:luanvanflutter/views/components/aspect_video_player.dart';
 import 'package:map_location_picker/google_map_location_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -30,7 +31,7 @@ class PreviewPostScreen extends StatefulWidget {
   final List<XFile> files;
   final bool isMultipleImage;
   final bool isVideo;
-  PreviewPostScreen({
+  const PreviewPostScreen({
     Key? key,
     required this.files,
     required this.userData,
@@ -44,7 +45,6 @@ class PreviewPostScreen extends StatefulWidget {
 
 class _PreviewPostScreenState extends State<PreviewPostScreen>
     with AutomaticKeepAliveClientMixin<PreviewPostScreen> {
-  List<XFile>? files;
   TextEditingController descriptionTextEditingController =
       TextEditingController();
   TextEditingController locationController = TextEditingController();
@@ -63,18 +63,15 @@ class _PreviewPostScreenState extends State<PreviewPostScreen>
   @override
   void initState() {
     super.initState();
-    files = widget.files;
-    Future.delayed(const Duration(microseconds: 0), () async {
-      if (widget.isVideo) {
-        _playVideo(files![0]);
-      }
-    });
-
-    Future.delayed(const Duration(milliseconds: 300), () async {
+    Future.delayed(const Duration(milliseconds: 0), () async {
       position = await _determinePosition().then((value) => value);
       placemarks = await placemarkFromCoordinates(
           position!.latitude, position!.longitude);
     });
+
+    if (widget.isVideo) {
+      _playVideo(widget.files[0]);
+    }
   }
 
   // compressPhoto() async {
@@ -128,23 +125,32 @@ class _PreviewPostScreenState extends State<PreviewPostScreen>
       required bool isMultipleImage}) async {
     UploadTask mStorageUploadTask;
     List<String> downloadUrl = [];
-    if (isMultipleImage) {
-      mImageFiles.asMap().forEach((index, value) async {
+    if (isMultipleImage && mImageFiles.length > 1) {
+      int index = 0;
+      await Future.forEach(mImageFiles, (XFile value) async {
         mStorageUploadTask = storageReference
             .child("post_${postId}_$index.jpg")
-            .putFile(File(mImageFiles[0].path));
+            .putFile(File(value.path));
         TaskSnapshot storageTaskSnapshot = await mStorageUploadTask;
         String url = await storageTaskSnapshot.ref.getDownloadURL();
         downloadUrl.add(url);
+        index++;
       });
-    } else if (!isMultipleImage && !isVideo) {
+    } else if (!isVideo) {
       mStorageUploadTask = storageReference
           .child("post_$postId.jpg")
           .putFile(File(mImageFiles[0].path));
       TaskSnapshot storageTaskSnapshot = await mStorageUploadTask;
       String url = await storageTaskSnapshot.ref.getDownloadURL();
       downloadUrl.add(url);
-    } else if (isVideo) {}
+    } else if (isVideo) {
+      mStorageUploadTask = storageReference
+          .child("post_video_$postId.mp4")
+          .putFile(File(mImageFiles[0].path));
+      TaskSnapshot storageTaskSnapshot = await mStorageUploadTask;
+      String url = await storageTaskSnapshot.ref.getDownloadURL();
+      downloadUrl.add(url);
+    }
     return downloadUrl;
   }
 
@@ -204,7 +210,7 @@ class _PreviewPostScreenState extends State<PreviewPostScreen>
     //await compressPhoto();
 
     List<String> downloadUrl = await uploadPhoto(
-        mImageFiles: files!,
+        mImageFiles: widget.files,
         isVideo: widget.isVideo,
         isMultipleImage: widget.isMultipleImage);
     postId = const Uuid().v4();
@@ -215,6 +221,7 @@ class _PreviewPostScreenState extends State<PreviewPostScreen>
         ownerId: uid,
         description: descriptionTextEditingController.text,
         location: locationController.text,
+        isVideo: widget.isVideo,
         likes: {},
         url: downloadUrl));
 
@@ -259,6 +266,7 @@ class _PreviewPostScreenState extends State<PreviewPostScreen>
               child: const CircularProgressIndicator(),
             )
           : ListView(
+              shrinkWrap: true,
               children: <Widget>[
                 ConstrainedBox(
                   constraints: BoxConstraints(
@@ -283,7 +291,7 @@ class _PreviewPostScreenState extends State<PreviewPostScreen>
                                   aspectRatio: 16 / 9,
                                   viewportFraction: 0.8,
                                   initialPage: 0,
-                                  enableInfiniteScroll: true,
+                                  enableInfiniteScroll: false,
                                   reverse: false,
                                   autoPlay: true,
                                   autoPlayInterval: Duration(seconds: 3),
@@ -299,7 +307,8 @@ class _PreviewPostScreenState extends State<PreviewPostScreen>
                                 child: Container(
                                   decoration: BoxDecoration(
                                     image: DecorationImage(
-                                        image: FileImage(File(files![0].path)),
+                                        image: FileImage(
+                                            File(widget.files[0].path)),
                                         fit: BoxFit.cover),
                                   ),
                                 ),
@@ -384,8 +393,8 @@ class _PreviewPostScreenState extends State<PreviewPostScreen>
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30.0)),
                           color: kPrimaryColor,
-                          onPressed: () {
-                            _getOtherUserLocation();
+                          onPressed: () async {
+                            await _getOtherUserLocation();
                           },
                           icon: const Icon(Icons.location_on_outlined),
                         ),
@@ -394,19 +403,15 @@ class _PreviewPostScreenState extends State<PreviewPostScreen>
                   ],
                 )
               ],
-            ),
+            ).paddingOnly(top: Dimen.paddingCommon10),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final user = context.watch<CurrentUserId?>();
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        body: displayUploadFormScreen(user!),
-      ),
-    );
+    return displayUploadFormScreen(user!);
   }
 
   @override

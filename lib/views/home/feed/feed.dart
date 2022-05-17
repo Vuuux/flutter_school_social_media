@@ -135,7 +135,7 @@ class _FeedState extends State<Feed> {
           await Get.to(() => PreviewPostScreen(
                 files: pickedFileList,
                 userData: userData,
-                isVideo: true,
+                isVideo: false,
                 isMultipleImage: true,
               ));
           _postController.getPosts();
