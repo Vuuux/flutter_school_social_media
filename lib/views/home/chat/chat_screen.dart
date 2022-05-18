@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:luanvanflutter/controller/controller.dart';
 import 'package:luanvanflutter/models/chat_room.dart';
@@ -98,6 +99,42 @@ class _ChatScreenState extends State<ChatScreen> {
         });
   }
 
+  _showDialog() {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleDialog(
+            title: const Text("Tạo phòng chat mới"),
+            children: <Widget>[
+              SimpleDialogOption(
+                child: const Text(
+                  "Cá nhân",
+                  style: TextStyle(color: Colors.black),
+                ),
+                onPressed: () {
+                  Get.to(() => SearchScreen(userId: currentUser.id));
+                },
+              ),
+              SimpleDialogOption(
+                child: const Text(
+                  "Hội nhóm",
+                  style: TextStyle(color: Colors.black),
+                ),
+                onPressed: () {},
+                //onPressed: () => _pickImageFromGallery(userData),
+              ),
+              SimpleDialogOption(
+                child: const Text(
+                  "Đóng",
+                  style: TextStyle(color: Colors.black),
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = context.watch<CurrentUserId?>();
@@ -126,9 +163,7 @@ class _ChatScreenState extends State<ChatScreen> {
               splashColor: Colors.transparent,
               icon: const Icon(Icons.add_comment_outlined),
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) =>
-                        SearchScreen(userId: currentUser.id)));
+                _showDialog();
               },
             ),
           ],

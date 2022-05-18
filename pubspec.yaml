@@ -104,6 +104,7 @@ dependencies:
   fl_chart: ^0.36.1
   video_player: ^2.4.2
   carousel_slider: ^4.1.1
+  flutter_multi_select_items: ^0.4.0
   flutter_localizations:
     sdk: flutter
   localization: ^2.1.0
