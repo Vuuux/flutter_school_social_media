@@ -10,6 +10,7 @@ import 'package:luanvanflutter/style/loading.dart';
 import 'package:luanvanflutter/utils/user_data_service.dart';
 import 'package:luanvanflutter/views/home/chat/components/chat_screen_tiles.dart';
 import 'package:luanvanflutter/views/home/search/search_screen.dart';
+import 'package:luanvanflutter/views/wrapper/wrapper.dart';
 import 'package:provider/provider.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -100,30 +101,42 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<CurrentUserId?>();
-    return Scaffold(
-      appBar: AppBar(
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
-        centerTitle: true,
-        elevation: 0,
-        title: const Text(
-          "T R Ò   C H U Y Ệ N",
-        ),
-        actions: <Widget>[
-          IconButton(
-            highlightColor: Colors.transparent,
-            splashColor: Colors.transparent,
-            icon: const Icon(Icons.add_comment_outlined),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => SearchScreen(userId: currentUser.id)));
-            },
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Wrapper(),
           ),
-        ],
+        );
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20))),
+          centerTitle: true,
+          elevation: 0,
+          title: const Text(
+            "T R Ò   C H U Y Ệ N",
+          ),
+          actions: <Widget>[
+            IconButton(
+              highlightColor: Colors.transparent,
+              splashColor: Colors.transparent,
+              icon: const Icon(Icons.add_comment_outlined),
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) =>
+                        SearchScreen(userId: currentUser.id)));
+              },
+            ),
+          ],
+        ),
+        body: chatsScreenStream != null
+            ? chatRoomList(currentUser.id)
+            : Center(child: Loading()),
       ),
-      body: chatsScreenStream != null
-          ? chatRoomList(currentUser.id)
-          : Center(child: Loading()),
     );
   }
 }

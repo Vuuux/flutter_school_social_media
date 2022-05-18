@@ -18,7 +18,8 @@ import 'package:provider/src/provider.dart';
 
 //class đăng ký tài khoản
 class Register extends StatefulWidget {
-  const Register({Key? key}) : super(key: key);
+  final bool isFromAdmin;
+  Register({Key? key, this.isFromAdmin = false}) : super(key: key);
 
   @override
   _RegisterState createState() => _RegisterState();
@@ -122,7 +123,7 @@ class _RegisterState extends State<Register> {
       Get.snackbar("Thành công",
           "Tạo tài khoản thành công, chuyển hướng tới trang chính",
           snackPosition: SnackPosition.BOTTOM);
-      Get.to(() => const OnBoarding());
+      widget.isFromAdmin ? Get.back() : Get.to(() => const OnBoarding());
     }, (error) {
       String err = '';
       switch (error.code) {

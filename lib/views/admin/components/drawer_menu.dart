@@ -36,16 +36,22 @@ class DrawerMenu extends StatelessWidget {
                 pageController.jumpToPage(1);
               }),
           DrawerListTile(
+              title: 'Quản lý bài viết',
+              svgSrc: 'assets/icons/Message.svg',
+              tap: () {
+                pageController.jumpToPage(2);
+              }),
+          DrawerListTile(
               title: 'Quản lý báo cáo',
               svgSrc: 'assets/icons/Message.svg',
               tap: () {
-                pageController.jumpToPage(1);
+                pageController.jumpToPage(2);
               }),
           DrawerListTile(
               title: 'Thống kê',
               svgSrc: 'assets/icons/Statistics.svg',
               tap: () {
-                pageController.jumpToPage(1);
+                pageController.jumpToPage(3);
               }),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: appPadding * 2),

@@ -1,8 +1,10 @@
+import 'package:eventual/eventual-notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:luanvanflutter/style/loading.dart';
 import 'package:luanvanflutter/views/admin/components/custom_appbar.dart';
 import 'package:luanvanflutter/views/admin/controllers/dashboard_controller.dart';
+import 'package:luanvanflutter/views/admin/views/posts/posts_screen.dart';
 import 'package:luanvanflutter/views/admin/views/users/users_screen.dart';
 
 import 'dashboard_content.dart';
@@ -25,20 +27,13 @@ class DashBoardScreen extends StatefulWidget {
 class _DashBoardScreenState extends State<DashBoardScreen> {
   late PageController _pageController;
   final _dashboardController = Get.put(DashboardController());
-  double currentPageValue = 0.0;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController();
     Future.delayed(Duration.zero, () async {
       await _dashboardController.getAlLData();
-    });
-    _pageController = PageController();
-    _pageController.addListener(() {
-      setState(() {
-        currentPageValue = _pageController.page!;
-        _dashboardController.getAlLData();
-      });
     });
   }
 
@@ -58,7 +53,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
       appBar: CustomAppbar(),
       body: Obx(() =>
           _dashboardController.requestStatus.value == RequestStatus.LOADING
-              ? Loading()
+              ? const Loading()
               : SafeArea(
                   top: false,
                   child: Row(
@@ -78,7 +73,9 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               ),
                               UserManagementScreen(
                                 dashboardController: _dashboardController,
-                              )
+                              ),
+                              PostManagementScreen(
+                                  dashboardController: _dashboardController),
                             ],
                           )
                           //DashboardContent(),

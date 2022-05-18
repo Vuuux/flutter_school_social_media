@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:luanvanflutter/models/post.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/utils/dimen.dart';
@@ -11,24 +12,26 @@ import 'package:luanvanflutter/views/admin/components/drawer_menu.dart';
 import 'package:luanvanflutter/views/admin/constants/constants.dart';
 import 'package:luanvanflutter/views/admin/controllers/dashboard_controller.dart';
 import 'package:luanvanflutter/views/admin/controllers/menu_controller.dart';
+import 'package:luanvanflutter/views/admin/views/posts/widgets/post_tile_items.dart';
 import 'package:luanvanflutter/views/authenticate/register_screen.dart';
 import 'package:luanvanflutter/views/components/buttons/bottom_sheet_button.dart';
+import 'package:luanvanflutter/views/home/feed/post_detail.dart';
 import 'package:provider/provider.dart';
 
-class UserManagementScreen extends StatefulWidget {
+class PostManagementScreen extends StatefulWidget {
   final DashboardController dashboardController;
-  const UserManagementScreen({Key? key, required this.dashboardController})
+  const PostManagementScreen({Key? key, required this.dashboardController})
       : super(key: key);
 
   @override
-  State<UserManagementScreen> createState() => _UserManagementScreenState();
+  State<PostManagementScreen> createState() => _PostManagementScreenState();
 }
 
-class _UserManagementScreenState extends State<UserManagementScreen> {
+class _PostManagementScreenState extends State<PostManagementScreen> {
   @override
   void initState() {
     super.initState();
-    widget.dashboardController.getAllUsers();
+    widget.dashboardController.getAllPosts();
   }
 
   @override
@@ -36,7 +39,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     return SafeArea(
       child: RefreshIndicator(
         onRefresh: () async {
-          widget.dashboardController.getAllUsers();
+          widget.dashboardController.getAllPosts();
           return;
         },
         child: SingleChildScrollView(
@@ -48,7 +51,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Danh sách người dùng',
+                    'Danh sách bài viết',
                     style: TextStyle(
                       color: textColor,
                       fontWeight: FontWeight.w700,
@@ -57,10 +60,10 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () async {
-                      await Get.to(() => Register(
-                            isFromAdmin: true,
-                          ));
-                      widget.dashboardController.getAllUsers();
+                      // await Get.to(() => Register(
+                      //   isFromAdmin: true,
+                      // ));
+                      // widget.dashboardController.getAllPosts();
                     },
                     child: const Text("Thêm"),
                     style: ElevatedButton.styleFrom(
@@ -75,17 +78,13 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               Obx(() => ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: widget.dashboardController.userList.length,
+                  itemCount: widget.dashboardController.postList.length,
                   itemBuilder: (context, index) {
-                    if (widget.dashboardController.userList[index].role !=
-                        'admin') {
-                      return DiscussionInfoDetail(
-                        info: widget.dashboardController.userList[index],
-                        onTapMore: () => _showBottomSheet(context,
-                            widget.dashboardController.userList[index]),
-                      );
-                    }
-                    return SizedBox.shrink();
+                    return PostInfoDetail(
+                      postInfo: widget.dashboardController.postList[index],
+                      onTapMore: () => _showBottomSheet(
+                          context, widget.dashboardController.postList[index]),
+                    );
                   }))
             ],
           ),
@@ -94,7 +93,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     );
   }
 
-  _showBottomSheet(BuildContext context, UserData user) {
+  _showBottomSheet(BuildContext context, PostModel post) {
     Get.bottomSheet(Container(
       color: Colors.white,
       padding: const EdgeInsets.only(top: 4),
@@ -109,27 +108,22 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 color: Get.isDarkMode ? Colors.grey[600] : Colors.grey[300]),
           ),
           BottomSheetButton(
-                  label: user.enabled == "disabled"
-                      ? "Mở khóa tài khoản"
-                      : "Khóa tài khoản",
+                  label: "Xem bài viết",
                   color: kWarninngColor,
                   textColor: Colors.black,
                   onTap: () async {
-                    user.enabled == "disabled"
-                        ? widget.dashboardController
-                            .enableUser(context: context, userId: user.id)
-                        : widget.dashboardController
-                            .disableUser(context: context, userId: user.id);
+                    Get.to(() =>
+                        PostDetail(postId: post.postId, ownerId: post.ownerId));
                   })
               .marginOnly(
                   bottom: Dimen.paddingCommon10, top: Dimen.paddingCommon10),
           BottomSheetButton(
-              label: "Xóa",
+              label: "Xóa bài viết",
               color: kErrorColor,
               textColor: Colors.white,
               onTap: () async {
                 widget.dashboardController
-                    .deleteUser(context: context, userId: user.id);
+                    .deletePost(postId: post.postId, userId: post.ownerId);
               }).marginOnly(bottom: Dimen.paddingCommon10),
           BottomSheetButton(
               label: "Đóng",
