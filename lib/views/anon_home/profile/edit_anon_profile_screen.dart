@@ -36,7 +36,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   File? _image;
   String y = "";
-  String x = "";
+  String imageUrl = "";
   final List<String> _genderType = <String>[
     'Male',
     'Female',
@@ -66,67 +66,42 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   updateUser(
       BuildContext context, CurrentUserId user, UserData userData) async {
-    Future uploadPic() async {
-      Reference firebaseStorageReference =
-          FirebaseStorage.instance.ref().child(_image!.path);
-
-      UploadTask uploadTask = firebaseStorageReference.putFile(_image!);
-      TaskSnapshot taskSnapshot = await uploadTask;
-      x = (await taskSnapshot.ref.getDownloadURL()).toString();
-      DatabaseServices(uid: user.uid)
-          .updateUserData(
-              userData.username,
-              _nicknameController.text.isEmpty
-                  ? userData.nickname
-                  : _nicknameController.text,
-              selectedGenderType,
-              selectedMajorType,
-              _bioController.text,
-              x,
-              true,
-              _mediaController.text,
-              _playlistController.text,
-              selectedCourse,
-              home)
-          .then((value) => print("RESULT:" + value));
-    }
-
+    Reference firebaseStorageReference =
+        FirebaseStorage.instance.ref().child("profile");
     if (_image != null) {
-      uploadPic();
-      setState(() {
-        loading = false;
-      });
-    } else {
-      await DatabaseServices(uid: user.uid)
-          .updateUserData(
-              userData.username,
-              _nicknameController.text.isEmpty
-                  ? userData.nickname
-                  : _nicknameController.text,
-              selectedGenderType,
-              selectedMajorType,
-              _bioController.text,
-              y,
-              true,
-              _mediaController.text,
-              _playlistController.text,
-              selectedCourse,
-              home)
-          .then((value) async {
-        if (value == 'OK') {
-          setState(() {
-            loading = false;
-          });
-          Get.snackbar("Thành công", 'Cập nhật thành công',
-              snackPosition: SnackPosition.BOTTOM);
-          Navigator.of(context).pushAndRemoveUntil(
-              FadeRoute(page: Wrapper()), ModalRoute.withName('Wrapper'));
-        } else {
-          final snackBar = SnackBar(content: Text(value));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        }
-      });
+      UploadTask uploadTask = firebaseStorageReference
+          .child("anon_profile_${user.uid}")
+          .putFile(_image!);
+      TaskSnapshot taskSnapshot = await uploadTask;
+      imageUrl = (await taskSnapshot.ref.getDownloadURL()).toString();
     }
+    setState(() {
+      loading = true;
+    });
+    var response = await DatabaseServices(uid: user.uid).updateUserData(
+        userData.username,
+        nickname,
+        selectedGenderType,
+        selectedMajorType,
+        _bioController.text,
+        imageUrl,
+        false,
+        _mediaController.text,
+        _playlistController.text,
+        selectedCourse,
+        home);
+    setState(() {
+      loading = false;
+    });
+    response.fold((left) {
+      if (left) {
+        Get.snackbar("Thành công", 'Cập nhật thành công',
+            snackPosition: SnackPosition.BOTTOM);
+        Navigator.pop(context);
+      }
+    },
+        (right) => Get.snackbar("Lỗi", 'Cập nhật thất bại:' + right.code,
+            snackPosition: SnackPosition.BOTTOM));
   }
 
   String error = '';

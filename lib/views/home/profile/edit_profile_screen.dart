@@ -1,6 +1,7 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:luanvanflutter/utils/image_utils.dart';
 import 'package:luanvanflutter/views/components/circle_avatar.dart';
 import 'package:luanvanflutter/views/components/rounded_dropdown.dart';
 import 'package:luanvanflutter/views/components/rounded_input_field.dart';
@@ -37,7 +38,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   File? _image;
   String y = "";
-  String x = "";
+  String imageUrl = "";
   final List<String> _genderType = <String>[
     'Male',
     'Female',
@@ -72,69 +73,44 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   _updateUser(
       BuildContext context, CurrentUserId user, UserData userData) async {
-    Future uploadPic() async {
-      Reference firebaseStorageReference =
-          FirebaseStorage.instance.ref().child(_image!.path);
-
-      UploadTask uploadTask = firebaseStorageReference.putFile(_image!);
-      TaskSnapshot taskSnapshot = await uploadTask;
-      x = (await taskSnapshot.ref.getDownloadURL()).toString();
-      await DatabaseServices(uid: user.uid)
-          .updateUserData(
-              _usernameController.text.isEmpty
-                  ? userData.username
-                  : _usernameController.text,
-              nickname,
-              selectedGenderType,
-              selectedMajorType,
-              _bioController.text,
-              x,
-              false,
-              _mediaController.text,
-              _playlistController.text,
-              selectedCourse,
-              home)
-          .then((value) => print("RESULT:" + value));
-    }
-
+    Reference firebaseStorageReference =
+        FirebaseStorage.instance.ref().child("profile");
     if (_image != null) {
-      uploadPic();
-      setState(() {
-        loading = false;
-      });
-    } else {
-      print(y);
-
-      await DatabaseServices(uid: user.uid)
-          .updateUserData(
-              _usernameController.text,
-              nickname,
-              selectedGenderType,
-              selectedMajorType,
-              _bioController.text,
-              y,
-              false,
-              _mediaController.text,
-              _playlistController.text,
-              selectedCourse,
-              home)
-          .then((value) async {
-        if (value == 'OK') {
-          Get.snackbar("Thành công", 'Cập nhật thành công',
-              snackPosition: SnackPosition.BOTTOM);
-          setState(() {
-            loading = false;
-          });
-          Get.back(canPop: true);
-        } else {
-          final snackBar = SnackBar(content: Text(value));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          setState(() {
-            loading = false;
-          });
-        }
-      });
+      UploadTask uploadTask = firebaseStorageReference
+          .child("profile_${user.uid}")
+          .putFile(_image!);
+      TaskSnapshot taskSnapshot = await uploadTask;
+      imageUrl = (await taskSnapshot.ref.getDownloadURL()).toString();
     }
+    setState(() {
+      loading = true;
+    });
+    var response = await DatabaseServices(uid: user.uid).updateUserData(
+        _usernameController.text.isEmpty
+            ? userData.username
+            : _usernameController.text,
+        nickname,
+        selectedGenderType,
+        selectedMajorType,
+        _bioController.text,
+        imageUrl,
+        false,
+        _mediaController.text,
+        _playlistController.text,
+        selectedCourse,
+        home);
+    setState(() {
+      loading = false;
+    });
+    response.fold((left) {
+      if (left) {
+        Get.snackbar("Thành công", 'Cập nhật thành công',
+            snackPosition: SnackPosition.BOTTOM);
+        Navigator.pop(context);
+      }
+    },
+        (right) => Get.snackbar("Lỗi", 'Cập nhật thất bại:' + right.code,
+            snackPosition: SnackPosition.BOTTOM));
   }
 
   String error = '';
@@ -364,8 +340,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               child: RoundedInputField(
                             controller: _playlistController,
                             icon: Icons.playlist_play_outlined,
-                            hintText: 'Instagram',
-                            title: 'Instagram',
+                            hintText: 'Tài khoản mạng xã hội',
+                            title: 'Tài khoản mạng xã hội',
                           )),
                         ],
                       ),

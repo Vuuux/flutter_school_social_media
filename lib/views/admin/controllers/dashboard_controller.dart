@@ -27,7 +27,7 @@ class DashboardController extends GetxController {
 
   var postList = <PostModel>[].obs;
   var userList = <UserData>[].obs;
-  var reportList = <Report>[].obs;
+  var reportList = <ReportModel>[].obs;
   var forumList = <ForumModel>[].obs;
   final requestStatus = RequestStatus.LOADING.obs;
 
@@ -82,7 +82,7 @@ class DashboardController extends GetxController {
     var response = await _database.getAllReports();
     response.fold((left) {
       reportList.assignAll(left.docs
-          .map((report) => Report.fromDocumentSnapshot(report))
+          .map((report) => ReportModel.fromDocumentSnapshot(report))
           .toList());
     }, (right) {
       setRequestStatus(RequestStatus.ERROR);
@@ -105,8 +105,13 @@ class DashboardController extends GetxController {
   }
 
   Future<Either<bool, FirebaseException>> reportPost(
-      {required String taskId, required String reason}) async {
-    return await _database.reportPost(taskId, reason);
+      {required PostModel post, required String reason}) async {
+    return await _database.reportPost(post, reason);
+  }
+
+  Future<Either<bool, FirebaseException>> validateReport(
+      {required ReportModel report, required String status}) async {
+    return await _database.validateReport(report, status);
   }
 
   Future searchPost(String query) async {

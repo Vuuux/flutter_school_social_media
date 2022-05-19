@@ -5,6 +5,7 @@ import 'package:luanvanflutter/style/loading.dart';
 import 'package:luanvanflutter/views/admin/components/custom_appbar.dart';
 import 'package:luanvanflutter/views/admin/controllers/dashboard_controller.dart';
 import 'package:luanvanflutter/views/admin/views/posts/posts_screen.dart';
+import 'package:luanvanflutter/views/admin/views/reports/reports_screen.dart';
 import 'package:luanvanflutter/views/admin/views/users/users_screen.dart';
 
 import 'dashboard_content.dart';
@@ -75,6 +76,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                 dashboardController: _dashboardController,
                               ),
                               PostManagementScreen(
+                                  dashboardController: _dashboardController),
+                              ReportManagementScreen(
                                   dashboardController: _dashboardController),
                             ],
                           )

@@ -25,7 +25,7 @@ class Wrapper extends StatelessWidget {
             if (snapshot.hasData) {
               UserData? userData = snapshot.data;
               if (userData != null) {
-                if (userData.enabled == "disabled") {
+                if (!userData.enabled) {
                   context.read<AuthService>().signOut().then((value) =>
                       Get.snackbar("Đăng nhập thất bại",
                           "Tài khoản của bạn đã bị khóa! Vui lòng liên hệ người quản trị để mở lại!"));

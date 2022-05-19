@@ -10,6 +10,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:luanvanflutter/models/comment.dart';
 import 'package:luanvanflutter/models/notification.dart';
 import 'package:luanvanflutter/models/post.dart';
+import 'package:luanvanflutter/models/report.dart';
 import 'package:luanvanflutter/models/task.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/views/home/notifications_page.dart';
@@ -379,13 +380,13 @@ class DatabaseServices {
     });
   }
 
-  Future<String> updateUserData(
+  Future<Either<bool, FirebaseException>> updateUserData(
     String username,
     String nickname,
     String gender,
     String major,
     String bio,
-    String avatar,
+    String? avatar,
     bool isAnon,
     String media,
     String playlist,
@@ -399,7 +400,7 @@ class DatabaseServices {
         "gender": gender,
         "major": major,
         "bio": bio,
-        "avatar": avatar,
+        if (avatar != null && avatar.isNotEmpty) "avatar": avatar,
         "isAnonymous": isAnon,
         'media': media,
         'course': course,
@@ -407,10 +408,9 @@ class DatabaseServices {
         'address': address,
       });
 
-      return "OK";
-    } catch (err) {
-      print(err);
-      return err.toString();
+      return const Left(true);
+    } on FirebaseException catch (err) {
+      return Right(err);
     }
   }
 
@@ -543,10 +543,18 @@ class DatabaseServices {
   }
 
   Future<Either<bool, FirebaseException>> reportPost(
-      String postId, String reason) async {
+      PostModel post, String reason) async {
     try {
-      await reportReference.doc(postId).set(
-          {"postId": postId, "reason": reason, "timestamp": Timestamp.now()});
+      await reportReference.doc(Uuid().v4()).set({
+        "postId": post.postId,
+        "ownerId": post.ownerId,
+        "ownerName": post.username,
+        "status": "pending",
+        "reason": reason,
+        "media": post.url,
+        "isVideo": post.isVideo,
+        "timestamp": Timestamp.now()
+      });
       return const Left(true);
     } on FirebaseException catch (error) {
       return Right(error);
@@ -1480,5 +1488,24 @@ class DatabaseServices {
 
   saveVerifyStatus(bool verified) async {
     await userReference.doc(uid).update({"verified": verified});
+  }
+
+  Future<Either<bool, FirebaseException>> validateReport(
+      ReportModel report, String status) async {
+    try {
+      await reportReference
+          .where("postId", isEqualTo: report.postId)
+          .get()
+          .then((snapshot) => {
+                if (snapshot.size > 0)
+                  {
+                    snapshot.docs.forEach(
+                        (doc) => doc.reference.update({"status": status}))
+                  }
+              });
+      return const Left(true);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
   }
 }

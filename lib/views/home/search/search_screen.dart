@@ -85,6 +85,7 @@ class _SearchScreenState extends State<SearchScreen> {
             List<UserData> _users = snapshot.data!.docs
                 .map((user) => UserData.fromDocumentSnapshot(user))
                 .toList();
+            _users.removeWhere((element) => widget.userId == element.id);
             return MultiSelectContainer<UserData>(
               showInListView: true,
               listViewSettings: ListViewSettings(
@@ -93,7 +94,6 @@ class _SearchScreenState extends State<SearchScreen> {
                         width: 10,
                       )),
               controller: _controller,
-              maxSelectableCount: 5,
               items: _users
                   .map((user) =>
                       MultiSelectCard(value: user, child: getChild(user)))
@@ -115,14 +115,6 @@ class _SearchScreenState extends State<SearchScreen> {
                     "Quá nhiều người!", "Bạn đã chọn quá số người cho phép!");
               },
             );
-            // return ListView.builder(
-            //     itemCount: snapshot.data!.docs.length,
-            //     shrinkWrap: true,
-            //     itemBuilder: (context, index) {
-            //       UserData user =
-            //           UserData.fromDocumentSnapshot(snapshot.data!.docs[index]);
-            //       return SearchTile(ctuer: user);
-            //     });
           } else {
             return const SizedBox.shrink();
           }
@@ -200,8 +192,9 @@ class _SearchScreenState extends State<SearchScreen> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(13),
                         border: Border.all(color: Colors.grey)),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 16),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: Dimen.paddingCommon20,
+                        vertical: Dimen.paddingCommon10),
                     child: Row(
                       children: <Widget>[
                         Expanded(

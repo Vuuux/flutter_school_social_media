@@ -49,8 +49,8 @@ class PostController extends GetxController {
   }
 
   Future<Either<bool, FirebaseException>> reportPost(
-      {required String taskId, required String reason}) async {
-    return await _database.reportPost(taskId, reason);
+      {required PostModel post, required String reason}) async {
+    return await _database.reportPost(post, reason);
   }
 
   Future searchPost(String query) async {

@@ -213,8 +213,7 @@ class _PostItemState extends State<PostItem> {
       Get.defaultDialog(
           title: "Lỗi", middleText: "Vui lòng nhập lý do báo cáo bài viết");
     } else {
-      DatabaseServices(uid: '')
-          .reportPost(widget.post.postId, _reasonController.text);
+      DatabaseServices(uid: '').reportPost(widget.post, _reasonController.text);
       Get.defaultDialog(
           title: "Báo cáo thành công",
           middleText:

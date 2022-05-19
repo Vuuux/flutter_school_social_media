@@ -39,11 +39,33 @@ class DiscussionInfoDetail extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    info.username,
-                    style: TextStyle(
-                        color: info.enabled ? textColor : disabledTextColor,
-                        fontWeight: FontWeight.w600),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        info.username,
+                        style: TextStyle(
+                            color: info.enabled ? textColor : disabledTextColor,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      SizedBox(
+                        width: 4.0,
+                      ),
+                      Image.asset(
+                        info.verified
+                            ? "assets/images/verified.png"
+                            : "assets/images/unverified.png",
+                        height: 24,
+                        width: 24,
+                      ),
+                      if (!info.enabled)
+                        Text(
+                          "Đã bị khóa",
+                          style: TextStyle(
+                              color: Colors.deepOrange,
+                              fontWeight: FontWeight.w600),
+                        )
+                    ],
                   ),
                   Text(
                     info.major,

@@ -431,7 +431,7 @@ class _MyProfileState extends State<MyProfile> {
                                         fontSize: 18,
                                       )),
                                   const SizedBox(height: 15),
-                                  const Text('S O C I A L   M E D I A ',
+                                  const Text('Y Ê U   T H Í C H ',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w300,
@@ -473,7 +473,7 @@ class _MyProfileState extends State<MyProfile> {
                                   SizedBox(
                                     height: 4.0,
                                   ),
-                                  const Text('P L A Y L I S T',
+                                  const Text('M E D I A',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w300,

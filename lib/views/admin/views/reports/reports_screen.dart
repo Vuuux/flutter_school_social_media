@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:luanvanflutter/models/post.dart';
+import 'package:luanvanflutter/models/report.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/utils/dimen.dart';
@@ -13,25 +14,26 @@ import 'package:luanvanflutter/views/admin/constants/constants.dart';
 import 'package:luanvanflutter/views/admin/controllers/dashboard_controller.dart';
 import 'package:luanvanflutter/views/admin/controllers/menu_controller.dart';
 import 'package:luanvanflutter/views/admin/views/posts/widgets/post_tile_items.dart';
+import 'package:luanvanflutter/views/admin/views/reports/widgets/report_tile_items.dart';
 import 'package:luanvanflutter/views/authenticate/register_screen.dart';
 import 'package:luanvanflutter/views/components/buttons/bottom_sheet_button.dart';
 import 'package:luanvanflutter/views/home/feed/post_detail.dart';
 import 'package:provider/provider.dart';
 
-class PostManagementScreen extends StatefulWidget {
+class ReportManagementScreen extends StatefulWidget {
   final DashboardController dashboardController;
-  const PostManagementScreen({Key? key, required this.dashboardController})
+  const ReportManagementScreen({Key? key, required this.dashboardController})
       : super(key: key);
 
   @override
-  State<PostManagementScreen> createState() => _PostManagementScreenState();
+  State<ReportManagementScreen> createState() => _ReportManagementScreenState();
 }
 
-class _PostManagementScreenState extends State<PostManagementScreen> {
+class _ReportManagementScreenState extends State<ReportManagementScreen> {
   @override
   void initState() {
     super.initState();
-    widget.dashboardController.getAllPosts();
+    widget.dashboardController.getAllReports();
   }
 
   @override
@@ -39,7 +41,7 @@ class _PostManagementScreenState extends State<PostManagementScreen> {
     return SafeArea(
       child: RefreshIndicator(
         onRefresh: () async {
-          widget.dashboardController.getAllPosts();
+          widget.dashboardController.getAllReports();
           return;
         },
         child: SingleChildScrollView(
@@ -63,7 +65,7 @@ class _PostManagementScreenState extends State<PostManagementScreen> {
                       // await Get.to(() => Register(
                       //   isFromAdmin: true,
                       // ));
-                      // widget.dashboardController.getAllPosts();
+                      // widget.dashboardController.getAllReports();
                     },
                     child: const Text("Thêm"),
                     style: ElevatedButton.styleFrom(
@@ -78,12 +80,12 @@ class _PostManagementScreenState extends State<PostManagementScreen> {
               Obx(() => ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: widget.dashboardController.postList.length,
+                  itemCount: widget.dashboardController.reportList.length,
                   itemBuilder: (context, index) {
-                    return PostInfoDetail(
-                      postInfo: widget.dashboardController.postList[index],
-                      onTapMore: () => _showBottomSheet(
-                          context, widget.dashboardController.postList[index]),
+                    return ReportInfoDetail(
+                      reportInfo: widget.dashboardController.reportList[index],
+                      onTapMore: () => _showBottomSheet(context,
+                          widget.dashboardController.reportList[index]),
                     );
                   }))
             ],
@@ -93,12 +95,12 @@ class _PostManagementScreenState extends State<PostManagementScreen> {
     );
   }
 
-  _showBottomSheet(BuildContext context, PostModel post) {
+  _showBottomSheet(BuildContext context, ReportModel report) {
     Get.bottomSheet(Container(
       color: Colors.white,
       padding: const EdgeInsets.only(top: 4),
-      height: MediaQuery.of(context).size.height * 0.32,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             height: 6,
@@ -112,19 +114,30 @@ class _PostManagementScreenState extends State<PostManagementScreen> {
                   color: kWarninngColor,
                   textColor: Colors.black,
                   onTap: () async {
-                    Get.to(() =>
-                        PostDetail(postId: post.postId, ownerId: post.ownerId));
+                    Get.to(() => PostDetail(
+                        postId: report.postId, ownerId: report.ownerId));
                   })
               .marginOnly(
                   bottom: Dimen.paddingCommon10, top: Dimen.paddingCommon10),
+          BottomSheetButton(
+              label: "Phê duyệt bài viết",
+              color: Colors.greenAccent,
+              textColor: Colors.black,
+              onTap: () async {
+                await widget.dashboardController
+                    .validateReport(report: report, status: "approved");
+                widget.dashboardController.getAllReports();
+                Get.back();
+              }).marginOnly(bottom: Dimen.paddingCommon10),
           BottomSheetButton(
               label: "Xóa bài viết",
               color: kErrorColor,
               textColor: Colors.white,
               onTap: () async {
-                await widget.dashboardController
-                    .deletePost(postId: post.postId, userId: post.ownerId);
-                widget.dashboardController.getAllPosts();
+                widget.dashboardController
+                    .deletePost(postId: report.postId, userId: report.ownerId);
+                widget.dashboardController.getAllReports();
+                Get.back();
               }).marginOnly(bottom: Dimen.paddingCommon10),
           BottomSheetButton(
               label: "Đóng",
