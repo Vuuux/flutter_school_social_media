@@ -169,7 +169,7 @@ class ChatScreenTile extends StatelessWidget {
                         children: <Widget>[
                           Text(
                             chatRoom.isGroup
-                                ? chatRoom.groupName
+                                ? chatRoom.groupName + " (Nhóm)"
                                 : ctuer.username,
                             style: const TextStyle(color: Colors.black),
                           ),

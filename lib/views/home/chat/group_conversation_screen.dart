@@ -206,7 +206,12 @@ class _GroupConversationScreenState extends State<GroupConversationScreen> {
                           isMultipleSelect: false,
                           isAddExtraUser: true,
                           chatRoomId: widget.chatRoom.chatRoomId,
-                          memberIdList: widget.chatRoom.users));
+                          memberIdList: widget.chatRoom.users,
+                          onMemberCallback: (String id) {
+                            setState(() {
+                              widget.chatRoom.users.add(id);
+                            });
+                          }));
                       setState(() {});
                     },
                   ),

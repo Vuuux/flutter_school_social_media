@@ -33,6 +33,8 @@ class SearchScreen extends StatefulWidget {
   final bool isAddExtraUser;
   final String? chatRoomId;
   final List<String>? memberIdList;
+  final Function(String id)? onMemberCallback;
+
   const SearchScreen(
       {Key? key,
       required this.userId,
@@ -40,7 +42,8 @@ class SearchScreen extends StatefulWidget {
       this.isFromChatScreen = false,
       this.isAddExtraUser = false,
       this.chatRoomId,
-      this.memberIdList})
+      this.memberIdList,
+      this.onMemberCallback})
       : super(key: key);
 
   @override
@@ -211,9 +214,12 @@ class _SearchScreenState extends State<SearchScreen> {
         !widget.isAddExtraUser) {
       await createChatRoomAndStartConversation(
           context, widget.userId, _selectedUser.value[0]);
-    } else if (widget.isAddExtraUser && widget.chatRoomId != null) {
+    } else if (widget.isAddExtraUser &&
+        widget.chatRoomId != null &&
+        widget.onMemberCallback != null) {
       await DatabaseServices(uid: widget.userId)
           .addUserToChatRoom(widget.chatRoomId!, _selectedUser.value[0].id);
+      widget.onMemberCallback!(_selectedUser.value[0].id);
       Get.back();
     } else {
       Get.defaultDialog(
