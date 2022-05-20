@@ -163,7 +163,7 @@ class SubUserData {
   late String username;
   late String avatar;
 
-  SubUserData({this.id = "", this.username = "", this.avatar = ""});
+  SubUserData({required this.id, required this.username, required this.avatar});
 
   static SubUserData fromDocumentSnapshot(DocumentSnapshot json) {
     return SubUserData(

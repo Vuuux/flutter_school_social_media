@@ -68,7 +68,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
     return Scaffold(
       appBar: StandardAppBar(
-        title: 'C Ô N G   V I Ệ C',
+        title: 'T H Ô N G   B Á O',
         trailingIcon: FontAwesomeIcons.trash,
         onTrailingClick: () async {
           _deleteAllNotification();

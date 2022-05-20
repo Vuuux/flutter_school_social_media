@@ -54,7 +54,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 .toList();
             return chatRoomList.isNotEmpty
                 ? ListView.builder(
-                    itemCount: snapshot.data!.docs.length,
+                    itemCount: chatRoomList.length,
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
                       ctuerId = '';
@@ -70,15 +70,13 @@ class _ChatScreenState extends State<ChatScreen> {
                           future:
                               DatabaseServices(uid: ctuerId).getUserByUserId(),
                           builder: (context, childSnapshot) {
-                            var roomId =
-                                snapshot.data!.docs[index].get("chatRoomId");
                             if (childSnapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return Container();
                             }
                             if (childSnapshot.hasData) {
                               return ChatScreenTile(
-                                chatRoomId: roomId,
+                                chatRoom: chatRoomList[index],
                                 userId: id,
                                 ctuer: UserData.fromDocumentSnapshot(
                                     childSnapshot.data!),
@@ -112,7 +110,11 @@ class _ChatScreenState extends State<ChatScreen> {
                   style: TextStyle(color: Colors.black),
                 ),
                 onPressed: () {
-                  Get.to(() => SearchScreen(userId: currentUser.id));
+                  Get.to(() => SearchScreen(
+                        userId: currentUser.id,
+                        isFromChatScreen: true,
+                        isMultipleSelect: false,
+                      ));
                 },
               ),
               SimpleDialogOption(
@@ -120,7 +122,14 @@ class _ChatScreenState extends State<ChatScreen> {
                   "Hội nhóm",
                   style: TextStyle(color: Colors.black),
                 ),
-                onPressed: () {},
+                onPressed: () async {
+                  await Get.to(() => SearchScreen(
+                        userId: currentUser.id,
+                        isFromChatScreen: true,
+                        isMultipleSelect: true,
+                      ));
+                  Get.back();
+                },
                 //onPressed: () => _pickImageFromGallery(userData),
               ),
               SimpleDialogOption(

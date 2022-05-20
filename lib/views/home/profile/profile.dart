@@ -118,7 +118,11 @@ class _MyProfileState extends State<MyProfile> {
               )),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: Get.isDarkMode ? kPrimaryDarkColor : kPrimaryColor,
+            color: Get.isDarkMode
+                ? kPrimaryDarkColor
+                : Get.isDarkMode
+                    ? kPrimaryDarkColor
+                    : kPrimaryColor,
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
@@ -304,7 +308,9 @@ class _MyProfileState extends State<MyProfile> {
                                   decoration: BoxDecoration(
                                       color: Get.isDarkMode
                                           ? kPrimaryDarkColor
-                                          : kPrimaryColor,
+                                          : Get.isDarkMode
+                                              ? kPrimaryDarkColor
+                                              : kPrimaryColor,
                                       borderRadius: const BorderRadius.all(
                                         Radius.circular(15),
                                       )),
@@ -397,11 +403,13 @@ class _MyProfileState extends State<MyProfile> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  const Text('V Ề  T Ô I',
+                                  Text('V Ề  T Ô I',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w300,
-                                          color: kPrimaryColor)),
+                                          color: Get.isDarkMode
+                                              ? kPrimaryDarkColor
+                                              : kPrimaryColor)),
                                   Text(
                                       userData.bio == ''
                                           ? 'Thêm thông tin bằng cách click vào nút Chỉnh sửa'
@@ -415,11 +423,13 @@ class _MyProfileState extends State<MyProfile> {
                                   const SizedBox(
                                     height: 5,
                                   ),
-                                  const Text('C Ộ N G    Đ Ồ N G',
+                                  Text('C Ộ N G    Đ Ồ N G',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w300,
-                                          color: kPrimaryColor)),
+                                          color: Get.isDarkMode
+                                              ? kPrimaryDarkColor
+                                              : kPrimaryColor)),
                                   const SizedBox(
                                     height: 5,
                                   ),
@@ -431,11 +441,13 @@ class _MyProfileState extends State<MyProfile> {
                                         fontSize: 18,
                                       )),
                                   const SizedBox(height: 15),
-                                  const Text('Y Ê U   T H Í C H ',
+                                  Text('Y Ê U   T H Í C H ',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w300,
-                                          color: kPrimaryColor)),
+                                          color: Get.isDarkMode
+                                              ? kPrimaryDarkColor
+                                              : kPrimaryColor)),
                                   const SizedBox(
                                     height: 5,
                                   ),
@@ -452,11 +464,13 @@ class _MyProfileState extends State<MyProfile> {
                                   SizedBox(
                                     height: 4.0,
                                   ),
-                                  const Text('K H O Á',
+                                  Text('K H O Á',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w300,
-                                          color: kPrimaryColor)),
+                                          color: Get.isDarkMode
+                                              ? kPrimaryDarkColor
+                                              : kPrimaryColor)),
                                   const SizedBox(
                                     height: 5,
                                   ),
@@ -473,11 +487,13 @@ class _MyProfileState extends State<MyProfile> {
                                   SizedBox(
                                     height: 4.0,
                                   ),
-                                  const Text('M E D I A',
+                                  Text('M E D I A',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w300,
-                                          color: kPrimaryColor)),
+                                          color: Get.isDarkMode
+                                              ? kPrimaryDarkColor
+                                              : kPrimaryColor)),
                                   const SizedBox(
                                     height: 5,
                                   ),
@@ -494,11 +510,13 @@ class _MyProfileState extends State<MyProfile> {
                                   SizedBox(
                                     height: 4.0,
                                   ),
-                                  const Text('Q U Ê  Q U Á N',
+                                  Text('Q U Ê  Q U Á N',
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w300,
-                                          color: kPrimaryColor)),
+                                          color: Get.isDarkMode
+                                              ? kPrimaryDarkColor
+                                              : kPrimaryColor)),
                                   const SizedBox(
                                     height: 5,
                                   ),

@@ -865,9 +865,19 @@ class DatabaseServices {
     return "";
   }
 
-  createChatRoom(String chatRoomId, Map<String, dynamic> data) async {
-    chatReference.doc(chatRoomId).set(data).catchError((e) {
-      print(e.toString());
+  Future<Either<bool, FirebaseException>> createChatRoom(
+      String chatRoomId, Map<String, dynamic> data) async {
+    try {
+      await chatReference.doc(chatRoomId).set(data);
+      return Left(true);
+    } on FirebaseException catch (error) {
+      return Right(error);
+    }
+  }
+
+  addUserToChatRoom(String chatRoomId, String newUserId) async {
+    chatReference.doc(chatRoomId).update({
+      'users': FieldValue.arrayUnion([newUserId])
     });
   }
 

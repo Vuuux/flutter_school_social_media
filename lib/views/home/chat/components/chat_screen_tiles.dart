@@ -6,15 +6,18 @@ import 'package:focused_menu/modals.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:luanvanflutter/controller/controller.dart';
+import 'package:luanvanflutter/models/chat_room.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
 import 'package:luanvanflutter/views/home/chat/conversation_screen.dart';
+import 'package:luanvanflutter/views/home/chat/group_conversation_screen.dart';
 import 'package:provider/src/provider.dart';
 
 class ChatScreenTile extends StatelessWidget {
   final String userId;
   final UserData ctuer;
-  final String chatRoomId;
+  final ChatRoom chatRoom;
+
   Stream<QuerySnapshot>? chatMessagesStream;
   var f = DateFormat('h:mm a');
   String latestMsg = '';
@@ -24,7 +27,7 @@ class ChatScreenTile extends StatelessWidget {
     Key? key,
     required this.userId,
     required this.ctuer,
-    required this.chatRoomId,
+    required this.chatRoom,
   }) : super(key: key);
 
   Widget getLatestMsg() {
@@ -56,7 +59,7 @@ class ChatScreenTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.watch<CurrentUserId?>();
     chatMessagesStream =
-        DatabaseServices(uid: '').getConversationMessages(chatRoomId);
+        DatabaseServices(uid: '').getConversationMessages(chatRoom.chatRoomId);
     return StreamBuilder<UserData?>(
         stream: DatabaseServices(uid: user!.uid).userData,
         builder: (context, snapshot) {
@@ -72,9 +75,18 @@ class ChatScreenTile extends StatelessWidget {
               ),
             ),
             onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => ConversationScreen(
-                      chatRoomId: chatRoomId, ctuer: ctuer, userId: userId)));
+              if (chatRoom.isGroup) {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => GroupConversationScreen(
+                        chatRoom: chatRoom, userId: userId)));
+              } else {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => ConversationScreen(
+                        chatRoomId: chatRoom.chatRoomId,
+                        ctuer: ctuer,
+                        userId: userId)));
+              }
+              ;
             },
             menuItems: <FocusedMenuItem>[
               FocusedMenuItem(
@@ -86,7 +98,7 @@ class ChatScreenTile extends StatelessWidget {
                   onPressed: () {
                     DatabaseServices(uid: '')
                         .chatReference
-                        .doc(chatRoomId)
+                        .doc(chatRoom.chatRoomId)
                         .collection('conversation')
                         .get()
                         .then((doc) {
@@ -97,7 +109,7 @@ class ChatScreenTile extends StatelessWidget {
 
                     DatabaseServices(uid: '')
                         .chatReference
-                        .doc(chatRoomId)
+                        .doc(chatRoom.chatRoomId)
                         .get()
                         .then((doc) {
                       if (doc.exists) {
@@ -139,13 +151,15 @@ class ChatScreenTile extends StatelessWidget {
                           child: SizedBox(
                             width: 180,
                             height: 180,
-                            child: ctuer.avatar.isNotEmpty
-                                ? Image.network(
-                                    ctuer.avatar,
-                                    fit: BoxFit.fill,
-                                  )
-                                : Image.asset('assets/images/profile1.png',
-                                    fit: BoxFit.fill),
+                            child: chatRoom.isGroup
+                                ? Image.network(chatRoom.groupAvatar)
+                                : ctuer.avatar.isNotEmpty
+                                    ? Image.network(
+                                        ctuer.avatar,
+                                        fit: BoxFit.fill,
+                                      )
+                                    : Image.asset('assets/images/profile1.png',
+                                        fit: BoxFit.fill),
                           ),
                         ),
                       ),
@@ -154,7 +168,9 @@ class ChatScreenTile extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            ctuer.username,
+                            chatRoom.isGroup
+                                ? chatRoom.groupName
+                                : ctuer.username,
                             style: const TextStyle(color: Colors.black),
                           ),
                           getLatestMsg()

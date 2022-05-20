@@ -1,6 +1,7 @@
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import 'package:luanvanflutter/controller/controller.dart';
+import 'package:luanvanflutter/models/chat_room.dart';
 import 'package:luanvanflutter/models/conversation_item.dart';
 import 'package:luanvanflutter/models/user.dart';
 import 'package:luanvanflutter/style/constants.dart';
@@ -12,6 +13,7 @@ import 'package:luanvanflutter/views/games/trivia/answerscreen.dart';
 import 'package:luanvanflutter/views/home/chat/chat_screen.dart';
 import 'package:luanvanflutter/views/home/chat/components/message_tiles.dart';
 import 'package:luanvanflutter/views/home/profile/others_profile.dart';
+import 'package:luanvanflutter/views/home/search/search_screen.dart';
 import 'package:luanvanflutter/views/wrapper/wrapper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,25 +28,22 @@ import 'package:uuid/uuid.dart';
 
 import 'components/chat_screen_tiles.dart';
 
-class ConversationScreen extends StatefulWidget {
-  final String chatRoomId;
-  final UserData ctuer;
+class GroupConversationScreen extends StatefulWidget {
+  final ChatRoom chatRoom;
   final String userId;
 
-  const ConversationScreen(
-      {Key? key,
-      required this.chatRoomId,
-      required this.ctuer,
-      required this.userId})
+  const GroupConversationScreen(
+      {Key? key, required this.chatRoom, required this.userId})
       : super(key: key);
 
   @override
-  _ConversationScreenState createState() => _ConversationScreenState();
+  _GroupConversationScreenState createState() =>
+      _GroupConversationScreenState();
 }
 
 final f = new DateFormat('h:mm a');
 
-class _ConversationScreenState extends State<ConversationScreen> {
+class _GroupConversationScreenState extends State<GroupConversationScreen> {
   String message = '';
   TextEditingController messageTextEditingController = TextEditingController();
 
@@ -79,8 +78,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       child: SlideAnimation(
                           child: FadeInAnimation(
                               child: MessageTile(
-                        ctuer: widget.ctuer,
-                        chatRoomId: widget.chatRoomId,
+                        ctuer: null,
+                        chatRoomId: widget.chatRoom.chatRoomId,
                         messageModel: messageList[index],
                         isSendByMe:
                             messageList[index].senderId == widget.userId,
@@ -104,21 +103,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
         "type": 'message'
       };
       DatabaseServices(uid: '')
-          .addConversationMessages(widget.chatRoomId, messageMap);
+          .addConversationMessages(widget.chatRoom.chatRoomId, messageMap);
       String notifId = Uuid().v4();
-      DatabaseServices(uid: '')
-          .addNotifiCation(widget.ctuer.id, widget.userId, notifId, {
-        'notifId': notifId,
-        'userId': userData.id,
-        'type': 'message',
-        'messageData': message,
-        'timestamp': Timestamp.now(),
-        'avatar': userData.avatar,
-        'username': userData.username,
-        'status': null,
-        'seenStatus': false,
-        'isAnon': false
-      });
 
       setState(() {
         message = "";
@@ -142,8 +128,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
         designSize: const Size(360, 690),
         orientation: Orientation.portrait);
-    chatMessagesStream =
-        DatabaseServices(uid: '').getConversationMessages(widget.chatRoomId);
+    chatMessagesStream = DatabaseServices(uid: '')
+        .getConversationMessages(widget.chatRoom.chatRoomId);
 
     return StreamBuilder<UserData?>(
       stream: DatabaseServices(uid: user.uid).userData,
@@ -179,9 +165,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
                             child: SizedBox(
                               width: 180,
                               height: 180,
-                              child: widget.ctuer.avatar.isNotEmpty
+                              child: widget.chatRoom.groupAvatar.isNotEmpty
                                   ? Image.network(
-                                      widget.ctuer.avatar,
+                                      widget.chatRoom.groupAvatar,
                                       fit: BoxFit.fill,
                                     )
                                   : Image.asset('assets/images/profile1.png',
@@ -194,42 +180,34 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     const SizedBox(
                       width: 10,
                     ),
-                    InkWell(
-                      highlightColor: Colors.transparent,
-                      splashColor: Colors.transparent,
-                      child: Text(widget.ctuer.username.split(" ").last,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 20)),
-                      onTap: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                            FadeRoute(
-                              page: OthersProfile(
-                                ctuerId: widget.ctuer.id,
-                              ),
-                            ),
-                            ModalRoute.withName('OthersProfile'));
-                      },
+                    Flexible(
+                      child: Text(
+                        widget.chatRoom.groupName,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 20),
+                      ),
                     ),
+                    const SizedBox(
+                      width: 4.0,
+                    ),
+                    const Icon(Icons.person),
+                    Text(widget.chatRoom.users.length.toString())
                   ],
                 ),
                 actions: <Widget>[
                   IconButton(
                     highlightColor: Colors.transparent,
                     splashColor: Colors.transparent,
-                    icon: const Icon(Icons.gamepad),
+                    icon: const Icon(Icons.add),
                     onPressed: () async {
-                      await DatabaseServices(uid: '')
-                          .getQAGameRoomId(widget.ctuer.id, userData.id)
-                          .then((QuerySnapshot<Map<String, dynamic>> value) {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => CompatibilityStart(
-                                  ctuer: widget.ctuer,
-                                  userData: userData,
-                                  gameRoomId: value.docs.isNotEmpty
-                                      ? value.docs[0].id
-                                      : "",
-                                )));
-                      });
+                      await Get.to(() => SearchScreen(
+                          userId: widget.userId,
+                          isFromChatScreen: true,
+                          isMultipleSelect: false,
+                          isAddExtraUser: true,
+                          chatRoomId: widget.chatRoom.chatRoomId,
+                          memberIdList: widget.chatRoom.users));
+                      setState(() {});
                     },
                   ),
                 ],
